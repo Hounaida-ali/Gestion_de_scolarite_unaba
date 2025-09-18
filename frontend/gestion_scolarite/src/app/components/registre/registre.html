@@ -1,0 +1,46 @@
+<div class="modal-dialog">
+  <div class="modal-content p-4 rounded">
+    <div class="modal-header border-0">
+      <h5 class="modal-title">Inscription</h5>
+      <button type="button" class="btn-close" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label">Prénom</label>
+          <input type="text" class="form-control" formControlName="firstName" placeholder="Votre prénom" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Nom</label>
+          <input type="text" class="form-control" formControlName="lastName" placeholder="Votre nom" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" formControlName="email" placeholder="Votre email" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" class="form-control" formControlName="password" placeholder="Votre mot de passe" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Vous êtes</label>
+          <select class="form-select" formControlName="role">
+            <option value="student">Étudiant</option>
+            <option value="teacher">Enseignant</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">
+            S'inscrire
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

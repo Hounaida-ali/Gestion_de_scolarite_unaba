@@ -1,0 +1,79 @@
+/* Centrer le formulaire sur la page */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* overlay semi-transparent */
+}
+
+/* Boîte principale (modal-content) */
+.modal-content {
+  border-radius: 12px;           /* arrondi comme sur ton image */
+  border: none;
+  max-width: 400px;              /* largeur max */
+  width: 100%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* ombre douce */
+  background: #fff;
+}
+
+/* Header */
+.modal-header {
+  padding-bottom: 0;
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937; /* gris foncé */
+}
+
+/* Bouton de fermeture (X) */
+.btn-close {
+  --bs-btn-close-color: #6b7280; /* gris moyen */
+  --bs-btn-close-focus-shadow: none;
+  opacity: 0.8;
+}
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* Inputs et selects */
+.form-control,
+.form-select {
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #2563eb; /* bleu */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* Labels */
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #374151;
+}
+
+/* Bouton de connexion */
+.btn-primary {
+  background-color: #1d4ed8;
+  border: none;
+  font-weight: 600;
+  padding: 0.6rem;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #1e40af;
+}
+
+/* Grille du bouton (prendre toute la largeur) */
+.d-grid .btn {
+  width: 100%;
+}
