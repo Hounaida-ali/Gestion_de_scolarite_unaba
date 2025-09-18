@@ -6,17 +6,21 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login {
-loginForm!: FormGroup;
+  loginForm!: FormGroup;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(private fb: FormBuilder, private userService: UserService) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
+      role: ['', Validators.required]
     });
   }
 
@@ -25,15 +29,22 @@ loginForm!: FormGroup;
   }
 
   onSubmit() {
-    if (this.loginForm.valid) {
-      const email = this.f['email'].value;
-      const password = this.f['password'].value;
+    if (!this.loginForm.valid) return;
+    const email = this.f['email'].value;
+    const password = this.f['password'].value;
 
-      this.userService.login( email, password ).subscribe({
-        next: res => console.log('Connexion réussie', res),
-        error: (err: any) => console.error('Erreur de connexion', err)
-      });
-    }
+    this.userService.login(email, password).subscribe({
+      next: res => {
+        this.errorMessage = '';
+        this.successMessage = res.message || 'Connexion réussie';
+        console.log('Connexion réussie', res);
+      },
+      error: (err: any) => {
+        this.errorMessage = err.error.error || err.error.message || 'Erreur de connexion';
+        this.successMessage = '';
+        console.error('Erreur de connexion', err);
+      }
+    });
   }
 }
 

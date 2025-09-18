@@ -6,7 +6,7 @@ const { register, login, verify, resetPassword, reinisilize, logout ,getAll} = r
 router.post("/register", register);
 router.patch("/verify-email", verify);
 router.post("/login", login);
-router.post("/resetpassword", resetPassword);
+router.patch("/resetpassword", resetPassword);
 router.post("/reinisilize", reinisilize);
 router.post("/logout", logout);
 router.get("/getAll", getAll);

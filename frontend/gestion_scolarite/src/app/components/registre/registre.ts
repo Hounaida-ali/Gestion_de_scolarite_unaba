@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
 import { UserService } from '../../services/user-service';
 import { CommonModule } from '@angular/common';
 
@@ -13,19 +12,21 @@ import { CommonModule } from '@angular/common';
 })
 export class Registre {
  registerForm: FormGroup;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(private fb: FormBuilder, private userService: UserService) {
     this.registerForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['user']
+      role: ['user', Validators.required]
     });
   }
 
   onSubmit() {
-    if (this.registerForm.valid) {
+    if (!this.registerForm.valid) return;
       const newUser = {
         firstName: this.registerForm.get('firstName')?.value as string,
         lastName: this.registerForm.get('lastName')?.value as string,
@@ -39,9 +40,16 @@ export class Registre {
       
 
       this.userService.register(newUser).subscribe({
-        next: res => console.log('Inscription réussie ', res),
-        error: err => console.error('Erreur inscription ', err)
+        next: res => {
+        this.errorMessage = '';
+        this.successMessage = res.message || 'Inscription réussie';
+        console.log('Inscription réussie', res);
+      },
+      error: err => {
+        this.errorMessage = err.error.error || err.error.message || 'Erreur serveur';
+        this.successMessage = '';
+        console.error('Erreur inscription', err);
+      }
       });
     }
   }
-}
