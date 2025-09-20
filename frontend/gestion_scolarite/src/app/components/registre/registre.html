@@ -1,8 +1,9 @@
 <div class="modal-dialog">
+  <div *ngIf="isVisible" class="modal-dialog">
   <div class="modal-content p-4 rounded">
     <div class="modal-header border-0">
       <h5 class="modal-title">Inscription</h5>
-      <button type="button" class="btn-close" aria-label="Close"></button>
+      <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
     </div>
 
     <div class="modal-body">
@@ -24,7 +25,7 @@
           <label class="form-label">Prénom</label>
           <input type="text" class="form-control" formControlName="firstName" placeholder="Votre prénom" />
           <div *ngIf="registerForm.controls['firstName'].touched && registerForm.controls['firstName'].invalid"
-               class="text-danger mt-1">
+            class="text-danger mt-1">
             Prénom invalide
           </div>
         </div>
@@ -34,7 +35,7 @@
           <label class="form-label">Nom</label>
           <input type="text" class="form-control" formControlName="lastName" placeholder="Votre nom" />
           <div *ngIf="registerForm.controls['lastName'].touched && registerForm.controls['lastName'].invalid"
-               class="text-danger mt-1">
+            class="text-danger mt-1">
             Nom invalide
           </div>
         </div>
@@ -44,7 +45,7 @@
           <label class="form-label">Email</label>
           <input type="email" class="form-control" formControlName="email" placeholder="Votre email" />
           <div *ngIf="registerForm.controls['email'].touched && registerForm.controls['email'].invalid"
-               class="text-danger mt-1">
+            class="text-danger mt-1">
             Email invalide
           </div>
         </div>
@@ -54,7 +55,7 @@
           <label class="form-label">Mot de passe</label>
           <input type="password" class="form-control" formControlName="password" placeholder="Votre mot de passe" />
           <div *ngIf="registerForm.controls['password'].touched && registerForm.controls['password'].invalid"
-               class="text-danger mt-1">
+            class="text-danger mt-1">
             Mot de passe invalide
           </div>
         </div>
@@ -69,7 +70,7 @@
             <option value="admin">Admin</option>
           </select>
           <div *ngIf="registerForm.controls['role'].touched && registerForm.controls['role'].invalid"
-               class="text-danger mt-1">
+            class="text-danger mt-1">
             Rôle obligatoire
           </div>
         </div>
@@ -80,7 +81,10 @@
             S'inscrire
           </button>
         </div>
-
+        <p class="text-center">
+          Déjà un compte?
+          <a routerLink="/login" class="login-link">Se connecter</a>
+        </p>
       </form>
     </div>
   </div>

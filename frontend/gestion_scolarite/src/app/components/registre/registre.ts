@@ -2,20 +2,23 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user-service';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-registre',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterLink],
   templateUrl: './registre.html',
   styleUrl: './registre.css'
 })
 export class Registre {
+// ✅ propriété pour gérer la visibilité
+  isVisible = true;
  registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService) {
+  constructor(private fb: FormBuilder, private userService: UserService,private router: Router) {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
@@ -23,6 +26,12 @@ export class Registre {
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['user', Validators.required]
     });
+  }
+
+  close() {
+     console.log('Bouton X cliqué');
+    this.isVisible = false;
+    this.router.navigate(['']);
   }
 
   onSubmit() {

@@ -106,6 +106,10 @@ const login = async (req, res) => {
     return res.status(404).send({ message: "Utilisateur introuvable" });
   }
 
+  if(user.isEmailVerified === false){
+    return res.status(401).send({ message: "Veuillez vérifier votre email avant de vous connecter" });
+  }
+
   const isPasswordCorrect = bcrypt.compareSync(password, user.password);
   if (!isPasswordCorrect) {
     return res.status(401).send({ message: "Identifiants invalides" });
@@ -154,6 +158,8 @@ const reinisilize = async (req, res) => {
     otpToken,
     purpose: "reset-password",
   });
+
+  // const resetLink = `http://localhost:4200/resetPassword?otpToken=${otpToken}`;
 
   transporter.sendMail({
     from: process.env.EMAIL_USER,
@@ -206,9 +212,45 @@ const resetPassword = async (req, res) => {
   });
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId; // Récupérer l'ID de l'utilisateur à partir du token
+    const { password } = req.body; // on ne prend que le nouveau mot de passe
+
+    if (!password) {
+      return res.status(400).send({ message: "Le mot de passe est obligatoire" });
+    }
+
+    // Hachage du mot de passe
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Mise à jour du mot de passe uniquement
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword },
+      { new: true }
+    )
+
+    if (!updatedUser) {
+      return res.status(404).send({ message: "Utilisateur non trouvé" });
+    }
+
+    res.send({
+      message: "Mot de passe mis à jour avec succès",
+      updatedUser
+    });
+
+  } catch (error) {
+    console.error("Erreur updateProfile:", error);
+    res.status(500).send({ message: "Erreur lors de la mise à jour du mot de passe" });
+  }
+};
+
+// Récupérer tous les utilisateurs
+
 const getAll = async (req, res) => {
     const users = await userModel.find()
     res.send(users);
 };
 
-module.exports = { register, login, verify, resetPassword, reinisilize, logout, getAll};
+module.exports = { register, login, verify, resetPassword, reinisilize, logout, getAll, updateProfile };

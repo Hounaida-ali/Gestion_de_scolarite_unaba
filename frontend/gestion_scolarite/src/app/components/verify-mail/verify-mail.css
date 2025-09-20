@@ -1,4 +1,4 @@
-/* Centrer le formulaire sur la page */
+/* Centrer le modal sur la page */
 :host {
   display: flex;
   justify-content: center;
@@ -9,12 +9,13 @@
 
 /* Boîte principale (modal-content) */
 .modal-content {
-  border-radius: 12px;           /* arrondi comme sur ton image */
+  border-radius: 12px;           
   border: none;
-  max-width: 400px;              /* largeur max */
+  max-width: 400px;              
   width: 100%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* ombre douce */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); 
   background: #fff;
+  padding: 1.5rem;
 }
 
 /* Header */
@@ -59,7 +60,7 @@
   color: #374151;
 }
 
-/* Bouton de connexion */
+/* Boutons principaux */
 .btn-primary {
   background-color: #1d4ed8;
   border: none;
@@ -78,16 +79,28 @@
   width: 100%;
 }
 
+/* Messages globaux */
+.alert {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* Lien / texte centré */
 .text-center {
   margin-top: 1rem;
   font-size: 0.9rem;
   color: #6b7280;
 }
-.reinisilize-link {
-      color: #1976d2;
+.back-to-login {
+      color: #667eea;
       text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
     }
 
-    .reinisilize-link:hover {
-      text-decoration: underline;
+    .back-to-login:hover {
+      color: #764ba2;
+    }
+    .text-center {
+      text-align: center;
     }

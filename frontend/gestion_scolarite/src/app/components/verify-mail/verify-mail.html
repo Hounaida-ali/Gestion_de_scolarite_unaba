@@ -1,0 +1,50 @@
+<div class="modal-dialog">
+  <div *ngIf="isVisible" class="modal-dialog">
+  <div class="modal-content p-4 rounded">
+    <div class="modal-header border-0">
+      <h5 class="modal-title">Vérification de l'email</h5>
+      <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Messages globaux -->
+      @if (errorMessage) {
+      <div class="alert alert-danger mt-3">{{ errorMessage }}</div>
+      }
+      @if (successMessage) {
+      <div class="alert alert-success mt-3">{{ successMessage }}</div>
+    }
+
+      <!-- Formulaire -->
+      <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+
+        <!-- Code OTP -->
+        <div class="mb-3">
+          <label class="form-label">Code OTP</label>
+          <input type="number" class="form-control" formControlName="otp" placeholder="Entrez le code reçu par email" />
+          @if (verifyForm.controls['otp'].touched && verifyForm.controls['otp'].hasError('required')) {
+          <div class="text-danger mt-1">
+            Le code OTP est obligatoire
+          </div>
+          }
+        </div>
+
+        <!-- otpToken (souvent fourni via lien/email) -->
+        <input type="hidden" formControlName="otpToken" />
+        <input type="hidden" formControlName="purpose" />
+
+        <!-- Bouton -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary" [disabled]="verifyForm.invalid">
+            Vérifier l'email
+          </button>
+        </div>
+        <div>
+          <div class="text-center mt-3">
+            <a routerLink="/login" class="back-to-login">Retour à la connexion</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

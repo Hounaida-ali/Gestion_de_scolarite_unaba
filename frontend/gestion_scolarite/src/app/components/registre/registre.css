@@ -77,3 +77,18 @@
 .d-grid .btn {
   width: 100%;
 }
+
+.text-center {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.login-link {
+      color: #1976d2;
+      text-decoration: none;
+    }
+
+    .login-link:hover {
+      text-decoration: underline;
+    }
