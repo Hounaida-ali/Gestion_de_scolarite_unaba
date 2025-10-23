@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user-service';
@@ -7,19 +7,23 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class Login {
-// ✅ propriété pour gérer la visibilité
-  isVisible = true;
+  @Input() isVisible: boolean = false;
+  @Output() close = new EventEmitter<void>();
 
   loginForm!: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService,private router: Router) {
+  constructor(
+    private fb: FormBuilder, 
+    private userService: UserService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -32,14 +36,19 @@ export class Login {
   }
 
   // ✅ méthode pour fermer la modal
-  close() {
-     console.log('Bouton X cliqué');
-    this.isVisible = false;
-    this.router.navigate(['']);
+  closeModal(): void {
+    console.log('Fermeture de la modal');
+    this.close.emit();
   }
 
-  onSubmit() {
+  // Empêche la propagation du clic dans la modal
+  onModalClick(event: Event): void {
+    event.stopPropagation();
+  }
+
+  onSubmit(): void {
     if (!this.loginForm.valid) return;
+    
     const email = this.f['email'].value;
     const password = this.f['password'].value;
 
@@ -48,6 +57,9 @@ export class Login {
         this.errorMessage = '';
         this.successMessage = res.message || 'Connexion réussie';
         console.log('Connexion réussie', res);
+        
+        // Optionally close modal on successful login
+        // setTimeout(() => this.closeModal(), 2000);
       },
       error: (err: any) => {
         this.errorMessage = err.error.error || err.error.message || 'Erreur de connexion';
@@ -57,5 +69,3 @@ export class Login {
     });
   }
 }
-
-

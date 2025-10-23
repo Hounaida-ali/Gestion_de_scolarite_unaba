@@ -4,16 +4,19 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: rgba(0, 0, 0, 0.4); /* overlay semi-transparent */
+  background: rgba(0, 0, 0, 0.4);
 }
 
 /* Boîte principale (modal-content) */
 .modal-content {
-  border-radius: 12px;           /* arrondi comme sur ton image */
+  border-radius: 12px;
+  /* arrondi comme sur ton image */
   border: none;
-  max-width: 400px;              /* largeur max */
+  max-width: 400px;
+  /* largeur max */
   width: 100%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* ombre douce */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  /* ombre douce */
   background: #fff;
 }
 
@@ -25,15 +28,18 @@
 .modal-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #1f2937; /* gris foncé */
+  color: #1f2937;
+  /* gris foncé */
 }
 
 /* Bouton de fermeture (X) */
 .btn-close {
-  --bs-btn-close-color: #6b7280; /* gris moyen */
+  --bs-btn-close-color: #6b7280;
+  /* gris moyen */
   --bs-btn-close-focus-shadow: none;
   opacity: 0.8;
 }
+
 .btn-close:hover {
   opacity: 1;
 }
@@ -48,7 +54,8 @@
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #2563eb; /* bleu */
+  border-color: #2563eb;
+  /* bleu */
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
@@ -83,11 +90,12 @@
   font-size: 0.9rem;
   color: #6b7280;
 }
-.reinisilize-link {
-      color: #1976d2;
-      text-decoration: none;
-    }
 
-    .reinisilize-link:hover {
-      text-decoration: underline;
-    }
+.reinisilize-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.reinisilize-link:hover {
+  text-decoration: underline;
+}
