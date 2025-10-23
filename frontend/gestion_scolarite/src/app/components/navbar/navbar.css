@@ -93,6 +93,7 @@ nav ul li a {
     padding: 5px 0;
     position: relative;
     font-weight: 500;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -103,6 +104,7 @@ nav ul li a:hover {
     color: var(--secondary-color);
 }
 
+
 nav ul li a:hover:after {
     content: '';
     position: absolute;
@@ -112,3 +114,6 @@ nav ul li a:hover:after {
     height: 2px;
     background-color: var(--secondary-color);
 }
+
+
+
