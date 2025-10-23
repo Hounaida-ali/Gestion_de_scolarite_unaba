@@ -1,0 +1,36 @@
+<!-- Liste des accès rapides -->
+<div *ngIf="!loading" class="quickaccess-list">
+  <div *ngFor="let acces of accesRapides" class="quickaccess-card">
+    <!-- Icône dynamique -->
+    <div class="quickaccess-icon">
+      <i class="{{ acces.icon }}"></i>
+    </div>
+    <!-- Titre principal -->
+    <h1 class="quickaccess-titre">
+      {{ acces.titre }}
+    </h1>
+
+    <!-- Contenu -->
+    <div class="quickaccess-contenu">
+      <p>{{ acces.contenu }}</p>
+    </div>
+
+    <!-- Action / TestAction -->
+    <div class="quickaccess-action">
+      <span class="quickaccess-link">
+        {{ acces.actionText }}
+        <svg class="arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path
+            d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+            fill="currentColor"
+          />
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Message si aucun accès rapide -->
+<div *ngIf="!loading && accesRapides.length === 0" class="no-quickaccess">
+  <p>Aucun accès rapide disponible pour le moment.</p>
+</div>

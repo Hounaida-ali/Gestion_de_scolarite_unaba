@@ -1,0 +1,161 @@
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--secondary-color);
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  gap: 10px;
+}
+.view-all {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition);
+}
+
+.view-all:hover {
+  color: var(--accent-color);
+  gap: 8px;
+}
+.quickaccess-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  font-family: 'Poppins', Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Loader */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #0056b3;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Liste des cartes */
+.quickaccess-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Carte individuelle */
+.quickaccess-card {
+  background: linear-gradient(180deg, #18478b 0%, #0a2d60 100%);
+  color: white;
+  flex: 1 1 280px;
+  max-width: 390px;
+  min-height: 250px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+
+  /* Centrage parfait du contenu */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.quickaccess-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon */
+.quickaccess-icon {
+  /* color: red; */
+  font-size: xx-large;
+}
+
+/* Titre */
+.quickaccess-titre {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  margin-top: 1.5rem; /* ↓ espace ajouté en haut du titre */
+}
+
+/* Contenu */
+.quickaccess-contenu p {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 1.25rem;
+  color: #dbe7ff;
+}
+
+/* Lien / Action */
+.quickaccess-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quickaccess-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  color: #053792;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.quickaccess-link:hover {
+  color: var(--accent-color);
+}
+
+.arrow-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  transition: transform 0.2s;
+}
+
+.quickaccess-link:hover .arrow-icon {
+  transform: translateX(5px);
+}
+
+/* Message vide */
+.no-quickaccess {
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+}
