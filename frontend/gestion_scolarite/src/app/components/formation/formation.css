@@ -1,0 +1,114 @@
+/* formations.component.css */
+.departments-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.department-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.department-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.department-header {
+  padding: 1.5rem;
+  color: white;
+  text-align: center;
+}
+
+.eco-header {
+  background-color: var(--eco-color);
+}
+
+.gestion-header {
+  background-color: var(--gestion-color);
+}
+
+.droit-header {
+  background-color: var(--droit-color);
+}
+
+.department-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.department-body {
+  padding: 1.5rem;
+}
+
+.program-list {
+  list-style: none;
+  margin-top: 1rem;
+}
+
+.program-list li {
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.program-list li:last-child {
+  border-bottom: none;
+}
+
+.program-details {
+  flex-grow: 1;
+}
+
+.program-name {
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.program-duration {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.view-program {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease;
+}
+
+.view-program:hover {
+  background-color: #0e3262;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .departments-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .department-card {
+    margin: 0 10px;
+  }
+  
+  .department-header {
+    padding: 1rem;
+  }
+  
+  .department-body {
+    padding: 1rem;
+  }
+}

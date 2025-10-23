@@ -1,0 +1,114 @@
+/* Section générale */
+.dashboard-section {
+  margin: 3rem 0;
+}
+
+.dashboard-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Carte principale */
+.dashboard-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  /* transition: all 0.3s ease; */
+  /* width: 350px; */
+  display: flex;
+  flex-direction: column;
+
+  flex: 1 1 280px;
+  max-width: 390px;
+  min-height: 250px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+
+  /* Centrage parfait du contenu */
+  /* align-items: center; */
+  justify-content: center;
+  text-align: center;
+  /* padding: 1.5rem; */
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* HEADER BLEU (icône + titre) */
+.dashboard-header {
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* espace entre icône et titre */
+  padding: 1rem 1.5rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.dashboard-header i {
+  font-size: 1.6rem;
+}
+
+.dashboard-header h1 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Contenu */
+.dashboard-contenu {
+  padding: 0.8rem 1.5rem;
+  color: #444;
+  font-size: 0.95rem;
+  flex-grow: 1;
+}
+
+/* FOOTER : label + action côte à côte */
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--gray-light);
+  border-top: 1px solid #eee;
+}
+
+/* Action text gauche */
+.dashboard-action .dashboard-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.dashboard-action .dashboard-link:hover {
+  color: var(--accent-color);
+  gap: 8px;
+}
+
+/* Label + icône à droite */
+.dashboard-label-container {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* espace entre icône et texte */
+}
+
+.dashboard-label-container i {
+  font-size: 1.2rem; /* taille icône */
+}
+
+.dashboard-label-container p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c2b2b;
+}

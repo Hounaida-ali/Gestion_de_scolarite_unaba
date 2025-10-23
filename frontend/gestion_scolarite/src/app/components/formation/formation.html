@@ -1,0 +1,69 @@
+<div class="container">
+  <h1 class="page-title">Nos Formations</h1>
+  <p class="page-description">
+    Découvrez l'ensemble des formations offertes par nos départements. 
+    Chaque programme est conçu pour offrir une éducation de qualité et préparer 
+    les étudiants aux défis du marché du travail.
+  </p>
+</div>
+
+<div class="container">
+  <div *ngIf="isLoading" class="loading">Chargement ...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <!-- Liste des départements avec leurs formations -->
+  <div class="departments-container" *ngIf="!isLoading && !error">
+    <div class="department-card" *ngFor="let departement of departements">
+      
+      <!-- En-tête bleu avec le NOM DE LA FORMATION principale -->
+      <div class="department-header" [ngClass]="getDepartmentClass(departement.nom)">
+        <div class="department-icon">
+          {{ departement.formations[0]?.icone || departement.icone }}
+        </div>
+        <div class="department-info">
+          <h2>{{ departement.formations[0]?.nom }}</h2>
+        </div>
+      </div>
+
+      <!-- Corps du département -->
+      <div class="department-body">
+        <p>{{ departement.description }}</p>
+
+        <!-- Liste des formations -->
+        <div class="formations-list">
+          <div class="formation-item" *ngFor="let formation of departement.formations">
+            <div class="formation-header">
+              <span class="formation-duration">{{ formation.duree }}</span>
+            </div>
+            <p>{{ formation.description }}</p>
+
+            <!-- Programmes -->
+            <div class="programmes-section" *ngIf="formation?.programmes?.length">
+              <ul class="program-list">
+                <li *ngFor="let programme of formation.programmes">
+                  <div class="program-details">
+                    <div class="program-name">{{ programme.nom }}</div>
+                    <div class="program-duration">{{ programme.duree }}</div>
+                  </div>
+                  <button class="view-program"
+                          (click)="openProgrammeModal(programme.departement, programme.code)">
+                    Voir
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<app-program
+  *ngIf="modalOpen"
+  [programme]="selectedProgramme"
+  (close)="closeModal()">
+</app-program>

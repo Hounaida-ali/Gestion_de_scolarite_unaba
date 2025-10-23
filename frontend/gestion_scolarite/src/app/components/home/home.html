@@ -1,0 +1,48 @@
+  <div class="dashboard-container">
+    <!-- État de chargement -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement des dashboards...</p>
+    </div>
+
+    <!-- Liste des dashboards -->
+    <div *ngIf="!loading" class="dashboard-list">
+      <div *ngFor="let dashboard of dashboards" class="dashboard-card">
+        <!-- En-tête -->
+        <div class="dashboard-header">
+          <i class="{{ dashboard.icon }}"></i>
+          <h1>{{ dashboard.titre }}</h1>
+        </div>
+
+        <!-- Contenu -->
+        <div class="dashboard-contenu">
+          <p>{{ dashboard.contenu }}</p>
+        </div>
+
+        <!-- Footer : label + action côte à côte -->
+        <div class="dashboard-footer">
+          <div class="dashboard-label-container">
+            <i class="{{ dashboard.labelIcon }}"></i>
+            <p>{{ dashboard.label }}</p>
+          </div>
+
+          <div class="dashboard-action">
+            <span class="dashboard-link">
+              {{ dashboard.actionText }}
+              <svg class="arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucun dashboard -->
+    <div *ngIf="!loading && dashboards.length === 0" class="no-dashboard">
+      <p>Aucun dashboard disponible pour le moment.</p>
+    </div>
+  </div>
