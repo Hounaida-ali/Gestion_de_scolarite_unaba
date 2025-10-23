@@ -7,7 +7,8 @@ import { User } from "../interfaces/userInterface";
 export interface AuthResponse {
   message: string;
   otpToken: string;
-  user: User;
+  token: string,
+  user: User
 }
 
 @Injectable({
@@ -44,10 +45,10 @@ export class UserService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.otpToken);
+          localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
           this.currentUserSubject.next(response.user);
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/']);
         })
       );
   }
@@ -105,5 +106,9 @@ export class UserService {
         })
       );
   }
+
+  
 }
+
+
 
