@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
+import { Hero } from '../hero/hero';
+import { Dashboard } from '../dashboard/dashboard';
 
 @Component({
   selector: 'app-acceuil',
-  imports: [RouterLink],
+  imports: [CommonModule, Hero, Dashboard],
   templateUrl: './acceuil.html',
-  styleUrl: './acceuil.css'
+  styleUrl: './acceuil.css',
 })
-export class Acceuil {
-
-}
+export class Acceuil {}
