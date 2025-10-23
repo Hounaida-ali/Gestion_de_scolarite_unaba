@@ -1,0 +1,151 @@
+<!-- program.component.html -->
+<div class="modal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ programme?.nom }}</h2>
+      <span class="close-modal" (click)="closeModal()">&times;</span>
+    </div>
+    
+    <!-- Vue d'ensemble du programme -->
+    <div *ngIf="currentView === 'overview' && programme">
+      <div class="program-info">
+        <p class="program-description">{{ programme.description }}</p>
+        
+        <div class="program-details-grid">
+          <div class="detail-item">
+            <div class="detail-label">Durée</div>
+            <div class="detail-value">{{ programme.duree }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Crédits</div>
+            <div class="detail-value">{{ programme.credits }}</div>
+          </div>
+          <div class="detail-item">
+             <div class="detail-label">Diplôme</div>
+            <div class="detail-value">{{ programme.diplome }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Accès</div>
+            <div class="detail-value">{{ programme.acces }}</div>
+          </div>
+        </div>
+      </div>
+      <h3>Niveaux de formation</h3>
+      
+      <!-- Message si pas de niveaux -->
+      <div *ngIf="!programme.niveaux || programme.niveaux.length === 0" class="no-data">
+        Aucun niveau disponible pour ce programme.
+      </div>
+      
+      <div class="levels-container" *ngIf="programme.niveaux && programme.niveaux.length > 0">
+        <div class="level-card" *ngFor="let niveau of programme.niveaux">
+          <div class="level-header">
+            <div class="level-icon">📚</div>
+            <div class="level-name">{{ niveau.nom }}</div>
+          </div>
+          <p class="level-description">{{ niveau.description }}</p>
+          <button class="view-level" (click)="viewLevelDetails(niveau)">
+            Voir les matières
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Vue détaillée d'un niveau -->
+    <div *ngIf="currentView === 'level' && selectedLevel" class="level-details">
+      <button class="back-button" (click)="backToOverview()">
+        ← Retour aux niveaux
+      </button>
+      
+      <h3>{{ selectedLevel.nom }}</h3>
+      <p class="program-description">{{ selectedLevel.description }}</p>
+      
+      <!-- Onglets des semestres -->
+      <div class="semester-tabs" *ngIf="selectedLevel.semestres && selectedLevel.semestres.length > 0">
+        <div *ngFor="let semestre of selectedLevel.semestres" 
+             class="semester-tab" 
+             [class.active]="selectedSemester?.numero === semestre.numero"
+             (click)="selectSemester(semestre)">
+          {{ semestre.nom }}
+        </div>
+      </div>
+      
+      <!-- Message si pas de semestres -->
+      <div *ngIf="!selectedLevel.semestres || selectedLevel.semestres.length === 0" class="no-data">
+        Aucun semestre disponible pour ce niveau.
+      </div>
+      
+      <!-- Contenu des semestres -->
+      <div *ngFor="let semestre of selectedLevel.semestres" 
+           class="semester-content"
+           [class.active]="selectedSemester?.numero === semestre.numero">
+        
+        <h4>{{ semestre.nom }}</h4>
+        
+        <!-- Message si pas d'UE -->
+        <div *ngIf="!semestre.ues || semestre.ues.length === 0" class="no-data">
+          Aucune unité d'enseignement disponible pour ce semestre.
+        </div>
+        
+        <table class="courses-table" *ngIf="semestre.ues && semestre.ues.length > 0">
+          <thead>
+            <tr>
+              <th>Unité d'Enseignement / Module</th>
+              <th>Code</th>
+              <th>Coeff</th>
+              <th>Crédits</th>
+              <th>CM</th>
+              <th>TD</th>
+              <th>Total Heures</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let ue of semestre.ues">
+              <!-- Ligne UE -->
+              <tr class="ue-header">
+                <td colspan="7">{{ ue.nom }}</td>
+              </tr>
+              
+              <ng-container *ngFor="let module of ue.modules">
+                <!-- Ligne Module -->
+                <tr class="module-header">
+                  <td>{{ module.nom }}</td>
+                  <td colspan="6"></td>
+                </tr>
+                
+                <!-- Lignes Cours -->
+                <tr *ngFor="let cours of module.cours" class="course-row">
+                  <td>{{ cours.nom }}</td>
+                  <td>{{ cours.code }}</td>
+                  <td>{{ cours.coefficient }}</td>
+                  <td>{{ cours.credits }}</td>
+                  <td>{{ cours.cm }}</td>
+                  <td>{{ cours.td }}</td>
+                  <td>{{ cours.totalHeures }}</td>
+                </tr>
+              </ng-container>
+              
+              <!-- Total UE -->
+              <tr class="total-row">
+                <td colspan="3">Total {{ ue.nom }}</td>
+                <td>{{ ue.totalCredits }}</td>
+                <td colspan="3"></td>
+              </tr>
+            </ng-container>
+            
+            <!-- Total Semestre -->
+            <tr class="total-row">
+              <td colspan="3">Total Semestre</td>
+              <td>{{ calculateSemesterCredits(semestre) }}</td>
+              <td colspan="2"></td>
+              <td>{{ calculateSemesterTotal(semestre) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="action-buttons">
+        <button class="action-button secondary">Télécharger le document</button>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,376 @@
+/* programme-modal.component.css */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 95%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.close-modal {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #777;
+  transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+  color: var(--danger-color);
+}
+
+.program-info {
+  margin-bottom: 1.5rem;
+}
+
+.program-description {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.program-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+/* Levels Section */
+.levels-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.level-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.level-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.level-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.level-icon {
+  font-size: 2rem;
+  margin-right: 1rem;
+}
+
+.level-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.level-description {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.view-level {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.view-level:hover {
+  background-color: #0e3262;
+}
+
+/* Semester Tabs */
+.semester-tabs {
+  display: flex;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+
+.semester-tab {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  margin-right: 5px;
+  border-radius: 5px 5px 0 0;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.semester-tab.active {
+  background-color: white;
+  border-color: #ddd;
+  border-bottom-color: white;
+  font-weight: bold;
+}
+
+.semester-tab:hover:not(.active) {
+  background-color: #e9ecef;
+}
+
+.semester-content {
+  display: none;
+}
+
+.semester-content.active {
+  display: block;
+}
+
+/* Courses Table */
+.courses-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.courses-table th,
+.courses-table td {
+  border: 1px solid #ddd;
+  padding: 0.8rem;
+  text-align: left;
+}
+
+.courses-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.courses-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.courses-table .ue-header {
+  background-color: #e9ecef;
+  font-weight: bold;
+}
+
+.courses-table .module-header {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.courses-table .module-header td:first-child {
+  padding-left: 2rem;
+}
+
+.courses-table .course-row td:first-child {
+  padding-left: 3rem;
+  font-style: italic;
+}
+
+.courses-table .total-row {
+  background-color: #e6f7ff;
+  font-weight: bold;
+}
+
+.courses-table .total-row td {
+  border-top: 2px solid #ccc;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.action-button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.action-button.primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: #0e3262;
+}
+
+.action-button.secondary {
+  background-color: #f8f9fa;
+  color: var(--dark-color);
+  border: 1px solid #ddd;
+}
+
+.action-button.secondary:hover {
+  background-color: #e9ecef;
+}
+
+/* Level Details View */
+.level-details h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.level-details .program-description {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+}
+
+/* Back Button */
+.back-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1rem;
+  }
+
+  .program-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .levels-container {
+    grid-template-columns: 1fr;
+  }
+
+  .courses-table {
+    font-size: 0.7rem;
+  }
+
+  .courses-table th,
+  .courses-table td {
+    padding: 0.3rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .semester-tabs {
+    flex-wrap: wrap;
+  }
+
+  .semester-tab {
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .courses-table {
+    font-size: 0.6rem;
+  }
+
+  .courses-table th,
+  .courses-table td {
+    padding: 0.2rem;
+  }
+
+  .modal-content {
+    margin: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .level-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .level-icon {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
