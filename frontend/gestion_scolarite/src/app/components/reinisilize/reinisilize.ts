@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user-service';
 import { Router, RouterLink } from '@angular/router';
@@ -11,46 +11,55 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './reinisilize.css'
 })
 export class Reinisilize {
-  // ✅ propriété pour gérer la visibilité
-  isVisible = true;
+   @Input() isVisible: boolean = false;
+  @Output() close = new EventEmitter<void>();
+
   requestForm!: FormGroup;
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
-    // Création du formulaire
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private router: Router
+  ) {
     this.requestForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
   }
 
-  // Getter pour accéder facilement aux champs du form
   get f() {
     return this.requestForm.controls;
   }
 
-  close() {
-    console.log('Bouton X cliqué');
-    this.isVisible = false;
-    this.router.navigate(['/login']);
+  // ✅ Ferme la modal
+  closeModal(): void {
+    this.close.emit();
   }
 
-  // Soumission du formulaire
-  onSubmit() {
+  // ✅ Empêche la propagation du clic dans la modal
+  onModalClick(event: Event): void {
+    event.stopPropagation();
+  }
+
+  // ✅ Soumission du formulaire
+  onSubmit(): void {
     if (this.requestForm.invalid) return;
 
     const email = this.f['email'].value;
 
     this.userService.reinisilize(email).subscribe({
-      next: (res) => {
-        this.successMessage = res.message || "Code OTP envoyé avec succès.";
+      next: res => {
+        this.successMessage = res.message || 'Code OTP envoyé avec succès.';
         this.errorMessage = '';
         console.log('Réinitialisation - OTP envoyé :', res);
+        // Optionnel : fermer modal après succès
+        // setTimeout(() => this.closeModal(), 2000);
       },
-      error: (err) => {
-        this.errorMessage = err.error.message || "Erreur lors de l’envoi de l’OTP.";
+      error: err => {
+        this.errorMessage = err.error?.message || 'Erreur lors de l’envoi de l’OTP.';
         this.successMessage = '';
-        console.error('Erreur réinitialisation', err);
+        console.error('Erreur réinitialisation :', err);
       }
     });
   }

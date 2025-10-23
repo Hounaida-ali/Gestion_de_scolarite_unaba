@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user-service';
 import { Router, RouterLink } from '@angular/router';
@@ -12,22 +12,23 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './reset-password.css'
 })
 export class ResetPassword {
-  // ✅ propriété pour gérer la visibilité
-  isVisible = true;
+ @Input() isVisible: boolean = false;
+  @Output() close = new EventEmitter<void>();
+
   resetForm!: FormGroup;
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
-
-  }
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    
-    // Récupération du otpToken depuis le localStorage
     const otpToken = localStorage.getItem('token') || '';
-    console.log('otpToken:', otpToken);
-    // Initialisation du formulaire
+    console.log('otpToken récupéré :', otpToken);
+
     this.resetForm = this.fb.group({
       otp: ['', Validators.required],
       otpToken: [otpToken, Validators.required],
@@ -35,26 +36,34 @@ export class ResetPassword {
     });
   }
 
-  close() {
-    console.log('Bouton X cliqué');
-    this.isVisible = false;
-    this.router.navigate(['/login']);
+  // ✅ Ferme la modal
+  closeModal(): void {
+    this.close.emit();
   }
 
-  // Soumission du formulaire
+  // ✅ Empêche la propagation du clic
+  onModalClick(event: Event): void {
+    event.stopPropagation();
+  }
 
-  onSubmit() {
-    if (!this.resetForm.valid) return;
+  // ✅ Soumission du formulaire
+  onSubmit(): void {
+    if (this.resetForm.invalid) return;
+
     const { otp, otpToken, newPassword } = this.resetForm.value;
 
     this.userService.resetPassword(otp, otpToken, newPassword).subscribe({
-      next: (res) => {
-        this.successMessage = res.message;
+      next: res => {
+        this.successMessage = res.message || 'Mot de passe réinitialisé avec succès.';
         this.errorMessage = '';
+        console.log('Réinitialisation réussie :', res);
+        // Optionnel : fermer modal après succès
+        // setTimeout(() => this.closeModal(), 2000);
       },
-      error: (err) => {
-        this.errorMessage = err.error.message || 'Erreur lors de la réinitialisation';
+      error: err => {
+        this.errorMessage = err.error?.message || 'Erreur lors de la réinitialisation.';
         this.successMessage = '';
+        console.error('Erreur reset password :', err);
       }
     });
   }

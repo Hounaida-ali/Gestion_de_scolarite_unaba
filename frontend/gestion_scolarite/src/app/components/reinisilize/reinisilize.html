@@ -1,46 +1,75 @@
-<div class="modal-dialog">
-  <div *ngIf="isVisible" class="modal-dialog">
-    <div class="modal-content p-4 rounded">
-      <div class="modal-header border-0">
-        <h5 class="modal-title">
-          <p>Mot de passe oublié</p>
-          <p>Entrez votre email pour recevoir un lien de réinitialisation</p>
-        </h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
-      </div>
-      <div class="modal-body">
+<div class="modal-dialog" (click)="onModalClick($event)">
+  <div class="modal-content p-4 rounded">
+    <div class="modal-header border-0">
+      <h2 class="modal-title">Réinitialiser le mot de passe</h2>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+    </div>
 
-        <!-- Messages globaux -->
-        <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
-          {{ errorMessage }}
+    <div class="modal-body">
+      <!-- Messages globaux -->
+      @if (errorMessage) {
+      <div class="alert alert-danger mt-3" role="alert">
+        {{ errorMessage }}
+      </div>
+      }
+
+      @if (successMessage) {
+      <div class="alert alert-success mt-3" role="alert">
+        {{ successMessage }}
+      </div>
+      }
+
+      <!-- Formulaire -->
+      <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
+
+        <!-- Code OTP -->
+        <div class="mb-3">
+          <label class="form-label">Code OTP</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="otp"
+            placeholder="Entrez le code reçu"
+          />
+          @if (requestForm.controls['otp'].touched && requestForm.controls['otp'].hasError('required')) {
+          <div class="text-danger mt-1">
+            Le code est obligatoire
+          </div>
+          }
         </div>
 
-        <div *ngIf="successMessage" class="alert alert-success mt-3" role="alert">
-          {{ successMessage }}
+        <!-- Nouveau mot de passe -->
+        <div class="mb-3">
+          <label class="form-label">Nouveau mot de passe</label>
+          <input
+            type="password"
+            class="form-control"
+            formControlName="newPassword"
+            placeholder="Votre nouveau mot de passe"
+          />
+          @if (requestForm.controls['newPassword'].touched && requestForm.controls['newPassword'].hasError('required')) {
+          <div class="text-danger mt-1">
+            Le mot de passe est obligatoire
+          </div>
+          }
         </div>
-        <!-- Formulaire -->
-        <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" formControlName="email" placeholder="Votre email" />
-            <div *ngIf="requestForm.controls['email']?.touched && requestForm.controls['email']?.hasError('required')"
-              class="text-danger mt-1">
-              L'email est obligatoire
-            </div>
-            <div *ngIf="requestForm.controls['email']?.touched && requestForm.controls['email']?.hasError('email')"
-              class="text-danger mt-1">
-              Email invalide
-            </div>
-          </div>
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary" [disabled]="requestForm.invalid">
-              Envoyer le code OTP
-            </button>
-          </div>
-          <div class="text-center mt-3">
-            <a routerLink="/resetpassword" class="back-to-resetpassword">Réinitialisation</a>
-          </div>
-        </form>
-      </div>
+
+        <!-- Token caché -->
+        <input type="hidden" formControlName="otpToken" />
+
+        <!-- Bouton -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary" [disabled]="requestForm.invalid">
+            Réinitialiser
+          </button>
+        </div>
+
+        <!-- Lien retour -->
+        <div class="text-center mt-3">
+          <a routerLink="/login" class="back-to-login">Retour à la connexion</a>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+

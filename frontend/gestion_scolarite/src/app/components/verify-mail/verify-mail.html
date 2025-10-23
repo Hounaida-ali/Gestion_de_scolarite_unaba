@@ -1,19 +1,23 @@
-<div class="modal-dialog">
-  <div *ngIf="isVisible" class="modal-dialog">
+<div class="modal-dialog" (click)="onModalClick($event)">
   <div class="modal-content p-4 rounded">
     <div class="modal-header border-0">
-      <h5 class="modal-title">Vérification de l'email</h5>
-      <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+      <h2 class="modal-title">Vérification de l'email</h2>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
     </div>
 
     <div class="modal-body">
       <!-- Messages globaux -->
       @if (errorMessage) {
-      <div class="alert alert-danger mt-3">{{ errorMessage }}</div>
+      <div class="alert alert-danger mt-3" role="alert">
+        {{ errorMessage }}
+      </div>
       }
+
       @if (successMessage) {
-      <div class="alert alert-success mt-3">{{ successMessage }}</div>
-    }
+      <div class="alert alert-success mt-3" role="alert">
+        {{ successMessage }}
+      </div>
+      }
 
       <!-- Formulaire -->
       <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
@@ -21,7 +25,12 @@
         <!-- Code OTP -->
         <div class="mb-3">
           <label class="form-label">Code OTP</label>
-          <input type="number" class="form-control" formControlName="otp" placeholder="Entrez le code reçu par email" />
+          <input
+            type="number"
+            class="form-control"
+            formControlName="otp"
+            placeholder="Entrez le code reçu par email"
+          />
           @if (verifyForm.controls['otp'].touched && verifyForm.controls['otp'].hasError('required')) {
           <div class="text-danger mt-1">
             Le code OTP est obligatoire
@@ -29,7 +38,7 @@
           }
         </div>
 
-        <!-- otpToken (souvent fourni via lien/email) -->
+        <!-- Champs cachés -->
         <input type="hidden" formControlName="otpToken" />
         <input type="hidden" formControlName="purpose" />
 
@@ -39,10 +48,10 @@
             Vérifier l'email
           </button>
         </div>
-        <div>
-          <div class="text-center mt-3">
-            <a routerLink="/login" class="back-to-login">Retour à la connexion</a>
-          </div>
+
+        <!-- Lien retour -->
+        <div class="text-center mt-3">
+          <a routerLink="/login" class="back-to-login">Retour à la connexion</a>
         </div>
       </form>
     </div>

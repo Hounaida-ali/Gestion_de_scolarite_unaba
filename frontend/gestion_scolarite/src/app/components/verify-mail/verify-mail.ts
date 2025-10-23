@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user-service';
 import { CommonModule } from '@angular/common';
@@ -12,47 +12,56 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './verify-mail.css'
 })
 export class VerifyMail {
-  // ✅ propriété pour gérer la visibilité
-  isVisible = true;
+  @Input() isVisible: boolean = false;
+  @Output() close = new EventEmitter<void>();
+
   verifyForm!: FormGroup;
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder, private userService: UserService,private router: Router) { }
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Récupération du otpToken depuis le localStorage
     const otpToken = localStorage.getItem('token') || '';
     console.log('otpToken:', otpToken);
-    
 
-    // Initialisation du formulaire
     this.verifyForm = this.fb.group({
       otp: ['', Validators.required],
       otpToken: [otpToken, Validators.required],
       purpose: ['verify-email', Validators.required]
     });
-
-    
   }
 
-   close() {
-     console.log('Bouton X cliqué');
-    this.isVisible = false;
-    this.router.navigate(['']);
+  // ✅ Ferme la modal
+  closeModal(): void {
+    this.close.emit();
   }
 
-  onSubmit() {
-    if (!this.verifyForm.valid) return;
+  // ✅ Empêche la propagation du clic dans la modal
+  onModalClick(event: Event): void {
+    event.stopPropagation();
+  }
+
+  // ✅ Soumission du formulaire
+  onSubmit(): void {
+    if (this.verifyForm.invalid) return;
 
     this.userService.verifyEmail(this.verifyForm.value).subscribe({
-      next: (res) => {
-        this.successMessage = res.message;
+      next: res => {
+        this.successMessage = res.message || 'Email vérifié avec succès.';
         this.errorMessage = '';
+        console.log('Vérification réussie :', res);
+        // Optionnel : fermer modal après succès
+        // setTimeout(() => this.closeModal(), 2000);
       },
-      error: (err) => {
-        this.errorMessage = err.error.message || 'Erreur lors de la vérification';
+      error: err => {
+        this.errorMessage = err.error?.message || 'Erreur lors de la vérification de l’email.';
         this.successMessage = '';
+        console.error('Erreur vérification :', err);
       }
     });
   }
