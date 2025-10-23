@@ -75,8 +75,10 @@ const verify = async (req, res) => {
   if (purpose !== "verify-email") {
     return res.status(422).send({ message: "purpose invalide" });
   }
-
-  const otpDetails = await otpModel.findOne({ otpToken, purpose });
+  const otpDetails = await otpModel.findOne({
+    otpToken,
+    purpose,
+  });
   if (!otpDetails) {
     return res.status(404).send({ message: "OTP introuvable" });
   }
@@ -106,7 +108,7 @@ const login = async (req, res) => {
     return res.status(404).send({ message: "Utilisateur introuvable" });
   }
 
-  if(user.isEmailVerified === false){
+  if (user.isEmailVerified === false) {
     return res.status(401).send({ message: "Veuillez vérifier votre email avant de vous connecter" });
   }
 
@@ -130,6 +132,7 @@ const login = async (req, res) => {
   res.send({
     message: "Connexion réussie",
     token,
+    user
   });
 };
 
@@ -249,8 +252,8 @@ const updateProfile = async (req, res) => {
 // Récupérer tous les utilisateurs
 
 const getAll = async (req, res) => {
-    const users = await userModel.find()
-    res.send(users);
+  const users = await userModel.find()
+  res.send(users);
 };
 
 module.exports = { register, login, verify, resetPassword, reinisilize, logout, getAll, updateProfile };
