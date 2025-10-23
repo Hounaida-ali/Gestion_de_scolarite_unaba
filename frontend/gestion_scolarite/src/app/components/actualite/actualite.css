@@ -1,0 +1,138 @@
+:root {
+  --primary-color: #2c3e50;
+  --accent-color: #e74c3c;
+  --dark-color: #2c3e50;
+  --transition: all 0.3s ease;
+}
+
+/* =========================
+   Structure globale
+========================= */
+.actualites-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  /* padding: 0 1rem; */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+/* Titre de section */
+.actualites-header {
+  margin-bottom: 2rem;
+}
+
+.actualites-title {
+  color: var(--dark-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.actualite-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================
+   Liste des actualités
+========================= */
+.actualites-list {
+  display: flex;
+  flex-wrap: wrap;         /* ✅ cartes sur plusieurs lignes si besoin */
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* Carte d'actualité */
+.actualite-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  /* justify-content: flex-start; */
+
+  overflow: hidden;
+
+  flex: 1 1 280px;
+  max-width: 390px;
+  min-height: 250px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+
+  justify-content: center;
+}
+
+.actualite-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Date */
+.actualite-date {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* espace entre l’icône et la date */
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+.actualite-date i {
+  color: var(--primary-color);
+  font-size: 0.95rem;
+}
+
+/* Titre */
+.actualite-titre {
+  color: var(--dark-color);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: normal; /* ✅ autorise plusieurs lignes */
+}
+
+/* Contenu */
+.actualite-contenu p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  text-align: justify;
+  overflow: visible;  /* ✅ affiche tout le texte */
+}
+
+/* Lire la suite */
+.lire-suite {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  padding-top: 0.8rem; /* ✅ espace avant le lien */
+  transition: var(--transition);
+}
+
+.lire-suite:hover {
+  color: var(--accent-color);
+  gap: 8px;
+}
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 768px) {
+  .actualites-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .actualite-card {
+    width: 90%;
+    min-height: auto;
+  }
+}

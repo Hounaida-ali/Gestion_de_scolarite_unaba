@@ -1,0 +1,44 @@
+<div class="actualites-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des accès rapide...</p>
+  </div>
+
+  <!-- Liste des actualités -->
+  <div *ngIf="!loading" class="actualites-list">
+    <div *ngFor="let actualite of actualites" class="actualite-card">
+      <!-- Date en haut à droite -->
+      <div class="actualite-date">
+        <i class="fas fa-calendar-alt"></i>
+        <span>{{ formatDate(actualite.date) }}</span>
+      </div>
+      <!-- Titre principal -->
+      <h1 class="actualite-titre">
+        {{ actualite.titre }}
+      </h1>
+
+      <!-- Contenu -->
+      <div class="actualite-contenu">
+        <p>{{ actualite.contenu }}</p>
+      </div>
+
+      <div class="lire-suite">
+        <span class="lire-suite-text">
+          {{ actualite.actionText }}
+          <svg class="arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+      </div>
+
+      <!-- Message si aucune actualité -->
+      <div *ngIf="!loading && actualites.length === 0" class="no-actualites">
+        <p>Aucune actualité disponible pour le moment.</p>
+      </div>
+    </div>
+  </div>
+</div>

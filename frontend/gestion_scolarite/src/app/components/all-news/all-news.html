@@ -1,0 +1,49 @@
+<section class="all-news-section">
+  <div class="dashboard-container">
+    <a type="button" (click)="closeModal()" class="back-button">
+      <i class="fas fa-close"></i> Fermer
+    </a>
+
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-cogs"></i> Toutes les Actualités</h2>
+    </div>
+
+    <!-- État de chargement -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement des actualités...</p>
+    </div>
+
+    <!-- Liste des actualités -->
+    <div *ngIf="!loading && allNews.length > 0" class="all-news-grid">
+      <div *ngFor="let news of allNews" class="all-news-card">
+        <!-- Date en haut à droite -->
+        <div class="news-date">
+          <i class="fas fa-calendar-alt"></i>
+          <span>{{ formatDate(news.date) }}</span>
+        </div>
+
+        <!-- Titre -->
+        <h3 class="news-title">{{ news.titre }}</h3>
+
+        <!-- Contenu -->
+        <div class="news-content">
+          <p>{{ news.contenu }}</p>
+        </div>
+
+        <!-- Action -->
+        <div class="news-action">
+          <a href="#" class="news-link">
+            {{ news.actionText }}
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucune actualité -->
+    <div *ngIf="!loading && allNews.length === 0" class="no-news">
+      <p>Aucune actualité disponible pour le moment.</p>
+    </div>
+  </div>
+</section>
