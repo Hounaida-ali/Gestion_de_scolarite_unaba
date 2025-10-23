@@ -4,3 +4,7 @@ node_modules/
 
 *.http
 *.rest
+
+public/uploads/
+
+file = res.data.file
