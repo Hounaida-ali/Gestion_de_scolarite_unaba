@@ -1,0 +1,34 @@
+<div class="container">
+  <!-- Dashboard Widgets -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-tachometer-alt-fast"></i> Tableau de bord</h2>
+      <a type="button" (click)="openDashBoardModal()" class="view-all"
+        >Voir tout <i class="fa-solid fa-arrow-right"></i
+      ></a>
+    </div>
+    <app-home></app-home>
+  </section>
+
+  <!-- Quick Access Section -->
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-rocket"></i> Accès rapide</h2>
+      <a type="button" (click)="openDashBoardModal()" class="view-all"
+        >Tous les services <i class="fa-solid fa-arrow-right"></i
+      ></a>
+    </div>
+
+    <app-quick-access></app-quick-access>
+  </section>
+
+  <section class="dashboard-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-newspaper"></i> Actualités du Faculté</h2>
+      <a type="button" (click)="openActualitiesModal()" class="view-all"
+        >Toutes les actualités <i class="fa-solid fa-arrow-right"></i
+      ></a>
+    </div>
+    <app-actualite></app-actualite>
+  </section>
+</div>

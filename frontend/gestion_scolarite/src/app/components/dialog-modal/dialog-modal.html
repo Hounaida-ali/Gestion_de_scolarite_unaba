@@ -1,0 +1,41 @@
+<div class="modal-container">
+  @if (data.dashboard) {
+  <div class="modal-header">
+    <img *ngIf="data.dashboard.icon" [src]="data.dashboard.icon" alt="Icon" class="icon" />
+    <h2>{{ data.dashboard.titre }}</h2>
+    <p *ngIf="data.dashboard.sousTitre" class="subtitle">{{ data.dashboard.sousTitre }}</p>
+  </div>
+
+  <div class="modal-content">
+    <p>{{ data.dashboard.contenu }}</p>
+
+    <div *ngIf="data.dashboard.modalDescription" class="modal-description">
+      <strong>Description:</strong>
+      <p>{{ data.dashboard.modalDescription }}</p>
+    </div>
+
+    <div *ngIf="data.dashboard.details?.length" class="details">
+      <strong>Details:</strong>
+      <ul>
+        <li *ngFor="let detail of data.dashboard.details">{{ detail }}</li>
+      </ul>
+    </div>
+
+    <p *ngIf="data.dashboard.status"><strong>Status:</strong> {{ data.dashboard.status }}</p>
+    <p *ngIf="data.dashboard.createdAt">
+      <strong>Created:</strong> {{ data.dashboard.createdAt | date : 'medium' }}
+    </p>
+    <p *ngIf="data.dashboard.updatedAt">
+      <strong>Updated:</strong> {{ data.dashboard.updatedAt | date : 'medium' }}
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="action-btn" (click)="close()">Close</button>
+  </div>
+}
+
+<!-- @if (data.news) {
+
+} -->
+</div>
