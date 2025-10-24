@@ -1,11 +1,15 @@
 const express = require('express');
-const {getAllDashboard, getIdDashboard, addDashboard, updateDashboard, deleteDashboard} = require('../controllers/dashboardController');
+const {getAllDashboards,
+  getDashboardById,
+  addDashboard,
+  updateDashboard,
+  deleteDashboard,} = require('../controllers/dashboardController');
 
 const router = express.Router();
 
 // Routes pour les actualités
-router.get('/', getAllDashboard);
-router.get('/:id', getIdDashboard);
+router.get('/', getAllDashboards);
+router.get('/:id', getDashboardById);
 router.post('/', addDashboard);
 router.put('/:id', updateDashboard);
 router.delete('/:id', deleteDashboard);

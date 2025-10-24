@@ -7,12 +7,13 @@
 
   <!-- Liste des actualités -->
   <div *ngIf="!loading" class="actualites-list">
-    <div *ngFor="let actualite of actualites" class="actualite-card">
+    <div *ngFor="let actualite of actualites; let i = index" class="actualite-card">
       <!-- Date en haut à droite -->
       <div class="actualite-date">
         <i class="fas fa-calendar-alt"></i>
         <span>{{ formatDate(actualite.date) }}</span>
       </div>
+
       <!-- Titre principal -->
       <h1 class="actualite-titre">
         {{ actualite.titre }}
@@ -23,8 +24,9 @@
         <p>{{ actualite.contenu }}</p>
       </div>
 
+      <!-- Lire la suite / Action -->
       <div class="lire-suite">
-        <span class="lire-suite-text">
+        <span class="lire-suite-text" (click)="openModal(i)">
           {{ actualite.actionText }}
           <svg class="arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path

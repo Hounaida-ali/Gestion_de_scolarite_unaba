@@ -1,10 +1,11 @@
 <!-- Liste des accès rapides -->
 <div *ngIf="!loading" class="quickaccess-list">
-  <div *ngFor="let acces of accesRapides" class="quickaccess-card">
+  <div *ngFor="let acces of accesRapides; let i = index" class="quickaccess-card">
     <!-- Icône dynamique -->
     <div class="quickaccess-icon">
       <i class="{{ acces.icon }}"></i>
     </div>
+
     <!-- Titre principal -->
     <h1 class="quickaccess-titre">
       {{ acces.titre }}
@@ -17,7 +18,7 @@
 
     <!-- Action / TestAction -->
     <div class="quickaccess-action">
-      <span class="quickaccess-link">
+      <span class="quickaccess-link" (click)="penModal(i)">
         {{ acces.actionText }}
         <svg class="arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path

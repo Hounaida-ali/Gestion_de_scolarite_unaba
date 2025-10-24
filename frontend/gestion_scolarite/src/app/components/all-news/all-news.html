@@ -16,7 +16,8 @@
 
     <!-- Liste des actualités -->
     <div *ngIf="!loading && allNews.length > 0" class="all-news-grid">
-      <div *ngFor="let news of allNews" class="all-news-card">
+      <!-- Déclaration de i pour l'index -->
+      <div *ngFor="let news of allNews; let i = index" class="all-news-card">
         <!-- Date en haut à droite -->
         <div class="news-date">
           <i class="fas fa-calendar-alt"></i>
@@ -33,7 +34,8 @@
 
         <!-- Action -->
         <div class="news-action">
-          <a href="#" class="news-link">
+          <!-- Supprimer href="#" et utiliser openModal(i) -->
+          <a class="news-link" (click)="openModal(i)">
             {{ news.actionText }}
             <i class="fas fa-arrow-right"></i>
           </a>

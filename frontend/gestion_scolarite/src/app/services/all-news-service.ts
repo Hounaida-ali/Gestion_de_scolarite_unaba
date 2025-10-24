@@ -8,7 +8,14 @@ export interface News {
   contenu: string;
   date: Date | string;
   actionText: string;
+  sousTitre?: string;
+  modalDescription?: string;
+  details?: string[];
+  status?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
 @Injectable({
   providedIn: 'root'
 })

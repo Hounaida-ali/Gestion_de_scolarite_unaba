@@ -10,6 +10,10 @@ export interface Dashboard {
   labelIcon?: string;
   icon: string;
   actionText: string;
+  sousTitre?: string;
+  modalDescription?: string;
+  details?: string[];
+  status?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

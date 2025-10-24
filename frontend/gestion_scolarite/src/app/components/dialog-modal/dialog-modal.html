@@ -1,13 +1,12 @@
+@if (data.dashboard) {
 <div class="modal-container">
-  @if (data.dashboard) {
   <div class="modal-header">
-    <img *ngIf="data.dashboard.icon" [src]="data.dashboard.icon" alt="Icon" class="icon" />
     <h2>{{ data.dashboard.titre }}</h2>
-    <p *ngIf="data.dashboard.sousTitre" class="subtitle">{{ data.dashboard.sousTitre }}</p>
+    <!-- <h3 *ngIf="data.dashboard.sousTitre" class="subtitle">{{ data.dashboard.sousTitre }}</h3> -->
   </div>
 
   <div class="modal-content">
-    <p>{{ data.dashboard.contenu }}</p>
+    <!-- <p>{{ data.dashboard.contenu }}</p> -->
 
     <div *ngIf="data.dashboard.modalDescription" class="modal-description">
       <strong>Description:</strong>
@@ -22,20 +21,214 @@
     </div>
 
     <p *ngIf="data.dashboard.status"><strong>Status:</strong> {{ data.dashboard.status }}</p>
-    <p *ngIf="data.dashboard.createdAt">
-      <strong>Created:</strong> {{ data.dashboard.createdAt | date : 'medium' }}
+  </div>
+
+  <div class="modal-footer">
+    <button class="action-btn" (click)="close()">Fermer</button>
+  </div>
+</div>
+}
+
+<!-- modal All News -->
+@if (data.news) {
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>{{ data.news.titre }}</h2>
+    <h3 *ngIf="data.news.sousTitre" class="subtitle">{{ data.news.sousTitre }}</h3>
+  </div>
+
+  <div class="modal-content">
+    <div *ngIf="data.news.modalDescription" class="modal-description">
+      <strong>Description :</strong>
+      <p>{{ data.news.modalDescription }}</p>
+    </div>
+
+    <div *ngIf="data.news.details?.length" class="details">
+      <strong>Détails :</strong>
+      <ul>
+        <li *ngFor="let detail of data.news.details">{{ detail }}</li>
+      </ul>
+    </div>
+
+    <p *ngIf="data.news.status"><strong>Statut :</strong> {{ data.news.status }}</p>
+
+    <p *ngIf="data.news.createdAt">
+      <strong>Publié le :</strong> {{ data.news.createdAt | date : 'medium' }}
     </p>
-    <p *ngIf="data.dashboard.updatedAt">
-      <strong>Updated:</strong> {{ data.dashboard.updatedAt | date : 'medium' }}
+
+    <p *ngIf="data.news.updatedAt">
+      <strong>Mis à jour le :</strong> {{ data.news.updatedAt | date : 'medium' }}
     </p>
   </div>
 
   <div class="modal-footer">
-    <button class="action-btn" (click)="close()">Close</button>
+    <button class="action-btn" (click)="close()">Fermer</button>
   </div>
+</div>
 }
 
-<!-- @if (data.news) {
 
-} -->
+<!-- modal actualite -->
+@if (data.actualite) {
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>{{ data.actualite.titre }}</h2>
+    <h3 *ngIf="data.actualite.sousTitre" class="subtitle">
+      {{ data.actualite.sousTitre }}
+    </h3>
+  </div>
+
+  <div class="modal-content">
+    <!-- Description -->
+    <div *ngIf="data.actualite.modalDescription" class="modal-description">
+      <strong>Description :</strong>
+      <p>{{ data.actualite.modalDescription }}</p>
+    </div>
+
+    <!-- Contenu principal -->
+    <div *ngIf="data.actualite.contenu" class="modal-description">
+      <strong>Contenu :</strong>
+      <p>{{ data.actualite.contenu }}</p>
+    </div>
+
+    <!-- Détails -->
+    <div *ngIf="data.actualite.details?.length" class="details">
+      <strong>Détails :</strong>
+      <ul>
+        <li *ngFor="let detail of data.actualite.details">{{ detail }}</li>
+      </ul>
+    </div>
+
+    <!-- Statut -->
+    <p *ngIf="data.actualite.status"><strong>Statut :</strong> {{ data.actualite.status }}</p>
+
+    <!-- Dates -->
+    <p *ngIf="data.actualite.date">
+      <strong>Date :</strong> {{ data.actualite.date | date : 'medium' }}
+    </p>
+
+    <p *ngIf="data.actualite.createdAt">
+      <strong>Publié le :</strong> {{ data.actualite.createdAt | date : 'medium' }}
+    </p>
+
+    <p *ngIf="data.actualite.updatedAt">
+      <strong>Mis à jour le :</strong> {{ data.actualite.updatedAt | date : 'medium' }}
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="action-btn" (click)="close()">Fermer</button>
+  </div>
 </div>
+}
+
+
+
+<!-- modal QuickAccess -->
+@if (data.acces) {
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>{{ data.acces.titre }}</h2>
+    <h3 *ngIf="data.acces.sousTitre" class="subtitle">
+      {{ data.acces.sousTitre }}
+    </h3>
+  </div>
+
+  <div class="modal-content">
+    <!-- Description -->
+    <div *ngIf="data.acces.modalDescription" class="modal-description">
+      <strong>Description :</strong>
+      <p>{{ data.acces.modalDescription }}</p>
+    </div>
+
+    <!-- Contenu principal -->
+    <div *ngIf="data.acces.contenu" class="modal-description">
+      <strong>Contenu :</strong>
+      <p>{{ data.acces.contenu }}</p>
+    </div>
+
+    <!-- Détails -->
+    <div *ngIf="data.acces.details?.length" class="details">
+      <strong>Détails :</strong>
+      <ul>
+        <li *ngFor="let detail of data.acces.details">{{ detail }}</li>
+      </ul>
+    </div>
+
+    <!-- Statut -->
+    <p *ngIf="data.acces.status"><strong>Statut :</strong> {{ data.acces.status }}</p>
+
+    <!-- Dates -->
+    <!-- <p *ngIf="data.acces.date">
+      <strong>Date :</strong> {{ data.acces.date | date : 'medium' }}
+    </p> -->
+
+    <p *ngIf="data.acces.createdAt">
+      <strong>Publié le :</strong> {{ data.acces.createdAt | date : 'medium' }}
+    </p>
+
+    <p *ngIf="data.acces.updatedAt">
+      <strong>Mis à jour le :</strong> {{ data.acces.updatedAt | date : 'medium' }}
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="action-btn" (click)="close()">Fermer</button>
+  </div>
+</div>
+}
+
+
+<!-- modal home -->
+@if (data.homeDashboards) {
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>{{ data.homeDashboards.titre }}</h2>
+    <h3 *ngIf="data.homeDashboards.sousTitre" class="subtitle">
+      {{ data.homeDashboards.sousTitre }}
+    </h3>
+  </div>
+
+  <div class="modal-content">
+    <!-- Description -->
+    <div *ngIf="data.homeDashboards.modalDescription" class="modal-description">
+      <strong>Description :</strong>
+      <p>{{ data.homeDashboards.modalDescription }}</p>
+    </div>
+
+    <!-- Contenu principal -->
+    <div *ngIf="data.homeDashboards.contenu" class="modal-description">
+      <strong>Contenu :</strong>
+      <p>{{ data.homeDashboards.contenu }}</p>
+    </div>
+
+    <!-- Détails -->
+    <div *ngIf="data.homeDashboards.details?.length" class="details">
+      <strong>Détails :</strong>
+      <ul>
+        <li *ngFor="let detail of data.homeDashboards.details">{{ detail }}</li>
+      </ul>
+    </div>
+
+    <!-- Statut -->
+    <p *ngIf="data.homeDashboards.status"><strong>Statut :</strong> {{ data.homeDashboards.status }}</p>
+
+    <!-- Dates -->
+    <!-- <p *ngIf="data.homeDashboards.date">
+      <strong>Date :</strong> {{ data.homeDashboards.date | date : 'medium' }}
+    </p> -->
+
+    <p *ngIf="data.homeDashboards.createdAt">
+      <strong>Publié le :</strong> {{ data.homeDashboards.createdAt | date : 'medium' }}
+    </p>
+
+    <p *ngIf="data.homeDashboards.updatedAt">
+      <strong>Mis à jour le :</strong> {{ data.homeDashboards.updatedAt | date : 'medium' }}
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="action-btn" (click)="close()">Fermer</button>
+  </div>
+</div>
+}

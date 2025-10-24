@@ -1,155 +1,198 @@
-require('dotenv').config();
-const QuickAccessModel = require('../models/QuickAccessModel');
+require("dotenv").config();
+const QuickAccessModel = require("../models/QuickAccessModel");
 
-// GET toutes les actualités
+// ============================
+// 🔹 GET — Récupérer tous les accès rapides
+// ============================
 const getAllQuickAccess = async (req, res) => {
   try {
-    const QuickAccess = await QuickAccessModel.find()
-      .sort({ createdAt: -1 });
+    const quickAccessList = await QuickAccessModel.find().sort({ createdAt: -1 });
 
     res.json({
       success: true,
-      data: QuickAccess,
-      count: QuickAccess.length
+      data: quickAccessList,
+      count: quickAccessList.length,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération des accès rapide',
-      error: error.message
+      message: "Erreur lors de la récupération des accès rapides",
+      error: error.message,
     });
   }
 };
 
-// GET une actualité par ID
+// ============================
+// 🔹 GET — Récupérer un accès rapide par ID
+// ============================
 const getIdQuickAccess = async (req, res) => {
   try {
-    const QuickAccess = await QuickAccessModel.findById(req.params.id);
+    const quickAccess = await QuickAccessModel.findById(req.params.id);
 
-    if (!QuickAccess) {
+    if (!quickAccess) {
       return res.status(404).json({
         success: false,
-        message: 'accès rapide  non trouvée'
+        message: "Accès rapide non trouvé",
       });
     }
 
     res.json({
       success: true,
-      data: QuickAccess
+      data: quickAccess,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération de l\'accès rapide',
-      error: error.message
+      message: "Erreur lors de la récupération de l'accès rapide",
+      error: error.message,
     });
   }
 };
 
-// POST créer une nouvelle actualité
+// ============================
+// 🔹 POST — Créer un nouvel accès rapide
+// ============================
 const addQuickAccess = async (req, res) => {
   try {
-    const { titre, contenu, icon, actionText } = req.body;
+    const {
+      titre,
+      contenu,
+      icon,
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
+    } = req.body;
 
-    // Validation simple
+    // ✅ Validation simple
     if (!titre || !contenu || !icon || !actionText) {
       return res.status(400).json({
         success: false,
-        message: 'Le titre, contenu , icon et actionText sont obligatoires'
+        message: "Les champs titre, contenu, icon et actionText sont obligatoires.",
       });
     }
+
+    // ✅ Vérifie si un Quick Access existe déjà
     const existingQuickAccess = await QuickAccessModel.findOne({ titre: titre.trim() });
     if (existingQuickAccess) {
       return res.status(400).json({
         success: false,
-        message: "Un accès rapide avec ce titre existe déjà"
+        message: "Un accès rapide avec ce titre existe déjà.",
       });
     }
 
-    
-    const nouvelleQuickAccess = new QuickAccessModel({
+    // ✅ Création du nouveau QuickAccess
+    const newQuickAccess = new QuickAccessModel({
       titre,
       contenu,
       icon,
-      actionText
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
     });
 
-    await nouvelleQuickAccess.save();
+    await newQuickAccess.save();
 
     res.status(201).json({
       success: true,
-      message: 'Accès rapide créée avec succès',
-      data: nouvelleQuickAccess
+      message: "Accès rapide créé avec succès.",
+      data: newQuickAccess,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la création de l\'accès rapide',
-      error: error.message
+      message: "Erreur lors de la création de l'accès rapide.",
+      error: error.message,
     });
   }
 };
 
-// PUT modifier une actualité
+// ============================
+// 🔹 PUT — Mettre à jour un accès rapide
+// ============================
 const updateQuickAccess = async (req, res) => {
   try {
-    const { titre, contenu, icon, actionText} = req.body;
+    const {
+      titre,
+      contenu,
+      icon,
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
+    } = req.body;
 
-    const QuickAccess = await QuickAccessModel.findByIdAndUpdate(
+    const updatedQuickAccess = await QuickAccessModel.findByIdAndUpdate(
       req.params.id,
-      { 
-        titre, 
+      {
+        titre,
         contenu,
         icon,
-        actionText
+        actionText,
+        sousTitre,
+        modalDescription,
+        details,
+        status,
       },
       { new: true }
     );
 
-    if (!QuickAccess) {
+    if (!updatedQuickAccess) {
       return res.status(404).json({
         success: false,
-        message: 'Accès rapide non trouvée'
+        message: "Accès rapide non trouvé.",
       });
     }
 
     res.json({
       success: true,
-      message: ' Accès rapide modifiée avec succès',
-      data: QuickAccess
+      message: "Accès rapide mis à jour avec succès.",
+      data: updatedQuickAccess,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la modification de l\'accès rapide',
-      error: error.message
+      message: "Erreur lors de la mise à jour de l'accès rapide.",
+      error: error.message,
     });
   }
 };
 
-// DELETE supprimer une actualité
+// ============================
+// 🔹 DELETE — Supprimer un accès rapide
+// ============================
 const deleteQuickAccess = async (req, res) => {
   try {
-    const QuickAccess = await QuickAccessModel.findByIdAndDelete(req.params.id);
+    const deletedQuickAccess = await QuickAccessModel.findByIdAndDelete(req.params.id);
 
-    if (!QuickAccess) {
+    if (!deletedQuickAccess) {
       return res.status(404).json({
         success: false,
-        message: 'Accès rapide non trouvée'
+        message: "Accès rapide non trouvé.",
       });
     }
 
     res.json({
       success: true,
-      message: 'Accès rapide supprimée avec succès'
+      message: "Accès rapide supprimé avec succès.",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la suppression de l\'accès rapide',
-      error: error.message
+      message: "Erreur lors de la suppression de l'accès rapide.",
+      error: error.message,
     });
   }
 };
 
-module.exports = {getAllQuickAccess, getIdQuickAccess, addQuickAccess, updateQuickAccess, deleteQuickAccess};
+module.exports = {
+  getAllQuickAccess,
+  getIdQuickAccess,
+  addQuickAccess,
+  updateQuickAccess,
+  deleteQuickAccess,
+};

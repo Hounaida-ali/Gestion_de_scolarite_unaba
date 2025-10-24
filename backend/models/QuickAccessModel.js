@@ -19,7 +19,27 @@ const QuickAccessSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
-  }
+  },
+  // Champs pour le contenu dynamique du modal
+    sousTitre: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    modalDescription: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    details: {
+      type: [String], // tableau de lignes (bullet points)
+      default: [],
+    },
+    status: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 }, {
   timestamps: true
 });

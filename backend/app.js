@@ -19,6 +19,8 @@ const QuickAccessRouter = require('./routers/QuickAccessRouter');
 const dashboardRouter = require('./routers/dashboardRouter');
 const seeAllDashboardRouter = require('./routers/seeAllDashboardRouter');
 const AllNewsRouter = require('./routers/AllNewsRouter');
+const  scheduleRouter = require('./routers/scheduleRouter');
+const  examRouter = require('./routers/examRouter');
 
 
 const app = express();
@@ -50,6 +52,8 @@ app.use('/api/QuickAccess', QuickAccessRouter);
 app.use('/api/Dashboard', dashboardRouter);
 app.use('/api/SeeAllDashboard', seeAllDashboardRouter );
 app.use('/api/AllNews', AllNewsRouter );
+app.use('/api/Schedule', scheduleRouter );
+app.use('/api/Exam', examRouter);
 
 
 app.post("/api/file-uploads", uploads.single("file"), (req, res) => {

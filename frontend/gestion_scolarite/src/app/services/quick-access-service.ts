@@ -8,6 +8,10 @@ export interface AccesRapide {
   contenu: string;
   icon:string;
   actionText: string;
+  sousTitre?: string;
+  modalDescription?: string;
+  details?: string[];
+  status?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

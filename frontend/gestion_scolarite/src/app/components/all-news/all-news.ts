@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { AllNewsService, News } from '../../services/all-news-service';
-import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { DialogModal } from '../dialog-modal/dialog-modal';
 
 @Component({
   selector: 'app-all-news',
@@ -10,6 +11,8 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
   styleUrl: './all-news.css',
 })
 export class AllNews {
+  readonly dialog = inject(Dialog);
+  
   readonly dialogRef = inject(DialogRef<string>);
   readonly data = inject(DIALOG_DATA);
 
@@ -41,5 +44,15 @@ export class AllNews {
 
   closeModal(result?: string) {
     this.dialogRef.close(result);
+  }
+  openModal(index: number): void {
+    const dialogRef = this.dialog.open(DialogModal, {
+      width: '65%',
+      data: { news: this.allNews[index] },
+    });
+
+    dialogRef.closed.subscribe((result) => {
+      console.log('AllNews modal closed with result:', result);
+    });
   }
 }

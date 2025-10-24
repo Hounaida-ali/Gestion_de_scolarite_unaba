@@ -1,27 +1,30 @@
 require('dotenv').config();
 const actualiteModel = require('../models/actualiteModel');
 
-// GET toutes les actualités
+// ====================
+// 🔹 Récupérer toutes les actualités
+// ====================
 const getAllActualite = async (req, res) => {
   try {
-    const actualites = await actualiteModel.find()
-      .sort({ datePublication: -1 });
+    const actualites = await actualiteModel.find().sort({ createdAt: -1 });
 
     res.json({
       success: true,
       data: actualites,
-      count: actualites.length
+      count: actualites.length,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération des actualités',
-      error: error.message
+      message: "Erreur lors de la récupération des actualités",
+      error: error.message,
     });
   }
 };
 
-// GET une actualité par ID
+// ====================
+// 🔹 Récupérer une actualité par ID
+// ====================
 const getIdActualite = async (req, res) => {
   try {
     const actualite = await actualiteModel.findById(req.params.id);
@@ -29,79 +32,111 @@ const getIdActualite = async (req, res) => {
     if (!actualite) {
       return res.status(404).json({
         success: false,
-        message: 'Actualité non trouvée'
+        message: "Actualité non trouvée",
       });
     }
 
     res.json({
       success: true,
-      data: actualite
+      data: actualite,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération de l\'actualité',
-      error: error.message
+      message: "Erreur lors de la récupération de l'actualité",
+      error: error.message,
     });
   }
 };
 
-// POST créer une nouvelle actualité
+// ====================
+// 🔹 Ajouter une nouvelle actualité
+// ====================
 const addActualite = async (req, res) => {
   try {
-    const { titre, contenu, date, actionText } = req.body;
+    const {
+      titre,
+      contenu,
+      date,
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
+    } = req.body;
 
-    // Validation simple
-    if (!titre || !contenu || !actionText) {
+    // ✅ Validation basique
+    if (!titre || !contenu || !date || !actionText) {
       return res.status(400).json({
         success: false,
-        message: 'Le titre, le contenu, le action et le icon sont obligatoires'
+        message: "Le titre, le contenu, la date et le texte d’action sont obligatoires",
       });
     }
+
+    // ✅ Vérifie si une actualité avec le même titre existe déjà
     const existingActualite = await actualiteModel.findOne({ titre: titre.trim() });
     if (existingActualite) {
       return res.status(400).json({
         success: false,
-        message: "Une actualité avec ce titre existe déjà"
+        message: "Une actualité avec ce titre existe déjà",
       });
     }
 
-    
+    // ✅ Création de l’actualité
     const nouvelleActualite = new actualiteModel({
       titre,
       contenu,
       date,
-      actionText
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
     });
 
     await nouvelleActualite.save();
 
     res.status(201).json({
       success: true,
-      message: 'Actualité créée avec succès',
-      data: nouvelleActualite
+      message: "Actualité créée avec succès",
+      data: nouvelleActualite,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la création de l\'actualité',
-      error: error.message
+      message: "Erreur lors de la création de l’actualité",
+      error: error.message,
     });
   }
 };
 
-// PUT modifier une actualité
+// ====================
+// 🔹 Modifier une actualité existante
+// ====================
 const updateActualite = async (req, res) => {
   try {
-    const { titre, contenu, date, actionText } = req.body;
+    const {
+      titre,
+      contenu,
+      date,
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
+    } = req.body;
 
     const actualite = await actualiteModel.findByIdAndUpdate(
       req.params.id,
-      { 
-        titre, 
+      {
+        titre,
         contenu,
         date,
-        actionText
+        actionText,
+        sousTitre,
+        modalDescription,
+        details,
+        status,
       },
       { new: true }
     );
@@ -109,25 +144,27 @@ const updateActualite = async (req, res) => {
     if (!actualite) {
       return res.status(404).json({
         success: false,
-        message: 'Actualité non trouvée'
+        message: "Actualité non trouvée",
       });
     }
 
     res.json({
       success: true,
-      message: 'Actualité modifiée avec succès',
-      data: actualite
+      message: "Actualité mise à jour avec succès",
+      data: actualite,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la modification de l\'actualité',
-      error: error.message
+      message: "Erreur lors de la mise à jour de l’actualité",
+      error: error.message,
     });
   }
 };
 
-// DELETE supprimer une actualité
+// ====================
+// 🔹 Supprimer une actualité
+// ====================
 const deleteActualite = async (req, res) => {
   try {
     const actualite = await actualiteModel.findByIdAndDelete(req.params.id);
@@ -135,21 +172,27 @@ const deleteActualite = async (req, res) => {
     if (!actualite) {
       return res.status(404).json({
         success: false,
-        message: 'Actualité non trouvée'
+        message: "Actualité non trouvée",
       });
     }
 
     res.json({
       success: true,
-      message: 'Actualité supprimée avec succès'
+      message: "Actualité supprimée avec succès",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la suppression de l\'actualité',
-      error: error.message
+      message: "Erreur lors de la suppression de l’actualité",
+      error: error.message,
     });
   }
 };
 
-module.exports = {getAllActualite, getIdActualite, addActualite, updateActualite, deleteActualite};
+module.exports = {
+  getAllActualite,
+  getIdActualite,
+  addActualite,
+  updateActualite,
+  deleteActualite,
+};

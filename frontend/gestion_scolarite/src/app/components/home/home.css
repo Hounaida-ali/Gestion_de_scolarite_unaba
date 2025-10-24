@@ -108,7 +108,8 @@
 
 .dashboard-label-container p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #2c2b2b;
+  color: #555;
+  text-align: center;
 }
