@@ -115,6 +115,7 @@ const addActualite = async (req, res) => {
 // ====================
 const updateActualite = async (req, res) => {
   try {
+    const actualiteId = req.params.id;
     const {
       titre,
       contenu,
@@ -126,37 +127,87 @@ const updateActualite = async (req, res) => {
       status,
     } = req.body;
 
-    const actualite = await actualiteModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        titre,
-        contenu,
-        date,
-        actionText,
-        sousTitre,
-        modalDescription,
-        details,
-        status,
-      },
-      { new: true }
-    );
-
-    if (!actualite) {
+    // 🔹 Vérifier si l’actualité existe
+    const currentActualite = await actualiteModel.findById(actualiteId);
+    if (!currentActualite) {
       return res.status(404).json({
         success: false,
-        message: "Actualité non trouvée",
+        message: "Actualité non trouvée.",
       });
     }
 
-    res.json({
+    // 🔹 Comparateur pour les tableaux
+    const areArraysEqual = (arr1 = [], arr2 = []) => {
+      if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
+      if (arr1.length !== arr2.length) return false;
+      return arr1.every((val, i) => val === arr2[i]);
+    };
+
+    // 🔹 Vérifier si les champs sont identiques
+    const isSame =
+      (currentActualite.titre || "").trim() === (titre || "").trim() &&
+      (currentActualite.contenu || "").trim() === (contenu || "").trim() &&
+      new Date(currentActualite.date).getTime() === new Date(date).getTime() &&
+      (currentActualite.actionText || "").trim() === (actionText || "").trim() &&
+      (currentActualite.sousTitre || "").trim() === (sousTitre || "").trim() &&
+      (currentActualite.modalDescription || "").trim() === (modalDescription || "").trim() &&
+      areArraysEqual(currentActualite.details, details) &&
+      (currentActualite.status || "").trim() === (status || "").trim();
+
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    // 🔹 Créer un objet contenant uniquement les champs modifiés
+    const updateData = {};
+
+    if ((titre || "").trim() !== (currentActualite.titre || "").trim())
+      updateData.titre = titre;
+    if ((contenu || "").trim() !== (currentActualite.contenu || "").trim())
+      updateData.contenu = contenu;
+    if (new Date(currentActualite.date).getTime() !== new Date(date).getTime())
+      updateData.date = date;
+    if ((actionText || "").trim() !== (currentActualite.actionText || "").trim())
+      updateData.actionText = actionText;
+    if ((sousTitre || "").trim() !== (currentActualite.sousTitre || "").trim())
+      updateData.sousTitre = sousTitre;
+    if ((modalDescription || "").trim() !== (currentActualite.modalDescription || "").trim())
+      updateData.modalDescription = modalDescription;
+    if (!areArraysEqual(currentActualite.details, details))
+      updateData.details = details;
+    if ((status || "").trim() !== (currentActualite.status || "").trim())
+      updateData.status = status;
+
+    // 🔹 Vérifier s’il y a des modifications
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    // 🔹 Effectuer la mise à jour
+    const updatedActualite = await actualiteModel.findByIdAndUpdate(
+      actualiteId,
+      updateData,
+      { new: true }
+    );
+
+    return res.json({
       success: true,
-      message: "Actualité mise à jour avec succès",
-      data: actualite,
+      message: "Actualité mise à jour avec succès !",
+      data: updatedActualite,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Erreur updateActualite:", error);
+    return res.status(500).json({
       success: false,
-      message: "Erreur lors de la mise à jour de l’actualité",
+      message: "Erreur lors de la mise à jour de l’actualité.",
       error: error.message,
     });
   }

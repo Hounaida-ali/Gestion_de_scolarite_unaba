@@ -95,31 +95,91 @@ const addSeeAllDashboard = async (req, res) => {
 // 🟡 PUT — Modifier un élément
 const updateSeeAllDashboard = async (req, res) => {
   try {
-    const { titre, contenu, icon, actionText, sousTitre, modalDescription, details, status } = req.body;
+    const dashboardId = req.params.id;
+    const {
+      titre,
+      contenu,
+      icon,
+      actionText,
+      sousTitre,
+      modalDescription,
+      details,
+      status,
+    } = req.body;
 
-    const updatedItem = await SeeAllDashboardModel.findByIdAndUpdate(
-      req.params.id,
-      { titre, contenu, icon, actionText, sousTitre, modalDescription, details, status },
-      { new: true }
-    );
-
-    if (!updatedItem) {
+    // 🔹 Vérifier si l’élément existe
+    const currentDashboard = await SeeAllDashboardModel.findById(dashboardId);
+    if (!currentDashboard) {
       return res.status(404).json({
         success: false,
-        message: 'Élément non trouvé'
+        message: "Élément du tableau de bord non trouvé.",
       });
     }
 
-    res.json({
+    // 🔹 Fonction de comparaison pour les tableaux
+    const areArraysEqual = (arr1 = [], arr2 = []) => {
+      if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
+      if (arr1.length !== arr2.length) return false;
+      return arr1.every((val, i) => val === arr2[i]);
+    };
+
+    // 🔹 Vérifier si tous les champs sont identiques
+    const isSame =
+      (currentDashboard.titre || "").trim() === (titre || "").trim() &&
+      (currentDashboard.contenu || "").trim() === (contenu || "").trim() &&
+      (currentDashboard.icon || "").trim() === (icon || "").trim() &&
+      (currentDashboard.actionText || "").trim() === (actionText || "").trim() &&
+      (currentDashboard.sousTitre || "").trim() === (sousTitre || "").trim() &&
+      (currentDashboard.modalDescription || "").trim() === (modalDescription || "").trim() &&
+      areArraysEqual(currentDashboard.details, details) &&
+      (currentDashboard.status || "").trim() === (status || "").trim();
+
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    // 🔹 Construire l’objet de mise à jour uniquement avec les champs modifiés
+    const updateData = {};
+    if ((titre || "").trim() !== (currentDashboard.titre || "").trim()) updateData.titre = titre;
+    if ((contenu || "").trim() !== (currentDashboard.contenu || "").trim()) updateData.contenu = contenu;
+    if ((icon || "").trim() !== (currentDashboard.icon || "").trim()) updateData.icon = icon;
+    if ((actionText || "").trim() !== (currentDashboard.actionText || "").trim()) updateData.actionText = actionText;
+    if ((sousTitre || "").trim() !== (currentDashboard.sousTitre || "").trim()) updateData.sousTitre = sousTitre;
+    if ((modalDescription || "").trim() !== (currentDashboard.modalDescription || "").trim()) updateData.modalDescription = modalDescription;
+    if (!areArraysEqual(currentDashboard.details, details)) updateData.details = details;
+    if ((status || "").trim() !== (currentDashboard.status || "").trim()) updateData.status = status;
+
+    // 🔹 Sécurité : aucun champ modifié
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    // 🔹 Mise à jour dans la base de données
+    const updatedDashboard = await SeeAllDashboardModel.findByIdAndUpdate(
+      dashboardId,
+      updateData,
+      { new: true }
+    );
+
+    return res.json({
       success: true,
-      message: 'Élément modifié avec succès',
-      data: updatedItem
+      message: "Élément du tableau de bord mis à jour avec succès !",
+      data: updatedDashboard,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Erreur updateSeeAllDashboard:", error);
+    return res.status(500).json({
       success: false,
-      message: "Erreur lors de la modification de l'élément du tableau de bord",
-      error: error.message
+      message: "Erreur lors de la mise à jour de l’élément du tableau de bord.",
+      error: error.message,
     });
   }
 };

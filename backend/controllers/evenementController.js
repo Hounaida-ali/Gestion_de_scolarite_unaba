@@ -34,50 +34,112 @@ const getIdEvent = async (req, res) => {
 // CREATE new event
 const addEvent = async (req, res) => {
   try {
+    const { title, description, date, type, period, academicYear, semester } = req.body;
 
-    const { title, description ,date, type, period, academicYear, semester } = req.body;
-    // Vérifier les événements en double
-    const existingEvent = await eventModel.findOne({ title, description, date,type, period, academicYear, semester });
+    // 🔍 Vérifier les événements en double
+    const existingEvent = await eventModel.findOne({
+      title,
+      description,
+      date,
+      type,
+      period,
+      academicYear,
+      semester
+    });
+
     if (existingEvent) {
-      return res.status(400).json({ message: "Cet événement existe déjà." });
+      return res.status(400).json({ success: false, message: "❌ Cet événement existe déjà." });
     }
-    const event = new eventModel(req.body);
+
+    // ✅ Créer et sauvegarder le nouvel événement
+    const event = new eventModel({ title, description, date, type, period, academicYear, semester });
     const savedEvent = await event.save();
-    res.status(201).json(savedEvent);
+
+    // ✅ Réponse de succès
+    res.status(201).json({
+      success: true,
+      message: "Événement enregistré avec succès.",
+      event: savedEvent
+    });
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 // UPDATE event
 const updateEvent = async (req, res) => {
   try {
-    const event = await eventModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!event) {
+    const currentEvent = await eventModel.findById(req.params.id);
+
+    if (!currentEvent) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    res.json(event);
+
+    const { title, description, date, type, period, academicYear, semester } = req.body;
+
+    // Vérification stricte
+    const isSame =
+      currentEvent.title === title &&
+      currentEvent.description === description &&
+      new Date(currentEvent.date).getTime() === new Date(date).getTime() &&
+      currentEvent.type === type &&
+      currentEvent.period === period &&
+      currentEvent.academicYear === academicYear &&
+      currentEvent.semester === semester;
+
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message: "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer."
+      });
+    }
+
+    const updatedEvent = await eventModel.findByIdAndUpdate(
+      req.params.id,
+      { title, description, date, type, period, academicYear, semester },
+      { new: true, runValidators: true }
+    );
+
+    res.json({
+      success: true,
+      message: 'Événement mis à jour avec succès.',
+      event: updatedEvent
+    });
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 // DELETE event
 const deleteEvent = async (req, res) => {
   try {
     const event = await eventModel.findByIdAndDelete(req.params.id);
+
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({
+        success: false,
+        message: '❌ Événement introuvable.'
+      });
     }
-    res.json({ message: 'Event deleted successfully' });
+
+    res.status(200).json({
+      success: true,
+      message: ' Événement supprimé avec succès.',
+      deletedEvent: event // (optionnel : utile pour journaliser ou annuler)
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
+
 
 // GET upcoming events
 const getnextevent = async (req, res) => {

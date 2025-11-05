@@ -93,35 +93,60 @@ const getFormationsByDepartement = async (req, res) => {
 // PUT modifier une formation
 const updateFormation = async (req, res) => {
   try {
-    const formationExist = await formationModel.findById(req.params.id);
-    if (!formationExist) {
-      return res.status(404).json({ message: 'Formation non trouvée' });
-    }
-
+    const formationId = req.params.id;
     const { nom, description, duree, departementId } = req.body;
 
-    // Préparer l'objet updateData
+    // 🔹 Vérifier si la formation existe
+    const currentFormation = await formationModel.findById(formationId);
+    if (!currentFormation) {
+      return res.status(404).json({
+        success: false,
+        message: "Formation non trouvée.",
+      });
+    }
+
+    // 🔹 Vérifier s’il y a un vrai changement
+    const isSame =
+      currentFormation.nom === nom &&
+      currentFormation.description === description &&
+      currentFormation.duree === duree &&
+      currentFormation.departement?.toString() === departementId;
+
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    // 🔹 Préparer les données de mise à jour
     const updateData = {};
     if (nom) updateData.nom = nom;
     if (description) updateData.description = description;
     if (duree) updateData.duree = duree;
     if (departementId) updateData.departement = departementId;
 
-    // Mise à jour
-    const formation = await formationModel.findByIdAndUpdate(
-      req.params.id,   
-      updateData,      
-      { new: true }    
+    // 🔹 Mettre à jour la formation
+    const updatedFormation = await formationModel.findByIdAndUpdate(
+      formationId,
+      updateData,
+      { new: true }
     );
 
-    res.json({
-      message: 'Formation mise à jour avec succès',
-      formation
+    return res.json({
+      success: true,
+      message: "Formation mise à jour avec succès !",
+      formation: updatedFormation,
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
+
 
 
 // DELETE supprimer une formation
@@ -131,7 +156,7 @@ const deleteFormation = async (req, res) => {
     if (!formation) {
       return res.status(404).json({ message: 'Formation non trouvée' });
     }
-    res.json({ message: 'Formation supprimée' });
+    res.json({ message: 'Formation supprimée avec succès' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
