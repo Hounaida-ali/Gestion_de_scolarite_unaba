@@ -39,12 +39,12 @@ const ressourceSchema = new mongoose.Schema({
   niveau: {
     type: String,
     required: true,
-    enum: ['licence1']
+    enum: ['licence1','licence2','licence3']
   },
   matiere: {
     type: String,
     required: true,
-    enum: ['microeconomie', 'gestion entreprise', 'statistiques', 'mathematiques', 'francais','sysyteme information']
+    // enum: ['microeconomie', 'gestion entreprise', 'statistiques', 'mathematiques', 'francais','sysyteme information']
   },
   fichier: { type: fileSchema, required: true },
   auteur: {

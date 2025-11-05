@@ -104,29 +104,39 @@ const updateRessource = async (req, res) => {
       return res.status(403).json({ message: 'Accès non autorisé' });
     }
 
-    const {
-      titre,
-      description,
-      type,
-      niveau,
-      matiere,
-      tags,
-    } = req.body;
+    const { titre, description, type, niveau, matiere, tags } = req.body;
 
-    // Préparer les données à mettre à jour
+    // 🔹 Vérifier s'il y a un vrai changement
+    const normalizedTags = tags
+      ? Array.isArray(tags)
+        ? tags.map(tag => tag.trim())
+        : tags.split(',').map(tag => tag.trim())
+      : undefined;
+
+    const isSame =
+      (titre === undefined || ressource.titre === titre) &&
+      (description === undefined || ressource.description === description) &&
+      (type === undefined || ressource.type === type) &&
+      (niveau === undefined || ressource.niveau === niveau) &&
+      (matiere === undefined || ressource.matiere === matiere) &&
+      (normalizedTags === undefined || JSON.stringify(ressource.tags) === JSON.stringify(normalizedTags));
+
+    if (isSame) {
+      return res.status(400).json({
+        message: "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer."
+      });
+    }
+
+    // 🔹 Préparer les données à mettre à jour
     const updateData = {};
-
     if (titre) updateData.titre = titre;
     if (description) updateData.description = description;
     if (type) updateData.type = type;
     if (niveau) updateData.niveau = niveau;
     if (matiere) updateData.matiere = matiere;
-    if (tags) {
-      updateData.tags = Array.isArray(tags)
-        ? tags.map(tag => tag.trim())
-        : tags.split(',').map(tag => tag.trim());
-    }   
-     // Mise à jour dans la base
+    if (normalizedTags) updateData.tags = normalizedTags;
+
+    // 🔹 Mise à jour dans la base
     const updatedRessource = await Ressource.findByIdAndUpdate(
       req.params.id,
       updateData,
@@ -137,11 +147,13 @@ const updateRessource = async (req, res) => {
       message: 'Ressource mise à jour avec succès',
       ressource: updatedRessource
     });
+
   } catch (error) {
     console.error('Erreur updateRessource:', error);
     res.status(400).json({ message: error.message });
   }
 };
+
 
 
 // DELETE supprimer une ressource
