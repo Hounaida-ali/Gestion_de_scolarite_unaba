@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middlewares/authMiddleware');
-const verifyAdmin = require('../middlewares/adminMiddleware');
 
 const { getAllExams,
     createExam,
@@ -10,8 +8,11 @@ const { getAllExams,
 
 // Routes
 router.get('/', getAllExams);
-router.post('/', authMiddleware, verifyAdmin, createExam);
-router.put('/:id', authMiddleware, verifyAdmin, updateExam);
-router.delete('/:id', authMiddleware, verifyAdmin, deleteExam);
+router.post('/',  
+     createExam);
+router.put('/:id',  
+     updateExam);
+router.delete('/:id',  
+     deleteExam);
 
 module.exports = router;
