@@ -21,6 +21,8 @@ const seeAllDashboardRouter = require('./routers/seeAllDashboardRouter');
 const AllNewsRouter = require('./routers/AllNewsRouter');
 const  scheduleRouter = require('./routers/scheduleRouter');
 const  examRouter = require('./routers/examRouter');
+const  gesUtilisateurRouter = require('./routers/gesUtilisateurRouter');
+const  noteRouter = require('./routers/noteRouter');
 
 
 const app = express();
@@ -54,6 +56,8 @@ app.use('/api/SeeAllDashboard', seeAllDashboardRouter );
 app.use('/api/AllNews', AllNewsRouter );
 app.use('/api/Schedule', scheduleRouter );
 app.use('/api/Exam', examRouter);
+app.use('/api/Utilisateur', gesUtilisateurRouter);
+app.use('/api/Note', noteRouter);
 
 
 app.post("/api/file-uploads", uploads.single("file"), (req, res) => {
