@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middlewares/adminMiddleware');
 const verifyAdmin = require('../middlewares/adminMiddleware');
 // Importer les méthodes du controller
 const {
@@ -12,8 +11,8 @@ const {
 
 
 router.get('/', getSchedules);
-router.post('/', authMiddleware, verifyAdmin, createSchedule);
-router.put('/:id', authMiddleware, verifyAdmin, updateSchedule);
-router.delete('/:id', authMiddleware, verifyAdmin,deleteSchedule);
+router.post('/',   createSchedule);
+router.put('/:id',   updateSchedule);
+router.delete('/:id',  deleteSchedule);
 
 module.exports = router;
