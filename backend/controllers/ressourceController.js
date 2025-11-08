@@ -1,4 +1,4 @@
-    require('dotenv').config();
+require('dotenv').config();
 const Ressource = require('../models/ressourceModel');
 
 // GET toutes les ressources avec filtres
@@ -8,41 +8,41 @@ const getAllRessource = async (req, res) => {
 
     let query = { estPublic: true };
 
-    // Filtres
     if (type) query.type = type;
     if (niveau) query.niveau = niveau;
     if (matiere) query.matiere = matiere;
 
-    // Recherche textuelle
     if (search) {
-      query.$text = { $search: search };
+      const safeSearch = search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+      query.$or = [
+        { titre: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } }
+      ];
     }
 
-    const options = {
-      page: parseInt(page),
-      limit: parseInt(limit),
-      sort: { datePublication: -1 },
-      populate: 'auteur'
-    };
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const ressources = await Ressource.find(query)
       .populate('auteur', 'firstName lastName')
       .sort({ datePublication: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .skip(skip)
+      .limit(parseInt(limit));
 
     const total = await Ressource.countDocuments(query);
 
     res.json({
       ressources,
       totalPages: Math.ceil(total / limit),
-      currentPage: page,
+      currentPage: parseInt(page),
       total
     });
   } catch (error) {
+    console.error('Erreur getAllRessource:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
+
 
 // GET ressource par ID
 const getIdRessource = async (req, res) => {

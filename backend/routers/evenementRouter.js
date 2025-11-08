@@ -8,7 +8,7 @@ router.post('/', addEvent);
 router.put('/:id', updateEvent);
 router.delete('/:id', deleteEvent);
 router.get('/year/:academicYear', getEvAcademic);
-router.get('/next', getnextevent);
+router.get('/upcoming/next', getnextevent);
 router.get('/:id', getIdEvent);
 
 module.exports = router;

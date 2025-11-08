@@ -23,7 +23,7 @@ const  scheduleRouter = require('./routers/scheduleRouter');
 const  examRouter = require('./routers/examRouter');
 const  gesUtilisateurRouter = require('./routers/gesUtilisateurRouter');
 const  noteRouter = require('./routers/noteRouter');
-
+const inscriptionRouter = require('./routers/inscriptionRouter')
 
 const app = express();
 const PORT = process.env.PORT
@@ -58,7 +58,7 @@ app.use('/api/Schedule', scheduleRouter );
 app.use('/api/Exam', examRouter);
 app.use('/api/Utilisateur', gesUtilisateurRouter);
 app.use('/api/Note', noteRouter);
-
+app.use('/api/etudiants', inscriptionRouter);
 
 app.post("/api/file-uploads", uploads.single("file"), (req, res) => {
   console.log("File propreties", req.file);
@@ -74,6 +74,23 @@ app.post("/api/file-uploads", uploads.single("file"), (req, res) => {
   });
 });
 
+// uoloads image etudiant
+app.post("/api/etudiants/file-uploads", uploads.single("file"), (req, res) => {
+  console.log("File properties:", req.file);
+
+  // URL publique que le front pourra afficher
+  const fileUrl = `/uploads/${req.file.filename}`;
+
+  res.json({
+    message: "File uploaded successfully",
+    file: {
+      nom: req.file.originalname,
+      url: fileUrl, // URL publique
+      taille: req.file.size,
+      type: req.file.mimetype
+    }
+  });
+});
 
 
 // Démarrage du serveur
