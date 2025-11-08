@@ -1,0 +1,104 @@
+<section class="quickaccess-section">
+  <div class="quickaccess-container">
+
+    <!-- ✅ Messages de succès / erreur -->
+    <div *ngIf="successMessage" class="notification-float notification-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="notification-float notification-error">
+      {{ errorMessage }}
+    </div>
+
+    <!-- En-tête avec bouton Ajouter -->
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-cogs"></i> Gestion des accès rapides</h2>
+      <button (click)="newAccess()" class="add-btn">
+        <i class="fas fa-plus"></i> Ajouter un accès rapide
+      </button>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement des accès rapides...</p>
+    </div>
+
+    <!-- ✅ Formulaire d’ajout / mise à jour -->
+    <form *ngIf="showForm" [formGroup]="accessForm" 
+    (ngSubmit)="onSubmit()" class="dashboard-form">
+      <div class="form-grid">
+        <input type="text" formControlName="titre" placeholder="Titre de l'accès rapide" />
+        <input type="text" formControlName="icon" placeholder="Icône (classe FontAwesome)" />
+        <textarea formControlName="contenu" placeholder="Contenu de l'accès rapide"></textarea>
+        <input type="text" formControlName="actionText" placeholder="Texte d'action (ex: Voir plus)" />
+      </div>
+
+      <div class="form-grid">
+        <input type="text" formControlName="sousTitre" placeholder="Sous-titre du modal" />
+        <textarea formControlName="modalDescription" placeholder="Description du modal"></textarea>
+      </div>
+
+      <div class="details-container">
+        <label>Détails :</label>
+        <div formArrayName="details">
+          <div *ngFor="let detail of details.controls; let i = index" class="detail-row">
+            <input [formControlName]="i" placeholder="Ex: Informations supplémentaires..." />
+            <button type="button" (click)="removeDetail(i)" class="btn-remove">×</button>
+          </div>
+        </div>
+        <button type="button" class="btn-add" (click)="addDetail()">+ Ajouter un détail</button>
+      </div>
+
+      <input type="text" formControlName="status" placeholder="Statut de l'accès rapide" />
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="accessForm.invalid">
+          {{ editMode ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()" class="btn-cancel">Annuler</button>
+      </div>
+    </form>
+
+    <!-- ✅ Tableau des accès rapides -->
+    <div *ngIf="!loading && accesRapides.length > 0 && !showForm" class="quickaccess-table">
+      <table class="dashboard-list">
+        <thead>
+          <tr>
+            <th>Icône</th>
+            <th>Titre</th>
+            <th>Contenu</th>
+            <th>Action</th>
+            <th>Gestion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let acces of accesRapides; let i = index">
+            <td class="dashboard-icon"><i class="{{ acces.icon }}"></i></td>
+            <td class="dashboard-title">{{ acces.titre }}</td>
+            <td class="dashboard-content">{{ acces.contenu }}</td>
+            <td class="dashboard-action">
+              <span class="dashboard-link" (click)="openModal(i)">
+                {{ acces.actionText }}
+                <i class="fas fa-arrow-right"></i>
+              </span>
+            </td>
+            <td class="action-buttons">
+              <button class="btn-edit" (click)="editAccess(acces)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="btn-delete" (click)="deleteAccess(acces._id!)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Message si aucun accès rapide -->
+    <div *ngIf="!loading && accesRapides.length === 0" class="no-quickaccess">
+      <p>Aucun accès rapide disponible pour le moment.</p>
+    </div>
+
+  </div>
+</section>

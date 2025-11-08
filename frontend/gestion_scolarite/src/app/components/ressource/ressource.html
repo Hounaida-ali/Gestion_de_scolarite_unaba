@@ -1,92 +1,239 @@
 <div class="container">
+  <!-- Notifications -->
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
   <!-- En-tête de page -->
   <section class="page-header">
     <h1><i class="fas fa-book-open"></i> Ressources Pédagogiques</h1>
-    <p>Accédez à l'ensemble des supports de cours, travaux dirigés et ressources pédagogiques du département</p>
+    <p>
+      Accédez à l'ensemble des supports de cours, travaux dirigés et ressources pédagogiques du
+      département
+    </p>
   </section>
 
   <!-- Section des ressources -->
-  <section class="resources-section">
+  <section class="resources-section" *ngIf="!showRessourceForm">
     <div class="section-header">
       <h2 class="section-title"><i class="fas fa-download"></i> Documents disponibles</h2>
       <div class="search-box">
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
           (keyup.enter)="onSearch()"
-          placeholder="Rechercher un document...">
+          placeholder="Rechercher un document..."
+        />
         <button (click)="onSearch()"><i class="fas fa-search"></i></button>
       </div>
     </div>
-    
+
     <!-- Filtres -->
     <div class="filters">
       <div class="filter-group">
         <label for="typeFilter">Type de document</label>
         <select id="typeFilter" [(ngModel)]="typeFilter" (change)="onFilterChange()">
-          <option *ngFor="let type of types" [value]="type.value">{{type.label}}</option>
+          <option *ngFor="let type of types" [value]="type.value">{{ type.label }}</option>
         </select>
       </div>
-      
+
       <div class="filter-group">
         <label for="niveauFilter">Niveau</label>
         <select id="niveauFilter" [(ngModel)]="niveauFilter" (change)="onFilterChange()">
-          <option *ngFor="let niveau of niveaux" [value]="niveau.value">{{niveau.label}}</option>
+          <option *ngFor="let niveau of niveaux" [value]="niveau.value">{{ niveau.label }}</option>
         </select>
       </div>
-      
+
       <div class="filter-group">
         <label for="matiereFilter">Matière</label>
         <select id="matiereFilter" [(ngModel)]="matiereFilter" (change)="onFilterChange()">
-          <option *ngFor="let matiere of matieres" [value]="matiere.value">{{matiere.label}}</option>
+          <option *ngFor="let matiere of matieres" [value]="matiere.value">
+            {{ matiere.label }}
+          </option>
         </select>
       </div>
-    </div>
-    
-    <!-- Grille des ressources -->
-    <div class="resources-grid">
-      <div *ngFor="let ressource of ressources" class="resource-card">
-        <div class="resource-header">
-          <i [class]="getFileIcon(ressource.fichier.type)" class="resource-icon"></i>
-          <h3>{{getTypeLabel(ressource.type)}}</h3>
-        </div>
-        <div class="resource-body">
-          <h4 class="resource-title">{{ressource.titre}}</h4>
-          <p class="resource-description">{{ressource.description}}</p>
-          <div class="resource-meta">
-            <span><i class="fas fa-graduation-cap"></i> {{getNiveauLabel(ressource.niveau)}}</span>
-            <span><i class="fas fa-book"></i> {{getMatiereLabel(ressource.matiere)}}</span>
-          </div>
-          <div class="resource-meta">
-            <span><i class="fas fa-user"></i> {{ressource.auteur.prenom}} {{ressource.auteur.nom}}</span>
-            <span><i class="fas fa-calendar"></i> {{ressource.datePublication | date:'dd/MM/yyyy'}}</span>
-          </div>
-        </div>
-        <div class="resource-footer">
-          <button class="download-btn" (click)="telechargerRessource(ressource)">
-            <i class="fas fa-download"></i> Télécharger
-          </button>
-          <span class="file-size">{{formatFileSize(ressource.fichier.taille)}}</span>
-        </div>
+
+      <div class="filter-group" style="margin-left: auto">
+        <button (click)="newRessource()" class="add-btn">
+          <i class="fas fa-plus"></i> Ajouter une ressource
+        </button>
       </div>
     </div>
-    
+
+    <!-- Tableau des ressources -->
+    <div class="table-responsive">
+      <table class="resources-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Titre</th>
+            <th>Description</th>
+            <th>Niveau</th>
+            <th>Matière</th>
+            <th>Auteur</th>
+            <th>Date publication</th>
+            <th>Taille</th>
+            <th>Télécharger</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ressource of ressources">
+            <td>{{ getTypeLabel(ressource.type) }}</td>
+            <td>{{ ressource.titre }}</td>
+            <td>{{ ressource.description }}</td>
+            <td>{{ getNiveauLabel(ressource.niveau) }}</td>
+            <td>{{ getMatiereLabel(ressource.matiere) }}</td>
+            <td>{{ressource.auteur.prenom}} {{ressource.auteur.nom}}</td>
+            <td>{{ ressource.datePublication | date : 'dd/MM/yyyy' }}</td>
+            <td>{{ formatFileSize(ressource.fichier.taille) }}</td>
+            <td class="telechargerRessource">
+              <button class="download-btn" (click)="telechargerRessource(ressource)">
+                <i class="fas fa-download"></i>
+              </button>
+            </td>
+            <td class="action-buttons">
+              <button (click)="editRessource(ressource)" class="btn-edit" title="Modifier">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button (click)="deleteRessource(ressource)" class="btn-delete" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="ressources.length === 0">
+            <td colspan="10" class="no-resources">Aucune ressource trouvée.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Pagination -->
     <div *ngIf="totalPages > 1" class="pagination">
-      <button 
-        *ngFor="let page of [].constructor(totalPages); let i = index" 
+      <button
+        *ngFor="let page of [].constructor(totalPages); let i = index"
         (click)="onPageChange(i + 1)"
         [class.active]="currentPage === i + 1"
-        class="page-btn">
-        {{i + 1}}
+        class="page-btn"
+      >
+        {{ i + 1 }}
       </button>
     </div>
-    
-    <!-- Message si aucune ressource -->
-    <div *ngIf="ressources.length === 0" class="no-resources">
-      <i class="fas fa-search fa-3x"></i>
-      <h3>Aucune ressource trouvée</h3>
-      <p>Aucun document ne correspond à vos critères de recherche.</p>
-    </div>
+  </section>
+
+  <!-- Formulaire d'ajout / édition -->
+  <section *ngIf="showRessourceForm" class="container1">
+    <h3>{{ selectedRessource?._id ? 'Modifier une ressource' : 'Ajouter une ressource' }}</h3>
+
+    <form (ngSubmit)="saveRessource()">
+      <!-- Titre -->
+      <div class="form-group">
+        <label>Titre</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedRessource.titre"
+          name="titre"
+          required
+          placeholder="Ex: Chapitre 2 Étude préliminaire"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="selectedRessource.description"
+          name="description"
+          placeholder="Brève description du document..."
+        ></textarea>
+      </div>
+
+      <!-- Type -->
+      <div class="form-group">
+        <label>Type de document</label>
+        <select [(ngModel)]="selectedRessource.type" name="type" required>
+          <option value="">-- Sélectionner un type --</option>
+          <option value="cours">Cours</option>
+          <option value="td">Travaux Dirigés (TD)</option>
+          <option value="tp">Travaux Pratiques (TP)</option>
+          <option value="examen">Examen</option>
+          <option value="autre">Autre</option>
+        </select>
+      </div>
+
+      <!-- Niveau -->
+      <div class="form-group">
+        <label>Niveau</label>
+        <select [(ngModel)]="selectedRessource.niveau" name="niveau" required>
+          <option value="">-- Sélectionner un niveau --</option>
+          <option value="licence1">Licence 1</option>
+          <option value="licence2">Licence 2</option>
+          <option value="licence3">Licence 3</option>
+          <option value="master1">Master 1</option>
+          <option value="master2">Master 2</option>
+        </select>
+      </div>
+
+      <!-- Matière -->
+      <div class="form-group">
+        <label>Matière</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedRessource.matiere"
+          name="matiere"
+          required
+          placeholder="Ex: Système d'information"
+        />
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        <label>Tags</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedRessource.tags"
+          name="tags"
+          placeholder="Ex: cours, économie, licence2"
+        />
+      </div>
+
+      <!-- Fichier -->
+      <div class="form-group">
+        <label>Fichier</label>
+
+        <!-- Bouton visible -->
+        <button type="btnn" class="file-btn"   (click)="onFakeFileClick()">
+          {{ selectedRessource._id ? 'Fichier non modifiable' : 'Choisir un fichier' }}
+        </button>
+
+        <!-- Input réel caché -->
+        <input
+          type="file"
+          #fileInput
+          style="display: none"
+          (change)="onFileSelected($event)"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt"
+        />
+
+        <div *ngIf="selectedFile || currentFileName" class="file-preview">
+          <p>
+            <i class="fas fa-file"></i>
+            {{ selectedFile?.name || currentFileName }}
+            ({{ selectedFile ? formatFileSize(selectedFile.size) : 'Fichier existant' }})
+          </p>
+        </div>
+      </div>
+
+      <!-- Boutons -->
+      <div class="buttons">
+        <button type="submit" class="btn-save">
+          {{ selectedRessource._id ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()" class="btn-cancel">Annuler</button>
+      </div>
+    </form>
   </section>
 </div>

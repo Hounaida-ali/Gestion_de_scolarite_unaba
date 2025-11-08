@@ -3,7 +3,7 @@ export interface Event {
   title: string;
   description: string;
   date: Date;
-  type: 'cours' | 'examen' | 'vacances' | 'ferie' | 'autre';
+  type: 'cours' | 'examen' | 'vacances' | 'ferier' | 'autre';
   period: string;
   academicYear: string;
   semester: 1 | 2;

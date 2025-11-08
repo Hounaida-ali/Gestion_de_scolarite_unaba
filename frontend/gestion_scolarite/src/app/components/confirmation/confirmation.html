@@ -1,0 +1,217 @@
+<div class="container">
+  <!-- Barre de progression -->
+  <div class="progress-bar">
+    <div class="step completed">
+      <div class="step-number">1</div>
+      <div class="step-label">Informations Personnelles</div>
+    </div>
+    <div class="step completed">
+      <div class="step-number">2</div>
+      <div class="step-label">Choix de Formation</div>
+    </div>
+    <div class="step completed">
+      <div class="step-number">3</div>
+      <div class="step-label">Validation Administrative</div>
+    </div>
+    <div class="step completed">
+      <div class="step-number">4</div>
+      <div class="step-label">Paiement</div>
+    </div>
+    <div class="step active">
+      <div class="step-number">5</div>
+      <div class="step-label">Confirmation</div>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <div class="form-section active">
+      <!-- Message de succès -->
+      <div class="success-header">
+        <div class="success-icon">🎓</div>
+        <h1>Félicitations !</h1>
+        <p class="success-subtitle">Votre inscription a été confirmée avec succès</p>
+      </div>
+
+      <div class="alert alert-success">
+        <p><strong>Bienvenue à l'Université Internationale !</strong></p>
+        <p>
+          Votre inscription a été traitée avec succès. Vous recevrez un email de confirmation avec
+          toutes les informations nécessaires pour débuter votre formation.
+        </p>
+      </div>
+
+      <!-- Carte d'étudiant virtuelle -->
+      <div class="student-card" *ngIf="etudiant">
+        <div class="card-header">
+          <div class="university-info">
+            <h3>Université Internationale</h3>
+            <p>Carte d'Étudiant</p>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="student-identity">
+            <!-- Section photo -->
+            <div class="student-photo-section">
+              <div class="student-photo">
+                <img
+                  *ngIf="photoUrl"
+                  [src]="photoUrl"
+                  alt="Photo étudiant"
+                  class="photo-image"
+                  (error)="onImageError()"
+                />
+                <div *ngIf="!photoUrl" class="photo-placeholder">
+                  <span class="photo-icon">👤</span>
+                </div>
+              </div>
+              <div class="photo-frame"></div>
+            </div>
+          </div>
+
+          <div class="student-info">
+            <div class="info-row">
+              <span class="info-label">Nom complet:</span>
+              <span class="info-value"
+                >{{ etudiant.nom | uppercase }} {{ etudiant.prenom | uppercase }}</span
+              >
+            </div>
+            <div class="info-row">
+              <span class="info-label">Numéro d'étudiant:</span>
+              <span class="info-value highlight">{{
+                etudiant.numeroEtudiant || 'En cours de génération'
+              }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ID Provisoire:</span>
+              <span class="info-value">{{ etudiant.idProvisoire }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Département:</span>
+              <div class="info-value">{{ getDepartementLabel(etudiant.departement) }}</div>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Formation:</span>
+              <span class="info-value">{{ getFormationLabel(etudiant.formation) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Mode:</span>
+              <span class="info-value">{{ getModeFormationLabel(etudiant.modeFormation) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Statut:</span>
+              <span class="info-value status-confirmed">{{ getStatutLabel(etudiant.statut) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="validity">Valide jusqu'au: {{ getDateFinAnnee() }}</div>
+          <div class="signature">
+            <!-- <div class="signature-line"></div>
+            <div class="signature-text">Signature</div> -->
+            <button type="button" class="btn btn-primary" (click)="telechargerAttestation()" clor="007bff">
+              Télécharger 
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- FIN de la carte d'étudiant virtuelle -->
+
+      <!-- Détails complets de l'inscription -->
+      <div class="confirmation-details" *ngIf="etudiant">
+        <h3>Détails de votre inscription</h3>
+
+        <div class="details-grid">
+          <div class="detail-section">
+            <h4>Informations Personnelles</h4>
+            <div class="detail-row">
+              <div class="detail-label">Nom complet:</div>
+              <div class="detail-value">
+                {{ etudiant.nom | uppercase }} {{ etudiant.prenom | uppercase }}
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Email:</div>
+              <div class="detail-value">{{ etudiant.email }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Téléphone:</div>
+              <div class="detail-value">{{ etudiant.telephone }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Date de naissance:</div>
+              <div class="detail-value">{{ formaterDate(etudiant.dateNaissance) }}</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Informations de Formation</h4>
+            <div class="detail-row">
+              <div class="detail-label">Département:</div>
+              <div class="detail-value">{{ getDepartementLabel(etudiant.departement) }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Formation:</div>
+              <div class="detail-value">{{ getFormationLabel(etudiant.formation) }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Mode:</div>
+              <div class="detail-value">{{ getModeFormationLabel(etudiant.modeFormation) }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Niveau d'études:</div>
+              <div class="detail-value">{{ etudiant.niveauEtudes }}</div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Informations Administratives</h4>
+            <div class="detail-row">
+              <div class="detail-label">Numéro d'étudiant:</div>
+              <div class="detail-value highlight">
+                {{ etudiant.numeroEtudiant || 'En cours de génération' }}
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">ID Provisoire:</div>
+              <div class="detail-value">{{ etudiant.idProvisoire }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Date d'inscription:</div>
+              <div class="detail-value">{{ formaterDate(etudiant.dateInscription) }}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Frais d'inscription:</div>
+              <div class="detail-value">{{ etudiant.fraisInscription || 50000 }} FCFA (Payé)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="confirmation-actions">
+        <button type="button" class="btn btn-primary" (click)="telechargerAttestation()">
+          <span class="btn-icon">📄</span>
+          Télécharger l'attestation
+        </button>
+
+        <button type="button" class="btn btn-secondary" (click)="nouvelleInscription()">
+          <span class="btn-icon">➕</span>
+          Nouvelle inscription
+        </button>
+
+        <button type="button" class="btn btn-outline" routerLink="/">
+          <span class="btn-icon">🏠</span>
+          Retour à l'accueil
+        </button>
+      </div>
+
+      <!-- Chargement -->
+      <div *ngIf="!etudiant" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement de votre confirmation...</p>
+      </div>
+    </div>
+  </div>
+</div>

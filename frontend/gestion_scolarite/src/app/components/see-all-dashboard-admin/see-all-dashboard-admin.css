@@ -1,0 +1,425 @@
+/* Container principal de la page "Tous les Services" */
+.see-all-dashboard-section {
+    padding: 2rem 0;
+    background-color: #f9f9f9;
+    min-height: 70vh;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.notification-float {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 300px;
+  padding: 12px 18px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: #155724; /* Couleur texte succès par défaut */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  z-index: 9999;
+  gap: 10px;
+  border: 4px solid #ffffff;
+  margin-top: -10px;
+
+}
+
+/* Icône */
+.notification-float .icon {
+  font-size: 18px;
+}
+
+/* Message */
+.notification-float .message {
+  flex: 1;
+}
+
+/* Types de notification */
+.notification-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.notification-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+
+/* =========================
+   Boutons d’action
+========================= */
+.action-buttons {
+  text-align: center;       /* ✅ Centre les boutons horizontalement */
+  white-space: nowrap;      /* ✅ Empêche les retours à la ligne */
+  vertical-align: middle;   /* ✅ Centre verticalement dans la cellule */
+}
+
+/* Boutons individuels */
+.btn-edit,
+.btn-delete {
+  display: inline-block;    /* ✅ Permet un alignement horizontal naturel */
+  margin: 0 6px;            /* ✅ Espacement horizontal entre les boutons */
+  padding: 6px 10px;        /* ✅ Taille du bouton */
+  border: none;             /* Supprime les bordures par défaut */
+  border-radius: 6px;       /* Coins arrondis */
+  cursor: pointer;          /* Curseur pointeur */
+  color: #fff;              /* Couleur du texte */
+  font-size: 16px;          /* Taille du texte / icône */
+  line-height: 1;           /* Évite les décalages verticaux */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  vertical-align: middle;   /* ✅ Alignement vertical parfait */
+}
+
+
+.btn-edit {
+  background: #f0ad4e;
+}
+
+.btn-edit:hover {
+  background: #ec971f;
+}
+
+.btn-delete {
+  background: #d9534f;
+}
+
+.btn-delete:hover {
+  background: #c9302c;
+}
+
+/* =========================
+   Conteneur du formulaire
+========================= */
+.dashboard-form {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 900px;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* =========================
+   Grilles de champs
+========================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Champs input et textarea */
+.dashboard-form input,
+.dashboard-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.dashboard-form input:focus,
+.dashboard-form textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* Textarea spécifique */
+.dashboard-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* =========================
+   Détails (FormArray)
+========================= */
+.details-container {
+  margin-bottom: 20px;
+}
+
+.details-container label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.detail-row input {
+  flex: 1;
+}
+
+.btn-remove {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-remove:hover {
+  background-color: #c82333;
+}
+
+.btn-add {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn-add:hover {
+  background-color: #218838;
+}
+
+/* =========================
+   Actions du formulaire
+========================= */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-start;
+  margin-top: 15px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+}
+
+.form-actions button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #c82333;
+}
+/* =========================
+   Boutons du haut
+========================= */
+.add-btn,
+.refresh-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.add-btn {
+  background-color: #2ecc71;
+}
+
+.add-btn:hover {
+  background-color: #27ae60;
+}
+
+.refresh-btn {
+  background-color: #3498db;
+}
+
+.refresh-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Bouton retour */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-color, #2c7be5);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    transition: 0.3s ease;
+}
+
+.back-button:hover {
+    gap: 12px;
+    color: var(--accent-color, #ff7b00);
+}
+
+/* En-tête de section */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #333;
+}
+
+/* Spinner de chargement */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #eee;
+    border-top: 5px solid var(--primary-color, #2c7be5);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Tableau des dashboards */
+.dashboard-list {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin-bottom: 2rem;
+} 
+
+/* Ligne d'en-tête du tableau */
+.dashboard-list thead {
+    background-color: var(--primary-color)
+}
+
+.dashboard-list table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* Les colonnes s'ajustent automatiquement */
+    min-width: 600px; /* Assure une largeur minimale pour éviter trop de compression */
+}
+
+.dashboard-list th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    border-bottom: 2px solid #ccc;
+    border-right: 1px solid #ddd; /* Bordure pour séparer les colonnes */
+}
+
+/* Lignes du tableau */
+.dashboard-list tbody tr {
+    background: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.dashboard-list tbody tr:hover {
+    background-color: #f4f4f4;
+}
+
+/* Colonnes du tableau */
+.dashboard-list td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+    color: #555;
+    border-right: 1px solid #ddd; /* Bordure pour séparer les colonnes */
+}
+
+/* Ajouter une bordure à la dernière colonne pour ne pas avoir de bordure à droite */
+.dashboard-list td:last-child, 
+.dashboard-list th:last-child {
+    border-right: none;
+}
+
+/* Style des icônes et titres dans le tableau */
+.dashboard-list .dashboard-header i {
+    font-size: 1.5rem;
+    color: var(--primary-color, #2c7be5);
+    margin-right: 10px;
+}
+
+.dashboard-list .dashboard-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Action Link dans le tableau */
+.dashboard-list .dashboard-link {
+    font-weight: 500;
+    color: var(--primary-color, #2c7be5);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.3s ease;
+}
+
+.dashboard-list .dashboard-link:hover {
+    gap: 10px;
+    color: var(--accent-color, #ff7b00);
+}
+
+/* Message quand aucun dashboard */
+.no-dashboard {
+    text-align: center;
+    padding: 3rem 0;
+    font-size: 1rem;
+    color: #777;
+}
+
+/* Animation fade-in pour la section */
+.see-all-dashboard-section.active {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

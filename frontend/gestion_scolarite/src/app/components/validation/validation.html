@@ -1,0 +1,153 @@
+<div class="container">
+  <!-- Barre de progression -->
+  <div class="progress-bar">
+    <div class="step completed">
+      <div class="step-number">1</div>
+      <div class="step-label">Informations Personnelles</div>
+    </div>
+    <div class="step completed">
+      <div class="step-number">2</div>
+      <div class="step-label">Choix de Formation</div>
+    </div>
+    <div class="step active">
+      <div class="step-number">3</div>
+      <div class="step-label">Validation Administrative</div>
+    </div>
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-label">Paiement</div>
+    </div>
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-label">Confirmation</div>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <div class="form-section active">
+      <h2>Validation Administrative</h2>
+
+      <!-- Message d'information -->
+      <div class="alert alert-info" *ngIf="etudiant?.statut === 'en-attente'">
+        <p><strong>Votre demande d'inscription a été soumise avec succès.</strong></p>
+        <p>Elle est en cours de validation par l'administration universitaire.</p>
+        <p>Vous recevrez un email de confirmation une fois votre inscription validée.</p>
+      </div>
+
+      <!-- Message de validation réussie -->
+      <div class="alert alert-success" *ngIf="etudiant?.statut === 'valide'">
+        <p><strong>Félicitations ! Votre inscription a été validée.</strong></p>
+        <p>Vous pouvez maintenant procéder au paiement des frais d'inscription.</p>
+      </div>
+
+      <!-- Récapitulatif de l'inscription -->
+      <div class="confirmation-details" *ngIf="etudiant">
+        <h3>Récapitulatif de votre inscription</h3>
+
+        <div class="detail-row">
+          <div class="detail-label">ID Provisoire:</div>
+          <div class="detail-value">{{ etudiant.idProvisoire || 'Non généré' }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Nom complet:</div>
+          <div class="detail-value">
+            {{ etudiant.prenom | uppercase }} {{ etudiant.nom | uppercase }}
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Email:</div>
+          <div class="detail-value">{{ etudiant.email }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Téléphone:</div>
+          <div class="detail-value">{{ etudiant.telephone }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Département:</div>
+          <div class="detail-value">{{ getDepartementLabel(etudiant.departement) }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Formation:</div>
+          <div class="detail-value">
+            {{ getFormationLabel(etudiant.formation) }} -
+            {{ getModeFormationLabel(etudiant.modeFormation) }}
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Niveau d'études:</div>
+          <div class="detail-value">{{ getNiveauEtudesLabel(etudiant.niveauEtudes) }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Documents fournis:</div>
+          <div class="detail-value">
+            <span *ngIf="!etudiant.documents || etudiant.documents.length === 0"
+              >Aucun document sélectionné</span
+            >
+            <ul *ngIf="etudiant.documents && etudiant.documents.length > 0" class="documents-list">
+              <li *ngFor="let doc of etudiant.documents">{{ getDocumentLabel(doc) }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Statut:</div>
+          <div class="detail-value">
+            <span [class]="'status-badge status-' + (etudiant.statut || 'inconnu')">
+              {{ getStatutLabel(etudiant.statut) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Date de soumission:</div>
+          <div class="detail-value">
+            {{ etudiant.dateInscription ? formaterDate(etudiant.dateInscription) : 'Non définie' }}
+          </div>
+        </div>
+
+        <div class="detail-row" *ngIf="etudiant.statut === 'valide'">
+          <div class="detail-label">Frais d'inscription:</div>
+          <div class="detail-value">{{ etudiant.fraisInscription || 450 }} €</div>
+        </div>
+      </div>
+
+      <!-- Chargement -->
+      <div *ngIf="!etudiant" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement des informations...</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/">← Retour à l'accueil</button>
+
+        <!-- Bouton pour l'administration (simulation) -->
+        <button
+          *ngIf="etudiant?.statut === 'en-attente'"
+          type="button"
+          class="btn btn-primary"
+          (click)="simulerValidation()"
+        >
+          Simuler la validation administrative
+        </button>
+
+        <!-- Bouton pour passer au paiement -->
+        <button
+          *ngIf="etudiant?.statut === 'valide'"
+          type="button"
+          class="btn btn-success"
+          (click)="naviguerVersPaiement()"
+        >
+          Procéder au paiement →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

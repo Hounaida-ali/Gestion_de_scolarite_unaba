@@ -40,6 +40,10 @@ footer {
 .footer-section ul {
     list-style: none;
 }
+.footer-section
+.rapides{
+    margin-left: 10%;
+}
 
 .footer-section a {
     color: white;

@@ -1,0 +1,77 @@
+<section class="container">
+  <div class="schedule-container">
+    <h2>Emploi du temps</h2>
+    <div class="schedule-header">
+      <button (click)="refreshPage()" class="refresh-btn">
+        <i class="fa-solid fa-rotate-right"></i> Actualiser
+      </button>
+    </div>
+    <div class="filters">
+      <div class="filter-group">
+        <label>Département :</label>
+        <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
+          <option value="">Tout les departement</option>
+          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Filière :</label>
+        <select
+          [(ngModel)]="filiereFilter"
+          (change)="onFiliereChange()"
+          [disabled]="!departementFilter"
+        >
+          <option value="">Toutes les filières</option>
+          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Niveau :</label>
+        <select [(ngModel)]="niveauFilter" (change)="filterSlots()" [disabled]="!filiereFilter">
+          <option value="">Tout les niveaux</option>
+          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+
+      <!-- <button class="add-btn" (click)="openModal()">Ajouter un cours</button> -->
+    </div>
+
+    <table class="timetable">
+      <thead>
+        <tr>
+          <th>Heures</th>
+          <th *ngFor="let day of days">{{ day }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Message si aucun cours trouvé -->
+        <tr *ngIf="filteredSlots.length === 0">
+          <td [attr.colspan]="days.length + 1" class="no-courses">
+            Aucun cours trouvé pour ces critères.
+          </td>
+        </tr>
+
+        <!-- Boucle sur les créneaux horaires -->
+        <tr *ngFor="let time of timeSlots">
+          <td>{{ time }}</td>
+          <td *ngFor="let day of days">
+            <ng-container *ngFor="let slot of filteredSlots">
+              <div
+                *ngIf="getDayName(slot.start) === day && formatTime(slot.start, slot.end) === time"
+                class="course {{ slot.group }}"
+                [class.canceled]="slot.canceled"
+                (click)="showDetails(slot)"
+              >
+                <strong>{{ slot.title }}</strong
+                ><br />
+                {{ slot.teacher }} - {{ slot.room }}
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

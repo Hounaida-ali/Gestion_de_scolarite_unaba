@@ -1,0 +1,250 @@
+<div class="container">
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <h1 class="page-title">Nos Formations</h1>
+  <p class="page-description">
+    Découvrez l'ensemble des formations offertes par nos départements. Chaque programme est conçu
+    pour offrir une éducation de qualité et préparer les étudiants aux défis du marché du travail.
+  </p>
+</div>
+
+<div class="container">
+  <div *ngIf="isLoading" class="loading">Chargement ...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="section-header">
+    <h2 class="section-title"><i class="fas fa-list"></i> Liste des formation par departement</h2>
+    <div class="filter-group" style="margin-left: auto">
+      <button (click)="newFormation()" class="add-btn">
+        <i class="fas fa-plus"></i> Ajouter une formation
+      </button>
+    </div>
+    <a [routerLink]="['/departement']" class="btn-link">
+      <i class="fas fa-external-link-alt"></i> Créer un département
+    </a>
+  </div>
+
+  <!-- FORMULAIRE DE CREATION DE FORMATION -->
+  <div *ngIf="showFormationForm" class="formation-form-container">
+    <form [formGroup]="formationForm" (ngSubmit)="saveFormation()">
+      <h3>Nouvelle Formation</h3>
+      <div>
+        <label>Nom de la formation</label>
+        <input formControlName="nom" placeholder="Nom de la formation" />
+      </div>
+
+      <div>
+        <label>Département</label>
+        <select formControlName="departementId">
+          <option value="">-- Sélectionnez un département --</option>
+          <option *ngFor="let dep of departements" [value]="dep._id">
+            {{ dep.nom }}
+          </option>
+        </select>
+      </div>
+
+      <!-- PROGRAMMES -->
+      <div formArrayName="programmes">
+        <div
+          *ngFor="let programme of programmes.controls; let i = index"
+          [formGroupName]="i"
+          class="programme-block"
+        >
+          <h4>Programme {{ i + 1 }}</h4>
+          <input formControlName="departement" placeholder="Code département" />
+          <input formControlName="code" placeholder="Code programme" />
+          <input formControlName="nom" placeholder="Nom programme" />
+          <input formControlName="description" placeholder="Description" />
+          <input formControlName="duree" placeholder="Durée" />
+          <input formControlName="credits" placeholder="Crédits" />
+          <input formControlName="diplome" placeholder="Diplôme" />
+          <input formControlName="acces" placeholder="Accès" />
+
+          <!-- NIVEAUX -->
+          <div formArrayName="niveaux">
+            <div
+              *ngFor="let niveau of getNiveaux(i).controls; let j = index"
+              [formGroupName]="j"
+              class="niveau-block"
+            >
+              <input formControlName="code" placeholder="Code Niveau" />
+              <input formControlName="nom" placeholder="Nom Niveau" />
+              <input formControlName="description" placeholder="Description Niveau" />
+
+              <!-- SEMESTRES -->
+              <div formArrayName="semestres">
+                <div
+                  *ngFor="let semestre of getSemestres(i, j).controls; let k = index"
+                  [formGroupName]="k"
+                  class="semestre-block"
+                >
+                  <input formControlName="numero" placeholder="Numéro Semestre" />
+                  <input formControlName="nom" placeholder="Nom Semestre" />
+
+                  <!-- UES -->
+                  <div formArrayName="ues">
+                    <div
+                      *ngFor="let ue of getUes(i, j, k).controls; let l = index"
+                      [formGroupName]="l"
+                      class="ue-block"
+                    >
+                      <input formControlName="nom" placeholder="Nom UE" />
+                      <input formControlName="totalCredits" placeholder="Total crédits UE" />
+
+                      <!-- MODULES -->
+                      <div formArrayName="modules">
+                        <div
+                          *ngFor="let module of getModules(i, j, k, l).controls; let m = index"
+                          [formGroupName]="m"
+                          class="module-block"
+                        >
+                          <input formControlName="nom" placeholder="Nom Module" />
+
+                          <!-- COURS -->
+                          <div formArrayName="cours">
+                            <div
+                              *ngFor="let cours of getCours(i, j, k, l, m).controls; let n = index"
+                              [formGroupName]="n"
+                              class="cours-block"
+                            >
+                              <input formControlName="nom" placeholder="Nom Cours" />
+                              <input formControlName="code" placeholder="Code Cours" />
+                              <input formControlName="coefficient" placeholder="Coefficient" />
+                              <input formControlName="credits" placeholder="Crédits" />
+                              <input formControlName="cm" placeholder="CM" />
+                              <input formControlName="td" placeholder="TD" />
+                              <input formControlName="totalHeures" placeholder="Total Heures" />
+                              <button
+                                type="button"
+                                (click)="removeCours(i, j, k, l, m, n)"
+                                class="delete-btn"
+                              >
+                                Supprimer Cours
+                              </button>
+                            </div>
+                            <button type="button" (click)="addCours(i, j, k, l, m)" class="add-btn">
+                              Ajouter Cours
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            (click)="removeModule(i, j, k, l, m)"
+                            class="delete-btn"
+                          >
+                            Supprimer Module
+                          </button>
+                        </div>
+                        <button type="button" (click)="addModule(i, j, k, l)" class="add-btn">
+                          Ajouter Module
+                        </button>
+                      </div>
+
+                      <button type="button" (click)="removeUe(i, j, k, l)" class="delete-btn">
+                        Supprimer UE
+                      </button>
+                    </div>
+                    <button type="button" (click)="addUe(i, j, k)" class="add-btn">
+                      Ajouter UE
+                    </button>
+                  </div>
+
+                  <button type="button" (click)="removeSemestre(i, j, k)" class="delete-btn">
+                    Supprimer Semestre
+                  </button>
+                </div>
+                <button type="button" (click)="addSemestre(i, j)" class="add-btn">
+                  Ajouter Semestre
+                </button>
+              </div>
+
+              <button type="button" (click)="removeNiveau(i, j)" class="delete-btn">
+                Supprimer Niveau
+              </button>
+            </div>
+            <button type="button" (click)="addNiveau(i)" class="add-btn">Ajouter Niveau</button>
+          </div>
+
+          <button type="button" (click)="removeProgramme(i)" class="delete-btn">
+            Supprimer Programme
+          </button>
+        </div>
+        <button type="button" (click)="addProgramme()" class="add-btn">Ajouter Programme</button>
+      </div>
+
+      <button type="submit">Enregistrer Formation</button>
+      <button type="button" (click)="showFormationForm = false" class="delete-btn">Annuler</button>
+    </form>
+  </div>
+
+  <!-- Tableau des départements -->
+  <div class="table-wrapper" *ngIf="!isLoading && !error && !showFormationForm">
+    <table class="departments-table">
+      <thead>
+        <tr>
+          <th>Département</th>
+          <th>Description</th>
+          <th>Formations</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let departement of departements">
+          <!-- Colonne Département -->
+          <td class="dept-col" [ngClass]="getDepartmentClass(departement.nom)">
+            <div class="dept-info">
+              <div class="dept-icon">
+                {{ departement.formations[0]?.icone || departement.icone }}
+              </div>
+              <strong>{{ departement.nom }}</strong>
+            </div>
+          </td>
+
+          <!-- Colonne Description -->
+          <td class="desc-col">
+            {{ departement.description }}
+          </td>
+
+          <!-- Colonne Formations -->
+          <td class="formation-col">
+            <ul class="formation-list">
+              <li *ngFor="let formation of departement.formations">
+                <div class="formation-item">
+                  <div class="formation-header">
+                    <strong>{{ formation.nom }}</strong>
+                    <span class="formation-duration">{{ formation.duree }}</span>
+                  </div>
+                  <p class="formation-desc">{{ formation.description }}</p>
+
+                  <!-- Programmes -->
+                  <ul class="program-list" *ngIf="formation.programmes?.length">
+                    <li *ngFor="let programme of formation.programmes">
+                      <span class="program-name">{{ programme.nom }}</span>
+                      <span class="program-duration">{{ programme.duree }}</span>
+                      <button
+                        class="view-program"
+                        *ngIf="programme?.code"
+                        (click)="openProgrammeModal(programme.departement, programme.code)"
+                      >
+                        Voir
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-program *ngIf="modalOpen" [programme]="selectedProgramme" (close)="closeModal()">
+</app-program>

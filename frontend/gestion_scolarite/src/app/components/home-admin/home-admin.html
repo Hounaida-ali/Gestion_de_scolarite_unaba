@@ -1,0 +1,117 @@
+<section class="dashboard-section">
+  <div class="dashboard-container">
+    <div *ngIf="successMessage" class="notification-float notification-success">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="notification-float notification-error">
+      {{ errorMessage }}
+    </div>
+
+    <div class="section-header">
+      <h2 class="section-title"><i class="fa-solid fa-house"></i> Tableau de bord</h2>
+      <button (click)="newDashboard()" class="add-btn">
+        <i class="fas fa-plus"></i>Ajouter un dashboard
+      </button>
+    </div>
+
+    <!-- ✅ Formulaire d’ajout / mise à jour -->
+    <form
+      *ngIf="showForm"
+      [formGroup]="dashboardForm"
+      (ngSubmit)="onSubmit()"
+      class="dashboard-form"
+    >
+      <div class="form-grid">
+        <input type="text" formControlName="titre" placeholder="Titre" />
+        <input type="text" formControlName="contenu" placeholder="Contenu" />
+        <input type="text" formControlName="label" placeholder="Label" />
+        <input
+          type="text"
+          formControlName="labelIcon"
+          placeholder="Icône du label (fa-solid fa-rotate)"
+        />
+        <input
+          type="text"
+          formControlName="icon"
+          placeholder="Icône principale (fa-solid fa-calendar-alt)"
+        />
+        <input type="text" formControlName="actionText" placeholder="Texte d’action (ex: Voir)" />
+      </div>
+
+      <div class="form-grid">
+        <input type="text" formControlName="sousTitre" placeholder="Sous-titre du modal" />
+        <textarea formControlName="modalDescription" placeholder="Description du modal"></textarea>
+      </div>
+
+      <div class="details-container">
+        <label>Détails :</label>
+        <div formArrayName="details">
+          <div *ngFor="let detail of details.controls; let i = index" class="detail-row">
+            <input [formControlName]="i" placeholder="Ex: Emploi du temps par semaine" />
+            <button type="button" (click)="removeDetail(i)" class="btn-remove">×</button>
+          </div>
+        </div>
+        <button type="button" class="btn-add" (click)="addDetail()">+ Ajouter un détail</button>
+      </div>
+
+      <input
+        type="text"
+        formControlName="status"
+        placeholder="Statut (ex: Dernière mise à jour…)"
+      />
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="dashboardForm.invalid">
+          {{ editMode ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()" class="btn-cancel">Annuler</button>
+      </div>
+    </form>
+
+    <!-- ✅ Tableau des dashboards -->
+    <div *ngIf="!loading && homeDashboards.length > 0 && !showForm" class="dashboard-table">
+      <table class="dashboard-list">
+        <thead>
+          <tr>
+            <th>Icône</th>
+            <th>Titre</th>
+            <th>Contenu</th>
+            <th>Label</th>
+            <th>Action</th>
+            <th>Gestion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dashboard of homeDashboards; let i = index">
+            <td class="dashboard-icon"><i class="{{ dashboard.icon }}"></i></td>
+            <td class="dashboard-title">{{ dashboard.titre }}</td>
+            <td class="dashboard-content">{{ dashboard.contenu }}</td>
+            <td class="dashboard-label">
+              <i class="{{ dashboard.labelIcon }}"></i>
+              <p>{{ dashboard.label }}</p>
+            </td>
+            <td class="dashboard-action">
+              <span class="dashboard-link" (click)="openModal(i)">
+                {{ dashboard.actionText }}
+                <i class="fa-solid fa-arrow-right"></i>
+              </span>
+            </td>
+            <td class="action-buttons">
+              <button class="btn-edit" (click)="editDashboard(dashboard)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="btn-delete" (click)="deleteDashboard(dashboard._id!)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && homeDashboards.length === 0 && !showForm" class="no-dashboard">
+      <p>Aucun dashboard disponible pour le moment.</p>
+    </div>
+  </div>
+</section>

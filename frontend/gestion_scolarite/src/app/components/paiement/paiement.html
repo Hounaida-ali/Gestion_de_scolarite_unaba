@@ -1,0 +1,243 @@
+<div class="container">
+  <!-- Barre de progression -->
+  <div class="progress-bar">
+    <div class="step completed">
+      <div class="step-number">1</div>
+      <div class="step-label">Informations Personnelles</div>
+    </div>
+    <div class="step completed">
+      <div class="step-number">2</div>
+      <div class="step-label">Choix de Formation</div>
+    </div>
+    <div class="step completed">
+      <div class="step-number">3</div>
+      <div class="step-label">Validation Administrative</div>
+    </div>
+    <div class="step active">
+      <div class="step-number">4</div>
+      <div class="step-label">Paiement</div>
+    </div>
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-label">Confirmation</div>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <div class="form-section active">
+      <h2>Paiement des Frais d'Inscription</h2>
+
+      <!-- Message de succès -->
+      <div class="alert alert-success" *ngIf="etudiant?.statut === 'valide'">
+        <p>
+          <strong>Félicitations ! Votre inscription a été validée par l'administration.</strong>
+        </p>
+        <p>
+          Montant des frais d'inscription:
+          <strong>{{ etudiant?.fraisInscription || 50000 }} €</strong>
+        </p>
+      </div>
+
+      <!-- Informations étudiant -->
+      <div class="confirmation-details" *ngIf="etudiant">
+        <h3>Informations de facturation</h3>
+
+        <div class="detail-row">
+          <div class="detail-label">Étudiant:</div>
+          <div class="detail-value">
+            {{ etudiant.prenom | uppercase }} {{ etudiant.nom | uppercase }}
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">ID Provisoire:</div>
+          <div class="detail-value">{{ etudiant.idProvisoire }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Département:</div>
+          <div class="detail-value">{{ etudiant.departement }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Formation:</div>
+          <div class="detail-value">
+            {{ getFormationLabel(etudiant.formation) }} -
+            {{ getModeFormationLabel(etudiant.modeFormation) }}
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Montant à payer:</div>
+          <div class="detail-value amount">{{ etudiant.fraisInscription || 450 }} €</div>
+        </div>
+      </div>
+
+      <!-- Sélection de la méthode de paiement -->
+      <div class="form-group">
+        <label class="section-label">Méthode de paiement *</label>
+        <div class="payment-methods">
+          <div
+            class="payment-method"
+            [class.selected]="methodePaiement === 'card'"
+            (click)="selectionnerMethode('card')"
+          >
+            <div class="payment-icon">💳</div>
+            <div class="payment-title">Carte Bancaire</div>
+            <div class="payment-description">Paiement sécurisé en ligne</div>
+          </div>
+
+          <div
+            class="payment-method"
+            [class.selected]="methodePaiement === 'transfer'"
+            (click)="selectionnerMethode('transfer')"
+          >
+            <div class="payment-icon">🏦</div>
+            <div class="payment-title">Virement Bancaire</div>
+            <div class="payment-description">Transfert bancaire sécurisé</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire de paiement par carte -->
+      <div *ngIf="methodePaiement === 'card'" class="payment-form">
+        <h3>Informations de carte bancaire</h3>
+
+        <div class="form-group">
+          <label for="numeroCarte">Numéro de carte *</label>
+          <input
+            type="text"
+            id="numeroCarte"
+            [(ngModel)]="formulaireCarte.numeroCarte"
+            placeholder="1234 5678 9012 3456"
+            class="form-control"
+            maxlength="19"
+          />
+          <div class="input-hint">Format: 16 chiffres sans espaces</div>
+        </div>
+
+        <div class="form-group">
+          <label for="titulaire">Nom du titulaire *</label>
+          <input
+            type="text"
+            id="titulaire"
+            [(ngModel)]="formulaireCarte.titulaire"
+            placeholder="JEAN DUPONT"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="expiration">Date d'expiration *</label>
+            <input
+              type="text"
+              id="expiration"
+              [(ngModel)]="formulaireCarte.expiration"
+              placeholder="MM/AA"
+              class="form-control"
+              maxlength="5"
+            />
+            <div class="input-hint">Format: MM/AA</div>
+          </div>
+
+          <div class="form-group">
+            <label for="cvv">CVV *</label>
+            <input
+              type="text"
+              id="cvv"
+              [(ngModel)]="formulaireCarte.cvv"
+              placeholder="123"
+              class="form-control"
+              maxlength="3"
+            />
+            <div class="input-hint">3 chiffres au dos</div>
+          </div>
+        </div>
+
+        <div class="security-notice">
+          <div class="security-icon">🔒</div>
+          <div class="security-text">
+            <strong>Paiement sécurisé</strong><br />
+            Vos informations bancaires sont cryptées et protégées
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulaire de virement bancaire -->
+      <div *ngIf="methodePaiement === 'transfer'" class="payment-form">
+        <h3>Instructions de virement</h3>
+
+        <div class="alert alert-info">
+          <p>
+            <strong>Veuillez effectuer un virement aux coordonnées bancaires suivantes :</strong>
+          </p>
+          <div class="bank-details">
+            <div class="bank-detail">
+              <span class="detail-name">IBAN:</span>
+              <span class="detail-value">FR76 3000 4000 0100 1234 5678 900</span>
+            </div>
+            <div class="bank-detail">
+              <span class="detail-name">BIC:</span>
+              <span class="detail-value">BNPAFRPPXXX</span>
+            </div>
+            <div class="bank-detail">
+              <span class="detail-name">Bénéficiaire:</span>
+              <span class="detail-value">Université Internationale</span>
+            </div>
+            <div class="bank-detail">
+              <span class="detail-name">Montant:</span>
+              <span class="detail-value">{{ etudiant?.fraisInscription || 450 }} €</span>
+            </div>
+            <div class="bank-detail">
+              <span class="detail-name">Référence:</span>
+              <span class="detail-value">{{ etudiant?.idProvisoire }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="referenceVirement">Référence de virement *</label>
+          <input
+            type="text"
+            id="referenceVirement"
+            [(ngModel)]="referenceVirement"
+            [placeholder]="etudiant?.idProvisoire || 'Votre référence'"
+            class="form-control"
+          />
+          <div class="input-hint">Utilisez votre ID provisoire comme référence</div>
+        </div>
+
+        <div class="transfer-notice">
+          <div class="notice-icon">⏱️</div>
+          <div class="notice-text">
+            <strong>Délai de traitement:</strong><br />
+            Votre inscription sera confirmée sous 24-48h après réception du virement
+          </div>
+        </div>
+      </div>
+
+      <!-- Chargement -->
+      <div *ngIf="!etudiant" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Chargement des informations...</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="retourValidation()">
+          ← Retour à la validation
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="traiterPaiement()"
+          [disabled]="!methodePaiement || !formulaireValide()"
+        >
+          <span class="btn-icon">💳</span>
+          Payer {{ etudiant?.fraisInscription || 450 }} €
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

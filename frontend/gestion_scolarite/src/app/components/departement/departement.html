@@ -1,0 +1,111 @@
+<div class="container">
+  <!-- Notifications -->
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- En-tête -->
+  <section class="page-header">
+    <h1 class="page-title">Départements</h1>
+    <p class="page-description">
+    Découvrez l'ensemble des formations offertes par nos départements. Chaque programme est conçu
+    pour offrir une éducation de qualité et préparer les étudiants aux défis du marché du travail.
+  </p>
+  </section>
+
+  <!-- Tableau des départements -->
+  <section class="resources-section">
+    <a [routerLink]="['/formationEtudiant']" class="btn-link">
+      <i class="fas fa-arrow-left"></i> Retour à la formation
+    </a>
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-list"></i> Liste des départements</h2>
+      <div class="filter-group" style="margin-left: auto">
+        <button (click)="newDepartement()" class="add-btn">
+          <i class="fas fa-plus"></i> Ajouter un département
+        </button>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!showDepartementForm">
+      <table class="resources-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Code / Type</th>
+            <th>Description</th>
+            <th>Date de création</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dep of departements">
+            <td>{{ dep.nom }}</td>
+            <td>{{ dep.departement }}</td>
+            <td>{{ dep.description || '-' }}</td>
+            <td>{{ dep.createdAt | date : 'dd/MM/yyyy' }}</td>
+            <td class="action-buttons">
+              <button (click)="editDepartement(dep)" class="btn-edit" title="Modifier">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button (click)="deleteDepartement(dep)" class="btn-delete" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="departements.length === 0">
+            <td colspan="5" class="no-resources">Aucun département trouvé.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Formulaire d’ajout / édition -->
+  <section *ngIf="showDepartementForm" class="container1">
+    <h3>{{ selectedDepartement?._id ? 'Modifier un département' : 'Ajouter un département' }}</h3>
+
+    <form (ngSubmit)="saveDepartement()">
+      <div class="form-group">
+        <label>Nom du département</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedDepartement.nom"
+          name="nom"
+          required
+          placeholder="Ex: Département d'Économie"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Code / Type</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedDepartement.departement"
+          name="departement"
+          required
+          placeholder="Ex: economie, gestion, droit"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="selectedDepartement.description"
+          name="description"
+          placeholder="Brève description du département"
+        ></textarea>
+      </div>
+
+      <div class="buttons">
+        <button type="submit" class="btn-save">
+          {{ selectedDepartement?._id ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()" class="btn-cancel">Annuler</button>
+      </div>
+    </form>
+  </section>
+</div>

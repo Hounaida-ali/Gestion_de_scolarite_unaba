@@ -1,0 +1,111 @@
+
+.schedule-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #ffffff; /* fond blanc */
+  border-radius: 15px; /* coins arrondis */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* ombre douce */
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* === Filtres === */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.filter-group select,
+.filter-group button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+}
+
+.filter-group button {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.filter-group button:hover {
+  background-color: #0069d9;
+}
+
+/* === Tableau emploi du temps === */
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.timetable th,
+.timetable td {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.timetable th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* === Cours colorés === */
+.course {
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.course.CM {
+  background-color: #3498db;
+}
+.course.TD {
+  background-color: #2ecc71;
+}
+.course.TP {
+  background-color: #f39c12;
+}
+
+.schedule-header {
+  /* justify-content: flex-end; */
+  margin-left: 85%;
+}
+.refresh-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+}
+.refresh-btn {
+  background-color: var(--primary-color); /* bleu */
+  margin-left: 15px;
+}
+
+.refresh-btn:hover {
+  background-color: #0e3262;
+}

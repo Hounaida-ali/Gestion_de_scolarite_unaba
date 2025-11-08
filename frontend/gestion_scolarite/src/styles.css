@@ -12,6 +12,8 @@
   --eco-color: #1565c0;
   --gestion-color: #1565c0;
   --droit-color: #1565c0;
+  --success-color: #2ecc71;
+  --danger-color: #e74c3c;
 }
 
 /* styles.scss */
@@ -204,3 +206,5 @@ body {
     font-size: 0.8rem;
   }
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,0 +1,217 @@
+<section class="container">
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <div class="schedule-container">
+    <h2>Calendrier des examens</h2>
+    <div class="schedule-header">
+      <button (click)="newExam()" class="add-btn">
+        <i class="fas fa-plus"></i>Ajouter un examen
+      </button>
+      <button (click)="refreshPage()" class="refresh-btn">
+        <i class="fa-solid fa-rotate-right"></i> Actualiser
+      </button>
+    </div>
+    <div class="filters">
+      <div class="filter-group">
+        <label>Département :</label>
+        <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
+          <option value="">Tous</option>
+          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Filière :</label>
+        <select
+          [(ngModel)]="filiereFilter"
+          (change)="onFiliereChange()"
+          [disabled]="!departementFilter"
+        >
+          <option value="">Toutes</option>
+          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Niveau :</label>
+        <select [(ngModel)]="niveauFilter" (change)="filterExams()" [disabled]="!filiereFilter">
+          <option value="">Tous</option>
+          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="timetable">
+      <thead>
+        <tr>
+          <th>Heures</th>
+          <th *ngFor="let day of days">{{ day }}</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredExams.length === 0">
+          <td [attr.colspan]="days.length + 1" class="no-courses">
+            Aucun examen trouvé pour ces critères.
+          </td>
+        </tr>
+
+        <tr *ngFor="let time of timeSlots">
+          <td>{{ time }}</td>
+          <td *ngFor="let day of days">
+            <ng-container *ngFor="let exam of filteredExams">
+              <div
+                *ngIf="getDayName(exam.start) === day && formatTime(exam.start, exam.end) === time"
+                class="course CM"
+                (click)="showDetails(exam)"
+              >
+                <strong>{{ exam.title }}</strong
+                ><br />
+                {{ exam.room }}
+              </div>
+            </ng-container>
+          </td>
+
+          <!-- Colonne Actions -->
+          <!-- Colonne Actions -->
+          <td>
+            <ng-container *ngFor="let exam of filteredExams">
+              <div *ngIf="formatTime(exam.start, exam.end) === time" class="btn">
+                <button (click)="editExam(exam); $event.stopPropagation()">
+                  <i class="fa-solid fa-pen-to-square" style="color: white"></i>
+                </button>
+                <button (click)="deleteExam(exam); $event.stopPropagation()">
+                  <i class="fa-solid fa-trash" style="color: white"></i>
+                </button>
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- form-exam.component.html -->
+<div *ngIf="showForm && selectedExam" class="container1">
+  <div class="form-container">
+    <h3>{{ selectedExam._id ? ' Modifier un examen' : ' Ajouter un examen' }}</h3>
+    <form (ngSubmit)="selectedExam._id ? updateExam() : addExam()">
+      <!-- Titre -->
+      <div class="form-group">
+        <label>Titre <span class="required"></span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedExam.title"
+          name="title"
+          placeholder="Titre"
+          required
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="selectedExam.description"
+          name="description"
+          placeholder="Description"
+        ></textarea>
+      </div>
+
+      <!-- Type, Département, Filière, Niveau -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type <span class="required"></span></label>
+          <select [(ngModel)]="selectedExam.type" name="type" required>
+            <option value="">Type</option>
+            <option value="examen">Examen</option>
+            <option value="devoir">Devoir</option>
+            <option value="quiz">Quiz</option>
+            <option value="projet">Projet</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Département <span class="required"></span></label>
+          <select
+            [(ngModel)]="selectedExam.departement"
+            name="departement"
+            required
+            (change)="onFormDepartementChange()"
+          >
+            <option value="">Département</option>
+            <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Filière <span class="required"></span></label>
+            <select
+              [(ngModel)]="selectedExam.filiere"
+              name="filiere"
+              required
+              (change)="onFormFiliereChange()"
+            >
+              <option value="">Filière</option>
+              <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Niveau <span class="required"></span></label>
+            <select [(ngModel)]="selectedExam.niveau" name="niveau" required>
+              <option value="">Niveau</option>
+              <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Salle -->
+      <div class="form-group">
+        <label>Salle <span class="required"></span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedExam.room"
+          name="room"
+          placeholder="Salle"
+          required
+        />
+      </div>
+
+      <!-- 🔹 Nouvelle section : Date -->
+      <div class="form-group">
+        <label>Date de l’examen <span class="required"></span></label>
+        <input type="date" [(ngModel)]="selectedExam.date" name="date" required />
+      </div>
+
+      <!-- Date et heure -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date et heure de début <span class="required"></span></label>
+          <input type="datetime-local" [(ngModel)]="selectedExam.start" name="start" required />
+        </div>
+        <div class="form-group">
+          <label>Date et heure de fin <span class="required"></span></label>
+          <input type="datetime-local" [(ngModel)]="selectedExam.end" name="end" required />
+        </div>
+      </div>
+
+      <!-- Boutons -->
+      <div class="buttons">
+        <button type="submit">
+          {{ selectedExam._id ? '💾 Mettre à jour' : ' Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>

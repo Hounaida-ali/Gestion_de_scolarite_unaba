@@ -1,0 +1,239 @@
+<section class="content">
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <div class="schedule-container">
+    <h2>Système de Saisie et d'affichage des Notes</h2>
+    <div class="schedule-header">
+      <button (click)="newEvaluation()" class="add-btn">
+        <i class="fas fa-plus"></i>Ajouter un examen
+      </button>
+      <button (click)="refreshPage()" class="refresh-btn">
+        <i class="fa-solid fa-rotate-right"></i> Actualiser
+      </button>
+    </div>
+    <div class="filters">
+      <div class="filter-group">
+        <label>Département :</label>
+        <select
+          [(ngModel)]="departementFilter"
+          (change)="onDepartementChange(); filterEvaluations()"
+        >
+          <option value="">Tous</option>
+          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Filière :</label>
+        <select
+          [(ngModel)]="filiereFilter"
+          (change)="onFiliereChange(); filterEvaluations()"
+          [disabled]="!departementFilter"
+        >
+          <option value="">Toutes</option>
+          <option *ngFor="let f of filteredFilieres" [value]="f">{{ f }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Niveau :</label>
+        <select [(ngModel)]="niveauFilter" (change)="filterEvaluations()">
+          <option value="">Tous</option>
+          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Matière :</label>
+        <select [(ngModel)]="matiereFilter" (change)="filterEvaluations()">
+          <option value="">Toutes</option>
+          <option *ngFor="let m of matieres" [value]="m">{{ m }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Enseignant :</label>
+        <select [(ngModel)]="enseignantFilter" (change)="filterEvaluations()">
+          <option value="">Tous</option>
+          <option *ngFor="let e of enseignants" [value]="e">{{ e }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Type :</label>
+        <select [(ngModel)]="typeEvaluationFilter" (change)="filterEvaluations()">
+          <option value="">Tous</option>
+          <option *ngFor="let t of typesEvaluation" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="timetable">
+      <thead>
+        <tr>
+          <th>Étudiant</th>
+          <th>Matière</th>
+          <th>Note</th>
+          <th>Statut</th>
+          <th>Date de création</th>
+          <th>Actions</th>
+          <!-- Nouvelle colonne Actions -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of filteredEvaluations">
+          <td>{{ e.etudiant.nom }}</td>
+
+          <td>{{ e.matiere }}</td>
+          <td>{{ e.note }}</td>
+          <td>{{ getAppreciation(e.note) }}</td>
+          <td>{{ e.dateCreation | date : 'dd-MM-yyyy HH:mm:ss' }}</td>
+          <td>
+            <div class="btn">
+              <button (click)="editEvaluation(e)">
+                <i class="fa-solid fa-pen-to-square" style="color: white"></i>
+              </button>
+              <button (click)="deleteEvaluation(e)">
+                <i class="fa-solid fa-trash" style="color: white"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filteredEvaluations.length === 0">
+          <td colspan="6">Aucune évaluation trouvée</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Formulaire d'évaluation -->
+<div *ngIf="showEvalForm && selectedEvaluation" class="container1">
+  <div class="form-container">
+    <h3>{{ selectedEvaluation._id ? 'Modifier une évaluation' : 'Ajouter une évaluation' }}</h3>
+    <form (ngSubmit)="selectedEvaluation._id ? updateEvaluation() : addEvaluation()">
+      <!-- Étudiant -->
+      <div class="form-group">
+        <label>Étudiant <span class="required">*</span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedEvaluation.etudiant.nom"
+          name="etudiant"
+          placeholder="Nom complet de l'étudiant"
+          required
+        />
+      </div>
+
+      <!-- Enseignant -->
+      <div class="form-group">
+        <label>Enseignant <span class="required">*</span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedEvaluation.enseignant.nom"
+          name="enseignant"
+          placeholder="Nom complet de l'enseignant"
+          required
+        />
+      </div>
+
+      <!-- Matière -->
+      <div class="form-group">
+        <label>Matière <span class="required">*</span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedEvaluation.matiere"
+          name="matiere"
+          placeholder="Nom de la matière"
+          required
+        />
+      </div>
+
+      <!-- Département, Filière, Niveau -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Département <span class="required">*</span></label>
+          <select
+            [(ngModel)]="selectedEvaluation.departement"
+            name="departement"
+            required
+            (change)="onFormDepartementChange()"
+          >
+            <option value="">Sélectionnez un département</option>
+            <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+          </select>
+        </div>
+
+        <!-- Filière -->
+        <div class="form-group">
+          <label>Filière</label>
+          <select
+            [(ngModel)]="selectedEvaluation.filiere"
+            name="filiere"
+            [disabled]="!selectedEvaluation.departement"
+            (ngModelChange)="onFormFiliereChange($event)"
+          >
+            <option value="">Sélectionnez une filière</option>
+            <option *ngFor="let f of filteredFilieres" [value]="f">{{ f }}</option>
+          </select>
+        </div>
+
+        <!-- Niveau -->
+        <div class="form-group">
+          <label>Niveau</label>
+          <select
+            [(ngModel)]="selectedEvaluation.niveau"
+            name="niveau"
+            [disabled]="!filteredNiveaux.length"
+          >
+            <option value="">Sélectionnez un niveau</option>
+            <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Type d'évaluation -->
+      <div class="form-group">
+        <label>Type d'évaluation <span class="required">*</span></label>
+        <select [(ngModel)]="selectedEvaluation.typeEvaluation" name="typeEvaluation" required>
+          <option value="">Sélectionnez le type</option>
+          <option value="controle">Contrôle</option>
+        </select>
+      </div>
+
+      <!-- Note -->
+      <div class="form-group">
+        <label>Note <span class="required">*</span></label>
+        <input
+          type="number"
+          [(ngModel)]="selectedEvaluation.note"
+          name="note"
+          min="0"
+          max="20"
+          required
+        />
+      </div>
+
+      <!-- Commentaire -->
+      <div class="form-group">
+        <label>Commentaire</label>
+        <textarea
+          [(ngModel)]="selectedEvaluation.commentaire"
+          name="commentaire"
+          placeholder="Commentaire"
+        ></textarea>
+      </div>
+
+      <!-- Boutons -->
+      <div class="buttons">
+        <button type="submit">{{ selectedEvaluation._id ? '💾 Mettre à jour' : 'Ajouter' }}</button>
+        <button type="button" (click)="resetEvalForm()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>

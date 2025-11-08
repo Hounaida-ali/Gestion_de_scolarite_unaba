@@ -1,12 +1,34 @@
 <div class="calendar-container">
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
   <div class="calendar-header">
-            <h1>Calendrier Universitaire</h1>
-            <p>Année académique 2025/2026 - Vacances et Jours Fériés</p>
-        </div>
+    <h1>Calendrier Universitaire</h1>
+    <p>Année académique 2025/2026 - Vacances et Jours Fériés</p>
+  </div>
+
+  <div class="schedule-header">
+    <button (click)="newCalendar()" class="add-btn">
+      <i class="fas fa-plus"></i>Ajouter un examen
+    </button>
+    <!-- <button (click)="refreshPage()" class="refresh-btn">
+      <i class="fa-solid fa-rotate-right"></i> Actualiser
+    </button> -->
+  </div>
+
   <div class="controls">
     <div class="control-group">
       <label for="academicYear">Année académique:</label>
-      <select id="academicYear" [(ngModel)]="selectedAcademicYear" (change)="onAcademicYearChange()">
+      <select
+        id="academicYear"
+        [(ngModel)]="selectedAcademicYear"
+        (change)="onAcademicYearChange()"
+      >
         <option *ngFor="let year of academicYears" [value]="year">{{ year }}</option>
       </select>
     </div>
@@ -18,7 +40,7 @@
         <option value="cours">Cours</option>
         <option value="examen">Examens</option>
         <option value="vacances">Vacances</option>
-        <option value="ferie">Jours fériés</option>
+        <option value="ferier">Jours fériés</option>
         <option value="autre">Autres événements</option>
       </select>
     </div>
@@ -32,9 +54,7 @@
       </select>
     </div>
     <div class="control-group">
-      <button class="today-btn" (click)="showUpcomingEvents()">
-        Événements à venir
-      </button>
+      <button class="today-btn" (click)="showUpcomingEvents()">Événements à venir</button>
     </div>
   </div>
 
@@ -52,14 +72,14 @@
       <span>Vacances</span>
     </div>
     <div class="legend-item">
-      <div class="legend-color ferie"></div>
+      <div class="legend-color ferier"></div>
       <span>Jours fériés</span>
     </div>
   </div>
 
   <div class="calendar-content">
     <!-- Semestre 1 -->
-    <div class="semester-section" *ngIf="getEventsBySemester(1).length > 0">
+    <div class="semester-section" *ngIf="getEventsBySemester(1).length > 0 && !showEventForm">
       <h2 class="semester-title">Semestre 1 (Octobre 2025 - Janvier 2026)</h2>
       <table class="calendar-table">
         <thead>
@@ -68,6 +88,7 @@
             <th>Événement</th>
             <th>Type</th>
             <th>Période</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -85,14 +106,22 @@
               </span>
             </td>
             <td class="event-period">{{ event.period }}</td>
+            <td class="action-buttons">
+              <button (click)="editEvent(event)" class="btn-edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button (click)="deleteEvent(event)" class="btn-delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Semestre 2 -->
-    <div class="semester-section" *ngIf="getEventsBySemester(2).length > 0">
-      <h2 class="semester-title">Semestre 2 (Février 2026 - Juin 2026)</h2>
+    <!-- SEMESTRE 2 -->
+    <div class="semester-section" *ngIf="getEventsBySemester(2).length > 0 && !showEventForm">
+      <h2 class="semester-title">Semestre 2 (Février 2026 - Juillet 2026)</h2>
       <table class="calendar-table">
         <thead>
           <tr>
@@ -100,6 +129,7 @@
             <th>Événement</th>
             <th>Type</th>
             <th>Période</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -112,18 +142,81 @@
               </div>
             </td>
             <td>
-              <span [class]="getEventTypeClass(event.type)">
-                {{ getEventTypeLabel(event.type) }}
-              </span>
+              <span [class]="getEventTypeClass(event.type)">{{
+                getEventTypeLabel(event.type)
+              }}</span>
             </td>
             <td class="event-period">{{ event.period }}</td>
+            <td>
+              <div class="btn">
+                <button (click)="editEvent(event)" class="btn-edit">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button (click)="deleteEvent(event)" class="btn-delete">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div *ngIf="events.length === 0" class="no-events">
-      <p>Aucun événement trouvé pour les critères sélectionnés.</p>
+    <!-- formulaire d'ajout/modification d'événement -->
+    <div *ngIf="showEventForm && selectedEvent" class="container1">
+      <h3>{{ selectedEvent._id ? 'Modifier un événement' : 'Ajouter un événement' }}</h3>
+      <form (ngSubmit)="saveEvent()">
+        <div class="form-group">
+          <label>Titre</label>
+          <input type="text" [(ngModel)]="selectedEvent.title" name="title" required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="selectedEvent.description" name="description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Type</label>
+          <select [(ngModel)]="selectedEvent.type" name="type" required>
+            <option value="cours">Cours</option>
+            <option value="examen">Examen</option>
+            <option value="vacances">Vacances</option>
+            <option value="ferier">Jour férié</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="selectedEvent.date" name="date" required />
+        </div>
+
+        <div class="form-group">
+          <label>Période</label>
+          <input type="text" [(ngModel)]="selectedEvent.period" name="period" required />
+        </div>
+
+        <div class="form-group">
+          <label>Année académique</label>
+          <select [(ngModel)]="selectedEvent.academicYear" name="academicYear" required>
+            <option *ngFor="let year of academicYears" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Semestre</label>
+          <select [(ngModel)]="selectedEvent.semester" name="semester" required>
+            <option [value]="1">Semestre 1</option>
+            <option [value]="2">Semestre 2</option>
+          </select>
+        </div>
+
+        <div class="buttons">
+          <button type="submit">{{ selectedEvent._id ? 'Mettre à jour' : 'Ajouter' }}</button>
+          <button type="button" (click)="resetForm()">Annuler</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

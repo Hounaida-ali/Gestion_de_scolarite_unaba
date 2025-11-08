@@ -1,0 +1,69 @@
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Université Adam Barka</h2>
+    <p>Espace Enseignant</p>
+    <div class="teacher-badge">Professeur</div>
+  </div>
+  <div class="sidebar-menu">
+    <ul>
+      <li class="active" data-section="dashboard">
+        <a href="#"><i class="fas fa-tachometer-alt"></i> <span>Tableau de Bord</span></a>
+      </li>
+      <li data-section="courses">
+        <a href="#"><i class="fas fa-book"></i> <span>Mes Cours</span></a>
+      </li>
+      <li data-section="schedule">
+        <a routerLink="scheduleEtudiant"><i class="fas fa-calendar-alt"></i> <span>Emploi du Temps</span></a>
+      </li>
+      <li data-section="grades">
+        <a routerLink="note"><i class="fas fa-file-alt"></i> <span>Saisie des Notes</span></a>
+      </li>
+      <li data-section="students">
+        <a href="#"><i class="fas fa-user-graduate"></i> <span>Mes Étudiants</span></a>
+      </li>
+    </ul>
+
+    <ul>
+      <!-- <li data-section="attendance">
+        <a href="#"><i class="fas fa-clipboard-check"></i> <span>Présences</span></a>
+      </li> -->
+      <li data-section="materials">
+        <a routerLink="ressourceEtudiant"><i class="fas fa-file-upload"></i> <span>Ressources</span></a>
+      </li>
+      <li data-section="exams">
+        <a routerLink="examEtudiant"><i class="fas fa-clipboard-list"></i> <span>Examens</span></a>
+      </li>
+    </ul>
+
+    <ul>
+      <li data-section="profile">
+        <a routerLink="calendarEtudiant"><i class="fas fa-calendar"></i> <span>Calendrier accademique</span></a>
+      </li>
+      <li data-section="settings">
+        <a href="#"><i class="fas fa-cog"></i> <span>Paramètres</span></a>
+      </li>
+      <li>
+        <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Header -->
+  <div class="header">
+    <h1 id="pageTitle">Tableau de Bord Enseignant</h1>
+    <div class="header-actions">
+      <div class="user-info">
+        <div class="user-avatar" title="Dr. Koulamallah">DR</div>
+        <div>
+          <div style="font-weight: 600">Dr. Ahmed Koulamallah</div>
+          <div style="font-size: 0.8rem; color: white">Professeur de Droit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</div>

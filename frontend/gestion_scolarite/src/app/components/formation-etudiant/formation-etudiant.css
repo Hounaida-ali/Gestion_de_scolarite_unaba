@@ -1,0 +1,489 @@
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.section-title i {
+  color: var(--accent-color);
+  font-size: 1.8rem;
+}
+
+.add-btn {
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.add-btn {
+  background-color: #2ecc71; /* vert */
+}
+
+.add-btn:hover {
+  background-color: #27ae60;
+}
+
+
+
+/* --- TABLEAU --- */
+.departments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  table-layout: fixed; /* ✅ rend les colonnes uniformes */
+}
+
+/* --- AJOUT DES BORDURES VERTICALES --- */
+.departments-table th,
+.departments-table td {
+  padding: 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee; /* ✅ Bordure verticale */
+  vertical-align: top;
+}
+
+/* Supprimer la bordure droite de la dernière colonne pour un rendu propre */
+.departments-table th:last-child,
+.departments-table td:last-child {
+  border-right: none;
+}
+
+/* Optionnel : unifier le style de la première ligne pour le header */
+.departments-table th {
+  background-color: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  border-right: 1px solid #eee; /* si tu veux aussi la bordure verticale ici */
+}
+
+.departments-table th:last-child {
+  border-right: none;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-edit,
+.btn-delete {
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background: #f0ad4e; /* couleur orange */
+}
+
+.btn-edit:hover {
+  background: #ec971f;
+}
+
+.btn-delete {
+  background: #d9534f; /* couleur rouge */
+}
+
+.btn-delete:hover {
+  background: #c9302c;
+}
+
+/* Lignes de tableau adaptatives */
+.departments-table tr {
+  height: auto; /* la hauteur s’adapte automatiquement au contenu */
+}
+
+.action-col {
+  width: 13%;
+  text-align: center;
+}
+/* --- COLONNES --- */
+.dept-col {
+  width: 25%;
+  font-weight: 600;
+}
+
+.desc-col {
+  width: 35%;
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.formation-col {
+  width: 40%;
+}
+
+/* --- DÉPARTEMENT --- */
+.dept-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.dept-icon {
+  font-size: 1.8rem;
+}
+
+.eco-header,
+.eco-color {
+  color: var(--eco-color);
+}
+
+.gestion-header,
+.gestion-color {
+  color: var(--gestion-color);
+}
+
+.droit-header,
+.droit-color {
+  color: var(--droit-color);
+}
+
+/* --- FORMATIONS --- */
+.formation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0; /* ✅ supprime le décalage vertical */
+}
+
+.formation-item {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0.8rem 0;
+}
+
+.formation-item:first-child {
+  padding-top: 0; /* ✅ colle la première formation au haut de la cellule */
+}
+
+.formation-item:last-child {
+  border-bottom: none;
+}
+
+.formation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  color: var(--dark-color);
+  font-size: 1rem;
+  margin-top: 0; /* ✅ supprime tout écart vertical */
+  padding-top: 0;
+}
+
+.formation-duration {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.formation-desc {
+  margin: 0.3rem 0 0.6rem 0;
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* --- PROGRAMMES --- */
+.program-list {
+  list-style: none;
+  padding-left: 1rem;
+  margin: 0.3rem 0;
+}
+
+.program-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.program-list li:last-child {
+  border-bottom: none;
+}
+
+.program-name {
+  font-weight: 500;
+  color: var(--dark-color);
+}
+
+.program-duration {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* --- BOUTON "VOIR" --- */
+.view-program {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.3s ease;
+  margin-left: 0.5rem;
+}
+
+.view-program:hover {
+  background-color: #0e3262;
+}
+
+/* --- HOVER ET RÉACTIVITÉ --- */
+.departments-table tr:hover {
+  background-color: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .departments-table th,
+  .departments-table td {
+    padding: 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .formation-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .departments-table {
+    font-size: 0.8rem;
+  }
+
+  .dept-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* formulaire */
+/* ========================== */
+/* Conteneur formulaire       */
+/* ========================== */
+.formation-form-container {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fafafa;
+}
+
+/* Titre du formulaire */
+.formation-form-container h3 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #1976d2;
+}
+
+/* Chaque input et label */
+.formation-form-container div {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.formation-form-container label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.formation-form-container input {
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ========================== */
+/* Blocs dynamiques            */
+/* ========================== */
+.programme-block, .niveau-block, .semestre-block, 
+.ue-block, .module-block, .cours-block {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.programme-block h4 {
+  color: #1976d2;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.notification-float {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 300px;
+  padding: 12px 18px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: #155724; /* Couleur texte succès par défaut */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  z-index: 9999;
+  gap: 10px;
+  border: 4px solid #ffffff;
+  margin-top: -10px;
+
+}
+
+/* Icône */
+.notification-float .icon {
+  font-size: 18px;
+}
+
+/* Message */
+.notification-float .message {
+  flex: 1;
+}
+
+/* Types de notification */
+.notification-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.notification-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+
+/* Indentation progressive pour lisibilité */
+.niveau-block {
+  margin-left: 15px;
+  border-color: #90caf9;
+}
+
+.semestre-block {
+  margin-left: 30px;
+  border-color: #64b5f6;
+}
+
+.ue-block {
+  margin-left: 45px;
+  border-color: #42a5f5;
+}
+
+.module-block {
+  margin-left: 60px;
+  border-color: #2196f3;
+}
+
+.cours-block {
+  margin-left: 75px;
+  border-color: #1976d2;
+}
+
+//* ✅ Boutons Ajouter (Vert) */
+/* ============================ */
+button.add-btn,
+button[type="button"].add,
+button[type="button"][ng-reflect-ng-click*="add"] {
+  background-color: #4caf50; /* Vert principal */
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 4px 4px 8px 0;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button.add-btn:hover,
+button[type="button"].add:hover,
+button[type="button"][ng-reflect-ng-click*="add"]:hover {
+  background-color: #43a047; /* Vert plus foncé */
+  transform: scale(1.03);
+}
+
+/* ============================ */
+/* ❌ Boutons Supprimer (Rouge) */
+/* ============================ */
+button.delete-btn,
+button[type="button"].delete,
+button[type="button"][ng-reflect-ng-click*="remove"],
+button[type="button"][ng-reflect-ng-click*="Supprimer"] {
+  background-color: #e53935; /* Rouge principal */
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 4px 4px 8px 0;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button.delete-btn:hover,
+button[type="button"].delete:hover,
+button[type="button"][ng-reflect-ng-click*="remove"]:hover,
+button[type="button"][ng-reflect-ng-click*="Supprimer"]:hover {
+  background-color: #c62828; /* Rouge plus foncé */
+  transform: scale(1.03);
+}
+
+
+button[type="submit"] {
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  background-color: #1565c0;
+}
+
+/* ========================== */
+/* Responsive & lisibilité    */
+/* ========================== */
+input::placeholder {
+  color: #aaa;
+}
+
+@media (max-width: 768px) {
+  .programme-block, .niveau-block, .semestre-block, 
+  .ue-block, .module-block, .cours-block {
+    margin-left: 10px !important;
+    padding: 8px;
+  }
+}

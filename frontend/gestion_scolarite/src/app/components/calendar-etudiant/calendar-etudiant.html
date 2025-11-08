@@ -1,0 +1,137 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <h1>Calendrier Universitaire</h1>
+    <p>Année académique 2025/2026 - Vacances et Jours Fériés</p>
+  </div>
+  <div class="schedule-header">
+    <button (click)="refreshPage()" class="refresh-btn">
+      <i class="fa-solid fa-rotate-right"></i> Actualiser
+    </button>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label for="academicYear">Année académique:</label>
+      <select
+        id="academicYear"
+        [(ngModel)]="selectedAcademicYear"
+        (change)="onAcademicYearChange()"
+      >
+        <option *ngFor="let year of academicYears" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="filter">Filtrer par type:</label>
+      <select id="filter" [(ngModel)]="selectedFilter" (change)="onFilterChange()">
+        <option value="all">Tous les événements</option>
+        <option value="cours">Cours</option>
+        <option value="examen">Examens</option>
+        <option value="vacances">Vacances</option>
+        <option value="ferier">Jours fériés</option>
+        <option value="autre">Autres événements</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="semester">Semestre:</label>
+      <select id="semester" [(ngModel)]="selectedSemester" (change)="onSemesterChange()">
+        <option [value]="null">Tous les semestres</option>
+        <option [value]="1">Semestre 1</option>
+        <option [value]="2">Semestre 2</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <button class="today-btn" (click)="showUpcomingEvents()">Événements à venir</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color cours"></div>
+      <span>Cours</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color examen"></div>
+      <span>Examens</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color vacances"></div>
+      <span>Vacances</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color ferier"></div>
+      <span>Jours fériés</span>
+    </div>
+  </div>
+
+  <div class="calendar-content">
+    <!-- Semestre 1 -->
+    <div class="semester-section" *ngIf="getEventsBySemester(1).length > 0">
+      <h2 class="semester-title">Semestre 1 (Octobre 2025 - Janvier 2026)</h2>
+      <table class="calendar-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Événement</th>
+            <th>Type</th>
+            <th>Période</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let event of getEventsBySemester(1)">
+            <td class="event-date">{{ formatDate(event.date) }}</td>
+            <td class="event-title">
+              <div class="event-item">
+                <div class="event-title-text">{{ event.title }}</div>
+                <div class="event-description">{{ event.description }}</div>
+              </div>
+            </td>
+            <td>
+              <span [class]="getEventTypeClass(event.type)">
+                {{ getEventTypeLabel(event.type) }}
+              </span>
+            </td>
+            <td class="event-period">{{ event.period }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Semestre 2 -->
+    <div class="semester-section" *ngIf="getEventsBySemester(2).length > 0">
+      <h2 class="semester-title">Semestre 2 (Février 2026 - Juin 2026)</h2>
+      <table class="calendar-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Événement</th>
+            <th>Type</th>
+            <th>Période</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let event of getEventsBySemester(2)">
+            <td class="event-date">{{ formatDate(event.date) }}</td>
+            <td class="event-title">
+              <div class="event-item">
+                <div class="event-title-text">{{ event.title }}</div>
+                <div class="event-description">{{ event.description }}</div>
+              </div>
+            </td>
+            <td>
+              <span [class]="getEventTypeClass(event.type)">
+                {{ getEventTypeLabel(event.type) }}
+              </span>
+            </td>
+            <td class="event-period">{{ event.period }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="events.length === 0" class="no-events">
+      <p>Aucun événement trouvé pour les critères sélectionnés.</p>
+    </div>
+  </div>
+</div>

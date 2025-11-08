@@ -1,0 +1,217 @@
+<div class="container">
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Barre de progression -->
+  <div class="progress-bar">
+    <div class="step" [class.completed]="etapeActuelle > 1" [class.active]="etapeActuelle === 1">
+      <div class="step-number">1</div>
+      <div class="step-label">Informations Personnelles</div>
+    </div>
+    <div class="step" [class.active]="etapeActuelle === 2">
+      <div class="step-number">2</div>
+      <div class="step-label">Choix de Formation</div>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <!-- Section 1: Informations personnelles -->
+    <div *ngIf="etapeActuelle === 1" class="form-section active">
+      <h2>Informations Personnelles</h2>
+
+      <form [formGroup]="etudiantForm">
+        <div class="form-group">
+          <label for="nom">Nom *</label>
+          <input type="text" id="nom" formControlName="nom" class="form-control" />
+          <div
+            *ngIf="etudiantForm.get('nom')?.invalid && etudiantForm.get('nom')?.touched"
+            class="error-message"
+          >
+            Le nom est obligatoire
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prenom">Prénom *</label>
+          <input type="text" id="prenom" formControlName="prenom" class="form-control" />
+          <div
+            *ngIf="etudiantForm.get('prenom')?.invalid && etudiantForm.get('prenom')?.touched"
+            class="error-message"
+          >
+            Le prénom est obligatoire
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Adresse Email *</label>
+          <input type="email" id="email" formControlName="email" class="form-control" />
+          <div
+            *ngIf="etudiantForm.get('email')?.invalid && etudiantForm.get('email')?.touched"
+            class="error-message"
+          >
+            Veuillez saisir une adresse email valide
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="telephone">Numéro de Téléphone *</label>
+          <input type="tel" id="telephone" formControlName="telephone" class="form-control" />
+          <div
+            *ngIf="etudiantForm.get('telephone')?.invalid && etudiantForm.get('telephone')?.touched"
+            class="error-message"
+          >
+            Le numéro de téléphone est obligatoire
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dateNaissance">Date de Naissance *</label>
+          <input
+            type="date"
+            id="dateNaissance"
+            formControlName="dateNaissance"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="adresse">Adresse *</label>
+          <textarea id="adresse" formControlName="adresse" rows="3" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="ville">Ville *</label>
+          <input type="text" id="ville" formControlName="ville" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label for="codePostal">Code Postal *</label>
+          <input type="text" id="codePostal" formControlName="codePostal" class="form-control" />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" disabled>Précédent</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="suivant()"
+            [disabled]="!etudiantForm.valid"
+          >
+            Suivant
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Section 2: Choix de formation -->
+    <div *ngIf="etapeActuelle === 2" class="form-section active">
+      <h2>Choix de Formation</h2>
+
+      <form [formGroup]="formationForm">
+        <div class="form-group">
+          <label for="niveauEtudes">Niveau d'études *</label>
+          <select id="niveauEtudes" formControlName="niveauEtudes" class="form-control">
+            <option value="">Sélectionnez votre niveau</option>
+            <option *ngFor="let niveau of niveauxEtudes" [value]="niveau.value">
+              {{ niveau.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Nouveau champ Departement -->
+        <div class="form-group">
+          <label for="departement">Département *</label>
+          <select id="departement" formControlName="departement" class="form-control">
+            <option value="">Sélectionnez un département</option>
+            <option value="économie">Économie</option>
+            <option value="droit">Droit</option>
+            <option value="gestion">Gestion</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="formation">Formation souhaitée *</label>
+          <select id="formation" formControlName="formation" class="form-control">
+            <option value="">Sélectionnez une formation</option>
+            <option *ngFor="let formation of formations" [value]="formation.value">
+              {{ formation.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Mode de formation *</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input
+                type="radio"
+                id="presentiel"
+                formControlName="modeFormation"
+                value="presentiel"
+              />
+              <label for="presentiel">Présentiel</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="en-ligne" formControlName="modeFormation" value="en-ligne" />
+              <label for="en-ligne">En ligne</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Documents à fournir</label>
+          <!-- Upload de photo -->
+          <div class="form-group">
+            <label for="photoEtudiant" class="photo-label">
+              <div class="photo-upload-area" [class.has-photo]="photoPreview">
+                <div class="upload-icon" *ngIf="!photoPreview">📷</div>
+                <img
+                  *ngIf="photoPreview"
+                  [src]="photoPreview"
+                  class="photo-preview"
+                  alt="Aperçu photo"
+                />
+                <div class="upload-text">
+                  {{ photoPreview ? 'Photo sélectionnée' : "Ajouter une photo d'identité" }}
+                </div>
+                <div class="upload-hint">Format JPG/PNG - Max 2MB</div>
+              </div>
+            </label>
+            <input
+              type="file"
+              id="photoEtudiant"
+              (change)="onPhotoSelected($event)"
+              accept=".jpg,.jpeg,.png"
+              class="photo-input"
+            />
+          </div>
+          <div *ngFor="let doc of documents" class="checkbox-group">
+            <input
+              type="checkbox"
+              [id]="doc.value"
+              (change)="onDocumentChange(doc.value, $event)"
+            />
+            <label [for]="doc.value">{{ doc.label }}</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="precedent()">Précédent</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="suivant()"
+            [disabled]="!formationForm.valid"
+          >
+            Soumettre pour validation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

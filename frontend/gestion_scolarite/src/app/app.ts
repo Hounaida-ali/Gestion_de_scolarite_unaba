@@ -1,92 +1,85 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { Navbar } from './components/navbar/navbar';
 import { Footer } from './components/footer/footer';
 import { Subscription } from 'rxjs';
 import { AuthModal } from './services/auth-modal';
-import { Login } from "./components/login/login";
-import { Registre } from "./components/registre/registre";
+import { Login } from './components/login/login';
+import { Registre } from './components/registre/registre';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer, Login, Registre],
-  template: ` <app-navbar></app-navbar>
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, Navbar, Footer, Login, Registre],
+  template: `
+    <!-- Navbar & Footer pour public uniquement -->
+    <app-navbar *ngIf="!isAdminRoute && !isEtudiantRoute && !isEnseignantRoute"></app-navbar>
 
     <!-- Login Modal -->
-    @if (isLoginModalVisible) {
-    <div class="modal-backdrop show" (click)="closeLoginModal()"></div>
-    <div class="modal show d-block" tabindex="-1" role="dialog">
+    <div *ngIf="isLoginModalVisible && !isAdminRoute" class="modal-backdrop show" (click)="closeLoginModal()"></div>
+    <div *ngIf="isLoginModalVisible && !isAdminRoute" class="modal show d-block" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-          <app-login [isVisible]="isLoginModalVisible" (close)="onLoginModalClose()"> </app-login>
+          <app-login [isVisible]="isLoginModalVisible" (close)="onLoginModalClose()"></app-login>
         </div>
       </div>
     </div>
-    }
 
     <!-- Register Modal -->
-    @if (isRegisterModalVisible) {
-    <div class="modal-backdrop show" (click)="closeRegisterModal()"></div>
-    <div class="modal show d-block" tabindex="-1" role="dialog">
+    <div *ngIf="isRegisterModalVisible && !isAdminRoute" class="modal-backdrop show" (click)="closeRegisterModal()"></div>
+    <div *ngIf="isRegisterModalVisible && !isAdminRoute" class="modal show d-block" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-          <app-registre [isVisible]="isRegisterModalVisible" (close)="onRegisterModalClose()">
-          </app-registre>
+          <app-registre [isVisible]="isRegisterModalVisible" (close)="onRegisterModalClose()"></app-registre>
         </div>
       </div>
     </div>
-    }
-    <router-outlet />
-    <app-footer></app-footer>`,
-  styles: '',
+
+    <!-- Route outlet -->
+    <router-outlet></router-outlet>
+
+    <!-- Footer pour public uniquement -->
+    <app-footer *ngIf="!isAdminRoute && !isEtudiantRoute && !isEnseignantRoute"></app-footer>
+  `,
 })
 export class App {
   protected readonly title = signal('gestion_scolarite');
 
-  isLoginModalVisible: boolean = false;
-  isRegisterModalVisible: boolean = false;
+  isLoginModalVisible = false;
+  isRegisterModalVisible = false;
   private modalSubscription: Subscription;
+  isAdminRoute = false;
+  isEtudiantRoute = false;
+  isEnseignantRoute = false;
 
-  constructor(private authModalService: AuthModal) {
-    this.modalSubscription = this.authModalService.loginModalState$.subscribe((isOpen) => {
-      this.isLoginModalVisible = isOpen;
-    });
-    this.modalSubscription = this.authModalService.registerModalState$.subscribe((isOpen) => {
-      this.isRegisterModalVisible = isOpen;
-    });
+  constructor(private authModalService: AuthModal, private router: Router) {
+    // Gestion modales Login/Register
+    this.modalSubscription = this.authModalService.loginModalState$.subscribe(
+      (isOpen) => (this.isLoginModalVisible = isOpen)
+    );
+    this.modalSubscription = this.authModalService.registerModalState$.subscribe(
+      (isOpen) => (this.isRegisterModalVisible = isOpen)
+    );
+
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const url = event.urlAfterRedirects;
+        this.isAdminRoute = url.startsWith('/admindashboard');
+        this.isEtudiantRoute = url.startsWith('/etudiantdashboard');
+        this.isEnseignantRoute = url.startsWith('/enseignantdashboard');
+      });
   }
 
-  ngOnInit(): void {}
-
-  // Ouvre la modal de login
-  openLoginModal(): void {
-    this.authModalService.openLoginModal();
-  }
-
-  // Ferme la modal de login
-  closeLoginModal(): void {
-    this.authModalService.closeLoginModal();
-  }
-
-  // Gère la fermeture de la modal depuis le composant login
-  onLoginModalClose(): void {
-    this.authModalService.closeLoginModal();
-  }
-
-  // Ouvre la modal de Register
-  openRegisterModal(): void {
-    this.authModalService.openRegisterModal();
-  }
-
-  // Ferme la modal de Register
-  closeRegisterModal(): void {
-    this.authModalService.closeRegisterModal();
-  }
-
-  // Gère la fermeture de la modal depuis le composant login
-  onRegisterModalClose(): void {
-    this.authModalService.closeRegisterModal();
-  }
+  // --- Gestion des modales ---
+  openLoginModal(): void { this.authModalService.openLoginModal(); }
+  closeLoginModal(): void { this.authModalService.closeLoginModal(); }
+  onLoginModalClose(): void { this.authModalService.closeLoginModal(); }
+  openRegisterModal(): void { this.authModalService.openRegisterModal(); }
+  closeRegisterModal(): void { this.authModalService.closeRegisterModal(); }
+  onRegisterModalClose(): void { this.authModalService.closeRegisterModal(); }
 
   ngOnDestroy(): void {
     if (this.modalSubscription) {

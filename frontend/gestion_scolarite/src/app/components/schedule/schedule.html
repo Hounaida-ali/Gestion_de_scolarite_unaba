@@ -1,0 +1,218 @@
+<section class="container">
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <div class="schedule-container">
+    <h2>Emploi du temps</h2>
+
+    <div class="schedule-header">
+      <button (click)="newCourse()" class="add-btn">
+        <i class="fas fa-plus"></i> Ajouter un cours
+      </button>
+      <button (click)="loadSlots()" class="refresh-btn">
+        <i class="fa-solid fa-rotate-right"></i> Actualiser
+      </button>
+    </div>
+
+    <!-- 🔹 Filtres -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Département :</label>
+        <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
+          <option value="">Tous</option>
+          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Filière :</label>
+        <select
+          [(ngModel)]="filiereFilter"
+          (change)="onFiliereChange()"
+          [disabled]="!departementFilter"
+        >
+          <option value="">Toutes</option>
+          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Niveau :</label>
+        <select [(ngModel)]="niveauFilter" (change)="filterSlots()" [disabled]="!filiereFilter">
+          <option value="">Tous</option>
+          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 🔹 Tableau emploi du temps -->
+    <table class="timetable">
+      <thead>
+        <tr>
+          <th>Heures</th>
+          <th *ngFor="let day of days">{{ day }}</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aucun cours -->
+        <tr *ngIf="filteredSlots.length === 0">
+          <td [attr.colspan]="days.length + 2" class="no-courses">
+            Aucun cours trouvé pour ces critères.
+          </td>
+        </tr>
+
+        <!-- Créneaux -->
+        <tr *ngFor="let time of timeSlots">
+          <td>{{ time }}</td>
+
+          <td *ngFor="let day of days">
+            <ng-container *ngFor="let slot of filteredSlots">
+              <div
+                *ngIf="getDayName(slot.start) === day && formatTime(slot.start, slot.end) === time"
+                class="course {{ slot.group }}"
+                [class.canceled]="slot.canceled"
+                (click)="showDetails(slot)"
+              >
+                <strong>{{ slot.title }}</strong><br />
+                {{ slot.teacher }} - {{ slot.room }}
+              </div>
+            </ng-container>
+          </td>
+
+          <!-- Colonne Actions -->
+          <td>
+            <ng-container *ngFor="let slot of filteredSlots">
+              <div *ngIf="formatTime(slot.start, slot.end) === time" class="btn">
+                <button (click)="editCourse(slot);courseForm.patchValue(slot); $event.stopPropagation()">
+                  <i class="fa-solid fa-pen-to-square" style="color: white"></i>
+                </button>
+                <button (click)="deleteCourse(slot); $event.stopPropagation()">
+                  <i class="fa-solid fa-trash" style="color: white"></i>
+                </button>
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 🔹 Formulaire d’ajout/modification de cours -->
+<div *ngIf="showForm && selectedCourse" class="container1">
+  <div class="form-container">
+    <h3>{{ selectedCourse._id ? 'Modifier un cours' : 'Ajouter un cours' }}</h3>
+
+    <form (ngSubmit)="selectedCourse._id ? updateCourse() : addCourse()">
+      <!-- 🔸 Titre -->
+      <div class="form-group">
+        <label>Titre du cours <span class="required"></span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedCourse.title"
+          name="title"
+          placeholder="Titre du cours"
+          required
+        />
+      </div>
+
+      <!-- 🔸 Enseignant -->
+      <div class="form-group">
+        <label>Enseignant <span class="required"></span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedCourse.teacher"
+          name="teacher"
+          placeholder="Nom de l’enseignant"
+          required
+        />
+      </div>
+
+      <!-- 🔸 Département, Filière, Niveau -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Département <span class="required"></span></label>
+          <select
+            [(ngModel)]="selectedCourse.departement"
+            name="departement"
+            required
+            (change)="onFormDepartementChange()"
+          >
+            <option value="">Département</option>
+            <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Filière <span class="required"></span></label>
+          <select
+            [(ngModel)]="selectedCourse.filiere"
+            name="filiere"
+            required
+            (change)="onFormFiliereChange()"
+          >
+            <option value="">Filière</option>
+            <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Niveau <span class="required"></span></label>
+          <select [(ngModel)]="selectedCourse.niveau" name="niveau" required>
+            <option value="">Niveau</option>
+            <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 🔸 Groupe -->
+      <div class="form-group">
+        <label>Groupe <span class="required"></span></label>
+        <select [(ngModel)]="selectedCourse.group" name="group" required>
+          <option value="CM">CM</option>
+          <option value="TD">TD</option>
+          <option value="TP">TP</option>
+        </select>
+      </div>
+
+      <!-- 🔸 Salle -->
+      <div class="form-group">
+        <label>Salle <span class="required"></span></label>
+        <input
+          type="text"
+          [(ngModel)]="selectedCourse.room"
+          name="room"
+          placeholder="Salle"
+          required
+        />
+      </div>
+
+      <!-- 🔸 Dates et heures -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date et heure de début <span class="required"></span></label>
+          <input type="datetime-local" [(ngModel)]="selectedCourse.start" name="start" required />
+        </div>
+
+        <div class="form-group">
+          <label>Date et heure de fin <span class="required"></span></label>
+          <input type="datetime-local" [(ngModel)]="selectedCourse.end" name="end" required />
+        </div>
+      </div>
+
+      <!-- 🔸 Boutons -->
+      <div class="buttons">
+        <button type="submit">
+          {{ selectedCourse._id ? '💾 Mettre à jour' : '➕ Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>

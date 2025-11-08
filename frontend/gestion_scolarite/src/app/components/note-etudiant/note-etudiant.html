@@ -1,0 +1,81 @@
+<div class="schedule-container">
+  <h2>Système de Saisie et d'affichage des Notes</h2>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Département :</label>
+      <select [(ngModel)]="departementFilter" (change)="onDepartementChange(); filterEvaluations()">
+        <option value="">Tous</option>
+        <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Filière :</label>
+      <select
+        [(ngModel)]="filiereFilter"
+        (change)="onFiliereChange(); filterEvaluations()"
+        [disabled]="!departementFilter"
+      >
+        <option value="">Toutes</option>
+        <option *ngFor="let f of filteredFilieres" [value]="f">{{ f }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Niveau :</label>
+      <select [(ngModel)]="niveauFilter" (change)="filterEvaluations()">
+        <option value="">Tous</option>
+        <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Matière :</label>
+      <select [(ngModel)]="matiereFilter" (change)="filterEvaluations()">
+        <option value="">Toutes</option>
+        <option *ngFor="let m of matieres" [value]="m">{{ m }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Enseignant :</label>
+      <select [(ngModel)]="enseignantFilter" (change)="filterEvaluations()">
+        <option value="">Tous</option>
+        <option *ngFor="let e of enseignants" [value]="e">{{ e }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Type :</label>
+      <select [(ngModel)]="typeEvaluationFilter" (change)="filterEvaluations()">
+        <option value="">Tous</option>
+        <option *ngFor="let t of typesEvaluation" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+  </div>
+
+  <table class="timetable">
+    <thead>
+      <tr>
+        <th>Étudiant</th>
+        <th>Matière</th>
+        <th>Note</th>
+        <th>Statut</th>
+        <th>dateCreation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of filteredEvaluations">
+        <td>{{ e.etudiant.nom }}</td>
+        <td>{{ e.matiere }}</td>
+        <td>{{ e.note }}</td>
+        <td>{{ getAppreciation(e.note) }}</td>
+        <td>{{ e.dateCreation | date : "dd-MM-yyyy HH:mm:ss" }}</td>
+      </tr>
+      <tr *ngIf="filteredEvaluations.length === 0">
+        <td colspan="4">Aucune évaluation trouvée</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

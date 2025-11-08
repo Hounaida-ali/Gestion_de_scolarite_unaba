@@ -1,0 +1,283 @@
+
+.schedule-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #ffffff; /* fond blanc */
+  border-radius: 15px; /* coins arrondis */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* ombre douce */
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* === Filtres === */
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.filter-group select,
+.filter-group button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+}
+
+.filter-group button {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.filter-group button:hover {
+  background-color: #0069d9;
+}
+
+/* === Tableau emploi du temps === */
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.timetable th,
+.timetable td {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.timetable th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* === Cours colorés === */
+.course {
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.course.CM {
+  background-color: #3498db;
+}
+.course.TD {
+  background-color: #2ecc71;
+}
+.course.TP {
+  background-color: #f39c12;
+}
+.container1 {
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 20px;
+}
+
+h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.required {
+  color: var(--danger-color);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+button[type='submit'] {
+  background-color: var(--success-color);
+}
+
+button[type='submit']:hover {
+  background-color: #27ae60;
+}
+
+button[type='button'] {
+  background-color: var(--danger-color);
+}
+
+button[type='button']:hover {
+  background-color: #c0392b;
+}
+
+.notification-float {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 300px;
+  padding: 12px 18px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: #155724; /* Couleur texte succès par défaut */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  z-index: 9999;
+  gap: 10px;
+  border: 4px solid #ffffff;
+  margin-top: -10px;
+
+}
+
+/* Icône */
+.notification-float .icon {
+  font-size: 18px;
+}
+
+/* Message */
+.notification-float .message {
+  flex: 1;
+}
+
+/* Types de notification */
+.notification-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.notification-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .buttons {
+    flex-direction: column;
+  }
+}
+.schedule-header {
+  /* justify-content: flex-end; */
+  margin-left: 71%
+}
+.add-btn,
+.refresh-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.add-btn {
+  background-color: #2ecc71; /* vert */
+}
+
+.add-btn:hover {
+  background-color: #27ae60;
+}
+
+.refresh-btn {
+  background-color: var(--primary-color); /* bleu */
+  margin-left: 15px;
+}
+
+.refresh-btn:hover {
+  background-color: #0e3262;
+}
+
+.btn button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 14px;
+}
+.btn button:first-child {
+  background-color: #f39c12;
+}
+
+/* Bouton Supprimer */
+.btn button:last-child {
+  background-color: #e74c3c; /* rouge */
+}

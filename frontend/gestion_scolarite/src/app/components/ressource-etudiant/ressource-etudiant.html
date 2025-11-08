@@ -1,0 +1,93 @@
+<div class="container">
+  <!-- En-tête de page -->
+  <section class="page-header">
+    <h1><i class="fas fa-book-open"></i> Ressources Pédagogiques</h1>
+    <p>Accédez à l'ensemble des supports de cours, travaux dirigés et ressources pédagogiques du département</p>
+  </section>
+
+  <!-- Section des ressources -->
+  <section class="resources-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-download"></i> Documents disponibles</h2>
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (keyup.enter)="onSearch()"
+          placeholder="Rechercher un document...">
+        <button (click)="onSearch()"><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+    
+    <!-- Filtres -->
+    <div class="filters">
+      <div class="filter-group">
+        <label for="typeFilter">Type de document</label>
+        <select id="typeFilter" [(ngModel)]="typeFilter" (change)="onFilterChange()">
+          <option *ngFor="let type of types" [value]="type.value">{{type.label}}</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="niveauFilter">Niveau</label>
+        <select id="niveauFilter" [(ngModel)]="niveauFilter" (change)="onFilterChange()">
+          <option *ngFor="let niveau of niveaux" [value]="niveau.value">{{niveau.label}}</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="matiereFilter">Matière</label>
+        <select id="matiereFilter" [(ngModel)]="matiereFilter" (change)="onFilterChange()">
+          <option *ngFor="let matiere of matieres" [value]="matiere.value">{{matiere.label}}</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Grille des ressources -->
+    <div class="resources-grid">
+      <div *ngFor="let ressource of ressources" class="resource-card">
+        <div class="resource-header">
+          <i [class]="getFileIcon(ressource.fichier.type)" class="resource-icon"></i>
+          <h3>{{getTypeLabel(ressource.type)}}</h3>
+        </div>
+        <div class="resource-body">
+          <h4 class="resource-title">{{ressource.titre}}</h4>
+          <p class="resource-description">{{ressource.description}}</p>
+          <div class="resource-meta">
+            <span><i class="fas fa-graduation-cap"></i> {{getNiveauLabel(ressource.niveau)}}</span>
+            <span><i class="fas fa-book"></i> {{getMatiereLabel(ressource.matiere)}}</span>
+          </div>
+          <div class="resource-meta">
+            <span><i class="fas fa-user"></i> {{ressource.auteur.prenom}} {{ressource.auteur.nom}}</span>
+            <span><i class="fas fa-calendar"></i> {{ressource.datePublication | date:'dd/MM/yyyy'}}</span>
+          </div>
+        </div>
+        <div class="resource-footer">
+          <button class="download-btn" (click)="telechargerRessource(ressource)">
+            <i class="fas fa-download"></i> Télécharger
+          </button>
+          <span class="file-size">{{formatFileSize(ressource.fichier.taille)}}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination">
+      <button 
+        *ngFor="let page of [].constructor(totalPages); let i = index" 
+        (click)="onPageChange(i + 1)"
+        [class.active]="currentPage === i + 1"
+        class="page-btn">
+        {{i + 1}}
+      </button>
+    </div>
+    
+    <!-- Message si aucune ressource -->
+    <div *ngIf="ressources.length === 0" class="no-resources">
+      <i class="fas fa-search fa-3x"></i>
+      <h3>Aucune ressource trouvée</h3>
+      <p>Aucun document ne correspond à vos critères de recherche.</p>
+    </div>
+  </section>
+</div>
+

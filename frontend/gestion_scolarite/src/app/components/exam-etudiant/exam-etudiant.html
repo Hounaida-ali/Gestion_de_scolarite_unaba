@@ -1,0 +1,87 @@
+<section class="container">
+  <div class="schedule-container">
+    <h2>Examens / Événements</h2>
+    <div class="schedule-header">
+      <button (click)="refreshPage()" class="refresh-btn">
+        <i class="fa-solid fa-rotate-right"></i> Actualiser
+      </button>
+      <div class="notification-icon" (click)="toggleNotifications()">
+        <i class="fa-solid fa-bell"></i>
+        <span *ngIf="notifications.length > 0" class="badge">{{ notifications.length }}</span>
+      </div>
+
+      <div class="notification-list">
+        <div
+          *ngFor="let n of notifications; let i = index"
+          [ngClass]="n.type"
+          class="notification-item"
+        >
+          {{ n.text }}
+          <button (click)="removeNotification(i)">×</button>
+        </div>
+      </div>
+    </div>
+    <div class="filters">
+      <div class="filter-group">
+        <label>Département :</label>
+        <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
+          <option value="">Tous les départements</option>
+          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Filière :</label>
+        <select
+          [(ngModel)]="filiereFilter"
+          (change)="onFiliereChange()"
+          [disabled]="!departementFilter"
+        >
+          <option value="">Toutes les filières</option>
+          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Niveau :</label>
+        <select [(ngModel)]="niveauFilter" (change)="filterExams()" [disabled]="!filiereFilter">
+          <option value="">Tous les niveaux</option>
+          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="timetable">
+      <thead>
+        <tr>
+          <th>Heures</th>
+          <th *ngFor="let day of days">{{ day }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredExams.length === 0">
+          <td [attr.colspan]="days.length + 1" class="no-courses">
+            Aucun examen trouvé pour ces critères.
+          </td>
+        </tr>
+
+        <tr *ngFor="let time of timeSlots">
+          <td>{{ time }}</td>
+          <td *ngFor="let day of days">
+            <ng-container *ngFor="let exam of filteredExams">
+              <div
+                *ngIf="getDayName(exam.start) === day && formatTime(exam.start, exam.end) === time"
+                class="course CM"
+                (click)="showDetails(exam)"
+              >
+                <strong>{{ exam.title }}</strong
+                ><br />
+                {{ exam.room }}
+              </div>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,4 +1,4 @@
-export interface Ressource {
+export interface ressourcesInterface {
   _id?: string;
   titre: string;
   description: string;
@@ -16,7 +16,8 @@ export interface Ressource {
     nom: string;
     prenom: string;
   };
-  datePublication: Date;
+  dateCreation: Date | string;       // ajouté
+  datePublication?: Date | string;
   tags: string[];
   estPublic: boolean;
 }
