@@ -34,6 +34,7 @@ const register = async (req, res) => {
       email,
       role,
       password: hashedPassword,
+       isActive: true,
     });
   } catch (error) {
     return res.status(500).send({ message: "L'utilisateur n'a pas pu être ajouté" });
@@ -63,6 +64,7 @@ const register = async (req, res) => {
   });
 
   res.send({
+    success: true,
     message: "Utilisateur ajouté avec succès",
     otpToken,
     user,
@@ -257,5 +259,101 @@ const getAll = async (req, res) => {
   const users = await userModel.find()
   res.send(users);
 };
+const getUserById = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.params.id);
 
-module.exports = { register, login, verify, resetPassword, reinisilize, logout, getAll, updateProfile };
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.json(user);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const updateUser = async (req, res) => {
+  try {
+    const { firstName, lastName, email, role, isEmailVerified } = req.body;
+
+    // Récupérer l'utilisateur existant
+    const user = await userModel.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Utilisateur non trouvé.",
+      });
+    }
+
+    let isUpdated = false;
+
+    if (firstName && firstName.trim() !== user.firstName) {
+      user.firstName = firstName.trim();
+      isUpdated = true;
+    }
+    if (lastName && lastName.trim() !== user.lastName) {
+      user.lastName = lastName.trim();
+      isUpdated = true;
+    }
+    if (email && email.trim() !== user.email) {
+      const emailExists = await userModel.findOne({ email: email.trim(), _id: { $ne: user._id } });
+      if (emailExists) {
+        return res.status(422).json({
+          success: false,
+          message: "Cet email est déjà utilisé par un autre utilisateur.",
+        });
+      }
+      user.email = email.trim();
+      isUpdated = true;
+    }
+    if (role && role !== user.role) {
+      user.role = role;
+      isUpdated = true;
+    }
+    if (typeof isEmailVerified === 'boolean' && isEmailVerified !== user.isEmailVerified) {
+      user.isEmailVerified = isEmailVerified;
+      isUpdated = true;
+    }
+
+    if (!isUpdated) {
+      return res.status(200).json({
+        success: false,
+        message: "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      success: true,
+      message: "Utilisateur mis à jour avec succès.",
+      data: updatedUser,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la mise à jour de l'utilisateur.",
+      error: err.message,
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const deletedUser = await userModel.findByIdAndDelete(req.params.id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.json({ success: true,message: "Utilisateur supprimé avec succès" });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+module.exports = { register, login, verify, resetPassword, reinisilize, logout, getAll, updateProfile, getUserById, updateUser, deleteUser };

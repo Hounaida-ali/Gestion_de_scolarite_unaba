@@ -1,165 +1,197 @@
-require('dotenv').config();
+require("dotenv").config();
 const formationModel = require("../models/formationModel");
 const departementModel = require("../models/departementModel");
-// GET toutes les formations
+
+/* =====================================================
+   🔹 GET — Toutes les formations
+===================================================== */
 const getAllFormations = async (req, res) => {
+  console.log("\nGet All Foramations Called.\n");
+  
   try {
-    const formations = await formationModel.find().populate('departement');
-    res.json({ data: formations});
+    const formations = await formationModel
+      .find()
+      .populate("departement", "nom departement");
+
+    res.json({ success: true, len: formations.length, data: formations });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// GET formation par ID
+/* =====================================================
+   🔹 GET — Formation par ID
+===================================================== */
 const getIdFormation = async (req, res) => {
   try {
-    const formation = await formationModel.findById(req.params.id);
+    const formation = await formationModel
+      .findById(req.params.id)
+      .populate("departement", "nom departement");
+
     if (!formation) {
-      return res.status(404).json({ message: 'Formation non trouvée' });
+      return res.status(404).json({ message: "Formation non trouvée" });
     }
-    res.json(formation);
+
+    res.json({ success: true, data: formation });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-// POST nouvelle formation
+
+/* =====================================================
+   🔹 POST — Ajouter une formation
+===================================================== */
 const addFormation = async (req, res) => {
   try {
-    const { nom, duree, departementId, programmes } = req.body;
+    const { nom, departementId, programmes } = req.body;
 
-    // 1️⃣ Vérifier que le département existe
-    const departement = await departementModel.findById(departementId);
-    if (!departement) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Département non trouvé' 
+    // Vérification des champs obligatoires
+    if (!nom || !departementId) {
+      return res.status(400).json({
+        success: false,
+        message: "Le nom et le département sont obligatoires.",
       });
     }
 
-    // 2️⃣ Vérifier qu’un programme avec le même code n’existe pas déjà dans ce département
-const codeProgramme = programmes && programmes.length > 0 ? programmes[0].code : null;
-
-if (codeProgramme) {
-  const formationExistante = await formationModel.findOne({
-    departement: departementId,
-    "programmes.code": codeProgramme
-  });
-
-  if (formationExistante) {
-    return res.status(400).json({
-      success: false,
-      message: "Un programme avec ce code existe déjà dans ce département."
-    });
-  }
-}
-
-    // 3️⃣ Créer la nouvelle formation
-    const nouvelleFormation = new formationModel({
-      nom,
-      duree,
+    // Vérifier département
+    const departement = await departementModel.findById(departementId);
+    if (!departement) {
+      return res.status(404).json({
+        success: false,
+        message: "Département non trouvé.",
+      });
+    }
+    //  Vérifier si une formation portant le même nom existe dans le même département
+    const existingFormation = await formationModel.findOne({
+      nom: nom.trim(),
       departement: departementId,
-      programmes: programmes || []
     });
 
-    // 4️⃣ Sauvegarder et peupler le département
-    await nouvelleFormation.save();
-    await nouvelleFormation.populate('departement', 'nom code');
+    if (existingFormation) {
+      return res.status(400).json({
+        success: false,
+        message: `La formation '${nom}' existe déjà dans ce département.`,
+      });
+    }
+    // Vérifier code programme unique
+    if (programmes && programmes.length > 0) {
+      for (let prog of programmes) {
+        const exist = await formationModel.findOne({
+          departement: departementId,
+          "programmes.code": prog.code,
+        });
 
-    // 5️⃣ Réponse
+        if (exist) {
+          return res.status(400).json({
+            success: false,
+            message: `Un programme avec le code '${prog.code}' existe déjà dans ce département.`,
+          });
+        }
+      }
+    }
+
+    // Création de la formation
+    const newFormation = new formationModel({
+      nom,
+      departement: departementId,
+      programmes: programmes || [],
+    });
+
+    await newFormation.save();
+    await newFormation.populate("departement", "nom departement");
+
     res.status(201).json({
       success: true,
-      data: nouvelleFormation,
-      message: "Formation ajoutée avec succès au département"
+      message: "Formation ajoutée avec succès.",
+      data: newFormation,
     });
-
   } catch (error) {
-    res.status(400).json({ 
-      success: false,
-      message: error.message
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-// GET formations par département
+
+/* =====================================================
+   🔹 GET — Formations par département
+===================================================== */
 const getFormationsByDepartement = async (req, res) => {
   try {
-    const formations = await formationModel.find({ departement: req.params.departementId });
-    res.json({ data: formations });
+    const formations = await formationModel
+      .find({ departement: req.params.departementId })
+      .populate("departement", "nom departement");
+
+    res.json({ success: true, data: formations });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// PUT modifier une formation
+/* =====================================================
+   🔹 PUT — Modifier formation
+===================================================== */
 const updateFormation = async (req, res) => {
   try {
     const formationId = req.params.id;
-    const { nom, description, duree, departementId } = req.body;
+    const { nom, departementId, programmes } = req.body;
 
-    // 🔹 Vérifier si la formation existe
-    const currentFormation = await formationModel.findById(formationId);
-    if (!currentFormation) {
+    const formation = await formationModel.findById(formationId);
+    if (!formation) {
       return res.status(404).json({
         success: false,
         message: "Formation non trouvée.",
       });
     }
 
-    // 🔹 Vérifier s’il y a un vrai changement
-    const isSame =
-      currentFormation.nom === nom &&
-      currentFormation.description === description &&
-      currentFormation.duree === duree &&
-      currentFormation.departement?.toString() === departementId;
-
-    if (isSame) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
-      });
+    // Si changement de département → vérifier existence
+    if (departementId) {
+      const dep = await departementModel.findById(departementId);
+      if (!dep) {
+        return res.status(404).json({
+          success: false,
+          message: "Département inexistant.",
+        });
+      }
     }
 
-    // 🔹 Préparer les données de mise à jour
-    const updateData = {};
-    if (nom) updateData.nom = nom;
-    if (description) updateData.description = description;
-    if (duree) updateData.duree = duree;
-    if (departementId) updateData.departement = departementId;
+    // Mise à jour
+    if (nom) formation.nom = nom;
+    if (departementId) formation.departement = departementId;
+    if (programmes) formation.programmes = programmes;
 
-    // 🔹 Mettre à jour la formation
-    const updatedFormation = await formationModel.findByIdAndUpdate(
-      formationId,
-      updateData,
-      { new: true }
-    );
+    await formation.save();
+    await formation.populate("departement", "nom departement");
 
-    return res.json({
+    res.json({
       success: true,
-      message: "Formation mise à jour avec succès !",
-      formation: updatedFormation,
+      message: "Formation mise à jour avec succès",
+      data: formation,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-
-
-// DELETE supprimer une formation
+/* =====================================================
+   🔹 DELETE — Supprimer formation
+===================================================== */
 const deleteFormation = async (req, res) => {
   try {
     const formation = await formationModel.findByIdAndDelete(req.params.id);
+
     if (!formation) {
-      return res.status(404).json({ message: 'Formation non trouvée' });
+      return res.status(404).json({ message: "Formation non trouvée" });
     }
-    res.json({ message: 'Formation supprimée avec succès' });
+
+    res.json({ success: true, message: "Formation supprimée avec succès" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-module.exports = {getAllFormations, getIdFormation, addFormation,getFormationsByDepartement, updateFormation, deleteFormation}
+module.exports = {
+  getAllFormations,
+  getIdFormation,
+  addFormation,
+  getFormationsByDepartement,
+  updateFormation,
+  deleteFormation,
+};

@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const morgan = require('morgan');
 
 const userRouter = require('./routers/userRouter');
 const contactRouter = require('./routers/contactRouter');
@@ -21,10 +22,10 @@ const seeAllDashboardRouter = require('./routers/seeAllDashboardRouter');
 const AllNewsRouter = require('./routers/AllNewsRouter');
 const  scheduleRouter = require('./routers/scheduleRouter');
 const  examRouter = require('./routers/examRouter');
-const  gesUtilisateurRouter = require('./routers/gesUtilisateurRouter');
 const  noteRouter = require('./routers/noteRouter');
-const inscriptionRouter = require('./routers/inscriptionRouter')
-
+const inscriptionRouter = require('./routers/inscriptionRouter');
+const enseignantRouter = require('./routers/enseignantRouter')
+const faculteRouter = require('./routers/faculteRouter')
 const app = express();
 const PORT = process.env.PORT
 
@@ -37,6 +38,7 @@ mongoose
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(morgan("dev"));
 
 // Routes
 app.use("/api/auth", userRouter);
@@ -56,9 +58,10 @@ app.use('/api/SeeAllDashboard', seeAllDashboardRouter );
 app.use('/api/AllNews', AllNewsRouter );
 app.use('/api/Schedule', scheduleRouter );
 app.use('/api/Exam', examRouter);
-app.use('/api/Utilisateur', gesUtilisateurRouter);
 app.use('/api/Note', noteRouter);
 app.use('/api/etudiants', inscriptionRouter);
+app.use('/api/enseignants', enseignantRouter);
+app.use('/api/faculte', faculteRouter);
 
 app.post("/api/file-uploads", uploads.single("file"), (req, res) => {
   console.log("File propreties", req.file);
@@ -74,23 +77,41 @@ app.post("/api/file-uploads", uploads.single("file"), (req, res) => {
   });
 });
 
-// uoloads image etudiant
-app.post("/api/etudiants/file-uploads", uploads.single("file"), (req, res) => {
-  console.log("File properties:", req.file);
-
-  // URL publique que le front pourra afficher
-  const fileUrl = `/uploads/${req.file.filename}`;
-
-  res.json({
-    message: "File uploaded successfully",
-    file: {
-      nom: req.file.originalname,
-      url: fileUrl, // URL publique
-      taille: req.file.size,
-      type: req.file.mimetype
-    }
-  });
+/// uoloads image etudiant
+// uploads images/documents étudiants
+app.post("/api/etudiants/file-uploads", uploads.fields([
+  { name: 'photoEtudiant', maxCount: 1 },
+  { name: 'documents', maxCount: 10 }
+]), (req, res) => {
+  try {
+    console.log("Photo:", req.files['photoEtudiant']);
+    console.log("Documents:", req.files['documents']);
+  
+    const photoData = req.files['photoEtudiant']?.map(file => ({
+      nom: file.originalname,
+      url: `/uploads/${file.filename}`,
+      taille: file.size,
+      type: file.mimetype
+    })) || [];
+  
+    const documentsData = req.files['documents']?.map(file => ({
+      nom: file.originalname,
+      url: `/uploads/${file.filename}`,
+      taille: file.size,
+      type: file.mimetype
+    })) || [];
+  
+    res.json({
+      message: "Files uploaded successfully",
+      photo: photoData[0] || null,
+      documents: documentsData
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Une error est survenue lors de l'upload.")
+  }
 });
+
 
 
 // Démarrage du serveur

@@ -1,35 +1,47 @@
 require("dotenv").config();
 const departementModel = require("../models/departementModel");
+const Faculte = require('../models/FaculteModel');
 
-// ============================
-// 🔹 POST — Ajouter un nouveau département
-// ============================
+
+//  POST — Ajouter un nouveau département
+
 const addDepartement = async (req, res) => {
+  console.log("\nAdd Departement called.\n");
+  
   try {
-    const { nom, departement, description } = req.body;
+    const { nom, departement, faculteNom, description } = req.body;
 
-    // Vérification des champs requis
-    if (!nom || !departement) {
+    if (!nom || !departement || !faculteNom) {
       return res.status(400).json({
         success: false,
-        message: "Le nom et le code du département sont obligatoires.",
+        message: "Le nom, le code du département et le nom de la faculté sont obligatoires.",
       });
     }
 
-    // Vérifier si le département existe déjà
+    // Vérifier que la faculté existe
+    const faculte = await Faculte.findOne({ nomFaculte: faculteNom.trim() });
+    if (!faculte) {
+      return res.status(404).json({
+        success: false,
+        message: `Aucune faculté trouvée avec le nom '${faculteNom}'.`,
+      });
+    }
+
+    // Vérifier doublon du département
     const existingDep = await departementModel.findOne({ departement: departement.trim() });
     if (existingDep) {
       return res.status(400).json({
         success: false,
-        message: "Un département avec ce nom existe déjà.",
+        message: "Un département avec ce code existe déjà.",
       });
     }
 
-    // Créer le nouveau département
+    // Créer le département
     const newDep = new departementModel({
       nom,
       departement,
-      description,
+      faculteNom: faculte._id, // <- ici le nom du champ doit correspondre au modèle
+      description
     });
 
     const savedDep = await newDep.save();
@@ -37,8 +49,15 @@ const addDepartement = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Département ajouté avec succès.",
-      data: savedDep,
+      data: {
+        ...savedDep._doc,
+        faculte: {
+          _id: faculte._id,
+          nomFaculte: faculte.nomFaculte
+        }
+      }
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -48,12 +67,16 @@ const addDepartement = async (req, res) => {
   }
 };
 
-// ============================
-// 🔹 GET — Récupérer tous les départements
-// ============================
+
+//  GET — Récupérer tous les départements
+
 const getAllDepartements = async (req, res) => {
+  console.log("\nGet All Departements Called.\n");
   try {
-    const departements = await departementModel.find().sort({ createdAt: -1 });
+    const departements = await departementModel.find()
+      .sort({ createdAt: -1 })
+      .populate({ path: 'faculteNom', select: 'nomFaculte adresse' }); // <- utiliser le champ correct
+
     res.json({
       success: true,
       count: departements.length,
@@ -68,12 +91,13 @@ const getAllDepartements = async (req, res) => {
   }
 };
 
-// ============================
-// 🔹 GET — Récupérer un département par ID
-// ============================
+
+//  GET — Récupérer un département par ID
+
 const getDepartementById = async (req, res) => {
   try {
-    const departementItem = await departementModel.findById(req.params.id);
+    const departementItem = await departementModel.findById(req.params.id)
+      .populate({ path: 'faculteNom', select: 'nomFaculte adresse' });
 
     if (!departementItem) {
       return res.status(404).json({
@@ -95,25 +119,67 @@ const getDepartementById = async (req, res) => {
   }
 };
 
-// ============================
-// 🔹 PUT — Modifier un département
-// ============================
+
+//  PUT — Modifier un département
+
 const updateDepartement = async (req, res) => {
   try {
-    const { nom, departement, description } = req.body;
+    const { nom, departement, faculteNom, description } = req.body;
 
-    const updatedDep = await departementModel.findByIdAndUpdate(
-      req.params.id,
-      { nom, departement, description },
-      { new: true }
-    );
-
-    if (!updatedDep) {
+    // Récupérer le département existant
+    const dep = await departementModel.findById(req.params.id).populate({ path: 'faculteNom', select: 'nomFaculte' });
+    if (!dep) {
       return res.status(404).json({
         success: false,
         message: "Département non trouvé.",
       });
     }
+
+    let isUpdated = false;
+
+    // Comparer chaque champ
+    if (nom && nom !== dep.nom) {
+      dep.nom = nom;
+      isUpdated = true;
+    }
+
+    if (departement && departement !== dep.departement) {
+      dep.departement = departement;
+      isUpdated = true;
+    }
+
+    if (description && description !== dep.description) {
+      dep.description = description;
+      isUpdated = true;
+    }
+
+    if (faculteNom) {
+      const faculte = await Faculte.findOne({ nomFaculte: faculteNom.trim() });
+      if (!faculte) {
+        return res.status(404).json({
+          success: false,
+          message: `La faculté '${faculteNom}' n'existe pas.`,
+        });
+      }
+
+      // Vérifier si le faculteNom a changé
+      if (!dep.faculteNom || dep.faculteNom._id.toString() !== faculte._id.toString()) {
+        dep.faculteNom = faculte._id;
+        isUpdated = true;
+      }
+    }
+
+    if (!isUpdated) {
+      return res.status(200).json({
+        success: false,
+        message: "Aucun changement détecté. Veuillez modifier au moins un champ avant d’enregistrer.",
+      });
+    }
+
+    const updatedDep = await dep.save();
+
+    // Renvoyer le département mis à jour avec la faculté peuplée
+    await updatedDep.populate({ path: 'faculteNom', select: 'nomFaculte adresse' });
 
     res.json({
       success: true,
@@ -129,9 +195,10 @@ const updateDepartement = async (req, res) => {
   }
 };
 
-// ============================
-// 🔹 DELETE — Supprimer un département
-// ============================
+
+
+//  DELETE — Supprimer un département
+
 const deleteDepartement = async (req, res) => {
   try {
     const deletedDep = await departementModel.findByIdAndDelete(req.params.id);

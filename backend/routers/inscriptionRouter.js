@@ -7,11 +7,14 @@ const {
   updateEtudiant,
   deleteEtudiant,
   validerInscription,
-  confirmerPaiement
+  confirmerPaiement,
+  isRegistered
 } = require('../controllers/inscriptionController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 router.post('/', createEtudiant);
 router.get('/', getEtudiants);
+router.get('/is-registered', authMiddleware, isRegistered);
 router.get('/:id', getEtudiantById);
 router.put('/:id', updateEtudiant);
 router.delete('/:id', deleteEtudiant);
