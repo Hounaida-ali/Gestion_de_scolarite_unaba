@@ -1,0 +1,422 @@
+<div *ngIf="successMessage" class="notification-float notification-success">
+  {{ successMessage }}
+</div>
+
+<div *ngIf="errorMessage" class="notification-float notification-error">
+  {{ errorMessage }}
+</div>
+<div class="container">
+  <div class="header">
+    <h1>Gestion des Enseignants</h1>
+    <p>Administration du corps professoral</p>
+  </div>
+
+  <!-- Formulaire Modal -->
+  <div *ngIf="showForm" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ formTitle }}</h2>
+        <button class="btn-close" (click)="cancelForm()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" #form="ngForm" class="enseignant-form">
+        <div class="form-grid">
+          <!-- Informations personnelles -->
+          <div class="form-section">
+            <h3><i class="fa-solid fa-user"></i> Informations Personnelles</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="matricule">Matricule *</label>
+                <input
+                  type="text"
+                  id="matricule"
+                  [(ngModel)]="enseignantForm.matricule"
+                  name="matricule"
+                  required
+                  readonly
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label for="nom">Nom *</label>
+                <input
+                  type="text"
+                  id="nom"
+                  [(ngModel)]="enseignantForm.nom"
+                  name="nom"
+                  required
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label for="prenom">Prénom *</label>
+                <input
+                  type="text"
+                  id="prenom"
+                  [(ngModel)]="enseignantForm.prenom"
+                  name="prenom"
+                  required
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateNaissance">Date de Naissance *</label>
+                <input
+                  type="date"
+                  id="dateNaissance"
+                  [(ngModel)]="enseignantForm.dateNaissance"
+                  name="dateNaissance"
+                  required
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  [(ngModel)]="enseignantForm.email"
+                  name="email"
+                  required
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label for="telephone">Téléphone *</label>
+                <input
+                  type="tel"
+                  id="telephone"
+                  [(ngModel)]="enseignantForm.telephone"
+                  name="telephone"
+                  required
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations professionnelles -->
+          <div class="form-section">
+            <h3><i class="fa-solid fa-briefcase"></i> Informations Professionnelles</h3>
+            <div class="form-group">
+              <label for="specialite">Spécialité *</label>
+              <select
+                id="specialite"
+                [(ngModel)]="enseignantForm.specialite"
+                name="specialite"
+                required
+                [disabled]="!isEditMode || isViewMode"
+                class="form-control"
+              >
+                <option value="">Sélectionnez une spécialité</option>
+                <option *ngFor="let specialite of specialites" [value]="specialite.value">
+                  {{ specialite.label }}
+                </option>
+              </select>
+              <div class="form-group">
+                <label for="grade">Grade *</label>
+                <select
+                  id="grade"
+                  [(ngModel)]="enseignantForm.grade"
+                  name="grade"
+                  required
+                  [disabled]="!isEditMode"
+                  class="form-control"
+                >
+                  <option *ngFor="let grade of grades" [value]="grade.value">
+                    {{ grade.label }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="coursAffectes">Cours Affectés *</label>
+                <input
+                  type="text"
+                  id="coursAffectes"
+                  [(ngModel)]="enseignantForm.coursAffectes"
+                  name="coursAffectes"
+                  required
+                  placeholder="Ex: Mathématiques, Physique..."
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+                <small class="text-muted"
+                  >Entrez un ou plusieurs cours séparés par des virgules.</small
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="departement">Département *</label>
+                <select
+                  id="departement"
+                  [(ngModel)]="enseignantForm.departement"
+                  name="departement"
+                  required
+                  [disabled]="!isEditMode"
+                  class="form-control"
+                >
+                  <option value="">Sélectionnez un département</option>
+                  <option *ngFor="let dept of departementsForm" [value]="dept.value">
+                    {{ dept.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateEmbauche">Date d'Embauche *</label>
+                <input
+                  type="date"
+                  id="dateEmbauche"
+                  [(ngModel)]="enseignantForm.dateEmbauche"
+                  name="dateEmbauche"
+                  required
+                  [readonly]="!isEditMode"
+                  class="form-control"
+                />
+              </div>
+              <div class="form-group">
+                <label for="statut">Statut *</label>
+                <select
+                  id="statut"
+                  [(ngModel)]="enseignantForm.statut"
+                  name="statut"
+                  required
+                  [disabled]="!isEditMode"
+                  class="form-control"
+                >
+                  <option
+                    *ngFor="let statut of statuts"
+                    [value]="statut.value"
+                    [disabled]="statut.value === 'tous'"
+                  >
+                    {{ statut.label }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <!-- Espace vide pour l'alignement -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+            <i class="fa-solid fa-times"></i>
+            Annuler
+          </button>
+
+          <!-- Bouton différent selon le mode -->
+          <button *ngIf="isEditMode" type="submit" class="btn btn-primary" [disabled]="!form.valid">
+            <i class="fa-solid fa-check"></i>
+            Enregistrer
+          </button>
+
+          <button
+            *ngIf="!isEditMode"
+            type="submit"
+            class="btn btn-success"
+            [disabled]="!form.valid"
+          >
+            <i class="fa-solid fa-plus"></i>
+            Créer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Actions CRUD - Header -->
+  <div class="crud-header">
+    <button class="btn btn-primary" (click)="creerEnseignant()">
+      <i class="fa-solid fa-plus"></i> Nouvel Enseignant
+    </button>
+
+    <div class="total-count">
+      <span class="badge total-badge">
+        <i class="fa-solid fa-users"></i>
+        {{ enseignantsFiltres.length }} Enseignant(s)
+      </span>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filtres-section">
+    <div class="filtres-grid">
+      <div class="filtre-group">
+        <label for="recherche"><i class="fa-solid fa-search"></i> Recherche</label>
+        <input
+          type="text"
+          id="recherche"
+          [(ngModel)]="filtreRecherche"
+          placeholder="Nom, prénom, email, matricule..."
+          class="form-control"
+        />
+      </div>
+      <div class="filtre-group">
+        <label for="departement">Département</label>
+        <select id="departement" [(ngModel)]="filtreDepartement" class="form-control">
+          <option value="tous">Tous les départements</option>
+          <option *ngFor="let dept of departementsForm" [value]="dept.value">
+            {{ dept.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filtre-group">
+        <label for="statut">Statut</label>
+        <select id="statut" [(ngModel)]="filtreStatut" class="form-control">
+          <option value="tous">Tous les statuts</option>
+          <option
+            *ngFor="let statut of statuts"
+            [value]="statut.value"
+            [disabled]="statut.value === 'tous'"
+          >
+            {{ statut.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau CRUD -->
+  <div class="table-container">
+    <!-- Chargement -->
+    <div *ngIf="chargement" class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement des enseignants...</p>
+    </div>
+
+    <!-- Erreur -->
+    <div *ngIf="erreur && !chargement" class="error-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h3>Erreur de chargement</h3>
+      <p>{{ erreur }}</p>
+      <button class="btn btn-retry" (click)="chargerEnseignants()">
+        <i class="fa-solid fa-refresh"></i> Réessayer
+      </button>
+    </div>
+
+    <!-- Tableau -->
+    <div *ngIf="!chargement && !erreur">
+      <div class="table-wrapper">
+        <table class="enseignants-table">
+          <thead>
+            <tr>
+              <th>Matricule</th>
+              <th>Nom Complet</th>
+              <th>Contact</th>
+              <th>Spécialité</th>
+              <th>Grade</th>
+              <th>Cours Affectés</th>
+              <th>Département</th>
+              <th>Statut</th>
+              <th>Expérience</th>
+              <th class="actions-column">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let enseignant of enseignantsFiltres" class="table-row">
+              <td class="matricule-cell">
+                <span class="matricule">{{ enseignant.matricule }}</span>
+              </td>
+              <td class="nom-cell">
+                <div class="enseignant-name">
+                  <strong
+                    >{{ enseignant.nom | uppercase }} {{ enseignant.prenom | uppercase }}</strong
+                  >
+                </div>
+                <small>Âge: {{ getAge(enseignant.dateNaissance) }} ans</small>
+              </td>
+              <td class="contact-cell">
+                <div class="contact-info">
+                  <div class="email">
+                    <i class="fa-solid fa-envelope" style="color: #3498db"></i>
+                    {{ enseignant.email }}
+                  </div>
+                  <div class="phone">
+                    <i class="fa-solid fa-phone" style="color: #3498db"></i>
+                    {{ enseignant.telephone }}
+                  </div>
+                </div>
+              </td>
+              <td class="specialite-cell">
+                <span class="specialite">{{ enseignant.specialite }}</span>
+              </td>
+              <td class="grade-cell">
+                <span [class]="'grade-badge ' + getGradeClass(enseignant.grade)">
+                  {{ enseignant.grade }}
+                </span>
+              </td>
+              <td class="cours-cell">
+                <span class="cours-list">
+                  {{ enseignant.coursAffectes || 'Aucun cours affecté' }}
+                </span>
+              </td>
+              <td class="departement-cell">
+                <span class="departement">{{ getDepartementLabel(enseignant.departement) }}</span>
+              </td>
+              <td class="statut-cell">
+                <span [class]="'statut-badge ' + getStatutClass(enseignant.statut)">
+                  {{ getStatutLabel(enseignant.statut) }}
+                </span>
+              </td>
+              <td class="experience-cell">
+                <div class="experience-info">
+                  <div>Embauche: {{ formaterDate(enseignant.dateEmbauche) }}</div>
+                </div>
+              </td>
+              <td class="actions-cell">
+                <div class="actions-group">
+                  <button
+                    class="btn-action btn-view"
+                    (click)="voirDetails(enseignant)"
+                    title="Voir détails"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                  <button
+                    class="btn-action btn-edit"
+                    (click)="modifierEnseignant(enseignant)"
+                    title="Modifier"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    (click)="supprimerEnseignant(enseignant)"
+                    title="Supprimer"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Aucune donnée -->
+        <div *ngIf="enseignantsFiltres.length === 0 && !chargement" class="empty-state">
+          <p>Aucun enseignant ne correspond aux critères de recherche.</p>
+          <!-- <button class="btn btn-primary" (click)="creerEnseignant()">
+          <i class="fa-solid fa-plus"></i>
+          Ajouter un enseignant
+        </button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

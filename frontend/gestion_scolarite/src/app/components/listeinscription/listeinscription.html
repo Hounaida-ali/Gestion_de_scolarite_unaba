@@ -1,0 +1,64 @@
+<div class="stats-simple">
+  <!-- Étudiants -->
+  <!-- Étudiants Payés -->
+<div class="stat-card-simple">
+  <div class="stat-content-simple">
+    <h3 class="stat-title-simple">Étudiants Payés</h3>
+
+    <!-- Nombre total -->
+    <div class="stat-number-simple">
+      {{ compterPayes() }}
+    </div>
+
+    <p class="stat-description-simple">Étudiants ayant payé</p>
+
+    <!-- Pourcentage -->
+    <div class="stat-percentage">
+      <span class="percentage-text positive">
+        {{ calculerPourcentagePayes() }}% du total
+      </span>
+    </div>
+  </div>
+
+  <div class="stat-icon-simple paye">
+    <i class="fas fa-money-bill-wave"></i>
+  </div>
+</div>
+
+
+  <!-- Enseignants -->
+  <div class="stat-card-simple">
+    <div class="stat-content-simple">
+      <h3 class="stat-title-simple">Enseignants</h3>
+      <div class="stat-number-simple">{{ getStatsEnseignants().total }}</div>
+      <p class="stat-description-simple">Enseignants actifs</p>
+      <div class="stat-percentage">
+        <span class="percentage-text positive">
+          {{ getStatsEnseignants().pourcentageActifs }}% cette année
+        </span>
+      </div>
+    </div>
+    <div class="stat-icon-simple teacher">
+      <i class="fas fa-chalkboard-teacher"></i>
+    </div>
+  </div>
+
+  <!-- Inscriptions en attente -->
+  <div class="stat-card-simple">
+    <div class="stat-content-simple">
+      <h3 class="stat-title-simple">Inscriptions en attente</h3>
+      <div class="stat-number-simple">{{ compterEnAttente() }}</div>
+      <p class="stat-description-simple">Demandes à traiter</p>
+      <div class="stat-percentage">
+        <span class="percentage-text negative">
+          {{ calculerPourcentageAttente() }}% cette semaine
+        </span>
+      </div>
+    </div>
+    <div class="stat-icon-simple pending">
+      <i class="fas fa-clipboard-list"></i>
+    </div>
+  </div>
+</div>
+
+<app-statistiques-graphiques [etudiants]="etudiants"></app-statistiques-graphiques>

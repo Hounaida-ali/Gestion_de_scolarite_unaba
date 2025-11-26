@@ -1,0 +1,95 @@
+<div class="container">
+  <!-- Notifications -->
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- En-tête -->
+  <section class="page-header">
+    <h1 class="page-title">Facultés</h1>
+    <p class="page-description">Parcourez nos facultés, véritables pôles d’enseignement et d’innovation, conçus pour accompagner les étudiants vers l’excellence académique et professionnelle.</p>
+  </section>
+
+  <section class="resources-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-list"></i> Liste des facultés</h2>
+      <div class="filter-group" style="margin-left: auto">
+        <button (click)="newFaculte()" class="add-btn">
+          <i class="fas fa-plus"></i> Ajouter une faculté
+        </button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-responsive" *ngIf="!showFaculteForm">
+      <table class="resources-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Adresse</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let fac of facultes">
+            <td>{{ fac.nomFaculte }}</td>
+            <td>{{ fac.adresse || '-' }}</td>
+
+            <td class="action-buttons">
+              <button (click)="editFaculte(fac)" class="btn-edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button (click)="deleteFaculte(fac)" class="btn-delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="facultes.length === 0">
+            <td colspan="3" class="no-resources">Aucune faculté trouvée.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  
+  <!-- Formulaire -->
+<section *ngIf="showFaculteForm" class="container1">
+  <h3>{{ faculteSelected?._id ? 'Modifier une faculté' : 'Ajouter une faculté' }}</h3>
+
+  <form (ngSubmit)="saveFaculte()">
+    <div class="form-group">
+      <label>Nom de la faculté</label>
+      <input
+        type="text"
+        [(ngModel)]="faculteSelected!.nomFaculte"
+        name="nomFaculte"
+        required
+        placeholder="Ex: Faculté des Sciences"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Adresse</label>
+      <input
+        type="text"
+        [(ngModel)]="faculteSelected!.adresse"
+        name="adresse"
+        placeholder="Ex: Campus principal"
+      />
+    </div>
+
+    <div class="buttons">
+      <button type="submit" class="btn-save">
+        {{ faculteSelected?._id ? 'Mettre à jour' : 'Ajouter' }}
+      </button>
+      <button type="button" (click)="resetForm()" class="btn-cancel">Annuler</button>
+    </div>
+  </form>
+</section>
+
+</div>

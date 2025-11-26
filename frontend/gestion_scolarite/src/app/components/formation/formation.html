@@ -1,9 +1,8 @@
 <div class="container">
   <h1 class="page-title">Nos Formations</h1>
   <p class="page-description">
-    Découvrez l'ensemble des formations offertes par nos départements. 
-    Chaque programme est conçu pour offrir une éducation de qualité et préparer 
-    les étudiants aux défis du marché du travail.
+    Découvrez l'ensemble des formations offertes par nos départements. Chaque programme est conçu
+    pour offrir une éducation de qualité et préparer les étudiants aux défis du marché du travail.
   </p>
 </div>
 
@@ -14,14 +13,13 @@
   <!-- Liste des départements avec leurs formations -->
   <div class="departments-container" *ngIf="!isLoading && !error">
     <div class="department-card" *ngFor="let departement of departements">
-      
       <!-- En-tête bleu avec le NOM DE LA FORMATION principale -->
       <div class="department-header" [ngClass]="getDepartmentClass(departement.nom)">
         <div class="department-icon">
           {{ departement.formations[0]?.icone || departement.icone }}
         </div>
         <div class="department-info">
-          <h2>{{ departement.formations[0]?.nom }}</h2>
+          <h2>{{ departement.nom }}</h2>
         </div>
       </div>
 
@@ -45,25 +43,23 @@
                     <div class="program-name">{{ programme.nom }}</div>
                     <div class="program-duration">{{ programme.duree }}</div>
                   </div>
-                  <button class="view-program"
-                          (click)="openProgrammeModal(programme.departement, programme.code)">
+                  <button
+                    class="view-program"
+                    (click)="
+                      openProgrammeModal(getDepartementId(programme.departement), programme.code)
+                    "
+                  >
                     Voir
                   </button>
                 </li>
               </ul>
             </div>
-
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
 </div>
 
-<app-program
-  *ngIf="modalOpen"
-  [programme]="selectedProgramme"
-  (close)="closeModal()">
+<app-program *ngIf="modalOpen" [programme]="selectedProgramme" (close)="closeModal()">
 </app-program>

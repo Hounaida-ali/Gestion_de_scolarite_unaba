@@ -5,6 +5,8 @@ import { Formation } from '../../interfaces/formationInterface';
 import { Programme } from '../../interfaces/ProgramInterface';
 import { Program } from '../program/program';
 import { DepartementAvecFormations } from '../../interfaces/DepartementAvecFormations';
+import { Departement } from '../../interfaces/departementInterface'; 
+
 
 @Component({
   selector: 'app-formation',
@@ -25,10 +27,10 @@ export class formation implements OnInit {
   ngOnInit(): void {
     this.loadData();
     // Test simple pour vérifier que la route fonctionne
-  this.formationService.getFormationsByDepartement('68e0f02daf2f0da2695fdf1d').subscribe({
-    next: (formations) => console.log('Formations reçues :', formations),
-    error: (err) => console.error('Erreur API formations :', err)
-  });
+    this.formationService.getFormationsByDepartement('68e0f02daf2f0da2695fdf1d').subscribe({
+      next: (formations) => console.log('Formations reçues :', formations),
+      error: (err) => console.error('Erreur API formations :', err),
+    });
   }
 
   loadData(): void {
@@ -56,18 +58,28 @@ export class formation implements OnInit {
     };
     return classes[code] || 'eco-header';
   }
+  getDepartementId(departement: string | Departement): string {
+  if (typeof departement === 'string') return departement;
+  return departement._id ?? '';
+}
 
-  openProgrammeModal(departement: string, code: string): void {
-    this.formationService.getProgramme(departement, code).subscribe({
-      next: (programme) => {
-        this.selectedProgramme = programme;
-        this.modalOpen = true;
-      },
-      error: (error) => {
-        this.error = 'Erreur lors du chargement du programme';
-      },
-    });
-  }
+
+
+ openProgrammeModal(departementId: string, code: string): void {
+  this.formationService.getProgramme(departementId, code).subscribe({
+    next: (programme) => {
+      this.selectedProgramme = programme;   // ⬅️ DIRECTEMENT LE PROGRAMME
+      this.modalOpen = true;
+
+      console.log("Programme reçu :", programme);
+    },
+    error: () => {
+      this.error = 'Erreur lors du chargement du programme';
+    },
+  });
+}
+
+
 
   closeModal(): void {
     this.modalOpen = false;

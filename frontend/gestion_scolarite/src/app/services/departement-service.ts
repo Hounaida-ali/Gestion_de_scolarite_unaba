@@ -24,7 +24,7 @@ export class DepartementService {
 
   update(id: string, dep: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, dep);
-  }
+  } 
 
   delete(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);

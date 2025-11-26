@@ -102,23 +102,38 @@ h2 {
   color: white;
 }
 
-.btn button {
-  border: none;
-  border-radius: 6px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: white;
-  font-size: 14px;
-}
-.btn button:first-child {
-  background-color: #f39c12;
+.btn-container {
+  display: flex;
+  gap: 8px; /* espace entre les boutons */
+  justify-content: center; /* centrer horizontalement */
 }
 
-/* Bouton Supprimer */
-.btn button:last-child {
-  background-color: #e74c3c; /* rouge */
+.btn-edit button {
+  background-color: #f39c12; /* orange */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
 }
+
+.btn-delete button {
+  background-color: #e74c3c; /* rouge */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.btn-edit button:hover {
+  background-color: #d68910;
+}
+
+.btn-delete button:hover {
+  background-color: #c0392b;
+}
+
 /* === Cours colorés === */
 .course {
   color: white;

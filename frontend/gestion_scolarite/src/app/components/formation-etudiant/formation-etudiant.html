@@ -57,7 +57,13 @@
           class="programme-block"
         >
           <h4>Programme {{ i + 1 }}</h4>
-          <input formControlName="departement" placeholder="Code département" />
+          <label>Département du programme</label>
+          <select formControlName="departement">
+            <option value="">-- Sélectionnez un département --</option>
+            <option *ngFor="let dep of departements" [value]="dep._id">
+              {{ dep.nom }}
+            </option>
+          </select>
           <input formControlName="code" placeholder="Code programme" />
           <input formControlName="nom" placeholder="Nom programme" />
           <input formControlName="description" placeholder="Description" />
@@ -120,6 +126,14 @@
                               <input formControlName="cm" placeholder="CM" />
                               <input formControlName="td" placeholder="TD" />
                               <input formControlName="totalHeures" placeholder="Total Heures" />
+                              <label>Niveau</label>
+                              <select formControlName="niveau">
+                                <option value="">-- Choisissez le niveau --</option>
+                                <option value="L1">L1</option>
+                                <option value="L2">L2</option>
+                                <option value="L3">L3</option>
+                              </select>
+
                               <button
                                 type="button"
                                 (click)="removeCours(i, j, k, l, m, n)"
@@ -191,6 +205,7 @@
           <th>Département</th>
           <th>Description</th>
           <th>Formations</th>
+          <!-- <th style="width: 120px; text-align: center">Actions</th> -->
         </tr>
       </thead>
 
@@ -223,23 +238,97 @@
                   <p class="formation-desc">{{ formation.description }}</p>
 
                   <!-- Programmes -->
+                  @if (formation.programmes?.length) {
                   <ul class="program-list" *ngIf="formation.programmes?.length">
                     <li *ngFor="let programme of formation.programmes">
                       <span class="program-name">{{ programme.nom }}</span>
                       <span class="program-duration">{{ programme.duree }}</span>
+                      <div class="action-buttons-wrapper">
                       <button
                         class="view-program"
-                        *ngIf="programme?.code"
-                        (click)="openProgrammeModal(programme.departement, programme.code)"
+                        (click)="
+                          openProgrammeModal(
+                            getDepartementId(programme.departement),
+                            programme.code
+                          )
+                        "
                       >
                         Voir
                       </button>
+                      <button
+                        (click)="editFormation(formation)"
+                        class="btn-edit"
+                        title="Modifier"
+                        *ngIf="departement.formations.length > 0"
+                      >
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button
+                        (click)="deleteFormation(formation, departement._id)"
+                        class="btn-delete"
+                        title="Supprimer"
+                        *ngIf="departement.formations.length > 0"
+                      >
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                      </div>
                     </li>
                   </ul>
+                  <!-- @for (programme of formation.programmes; track $index) {
+                  <div class="action-buttons-wrapper">
+                    <button
+                      class="view-program"
+                      (click)="
+                        openProgrammeModal(getDepartementId(programme.departement), programme.code)
+                      "
+                    >
+                      Voir
+                    </button>
+                    <button
+                      (click)="editForm(formation)"
+                      class="btn-edit"
+                      title="Modifier"
+                      *ngIf="departement.formations.length > 0"
+                    >
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button
+                      (click)="deleteFormation(formation, departement._id)"
+                      class="btn-delete"
+                      title="Supprimer"
+                      *ngIf="departement.formations.length > 0"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                  } -->
+                }
                 </div>
               </li>
             </ul>
           </td>
+          <!-- <td class="action-buttons">
+            @for (formation of departement.formations; track $index) {
+            <div class="action-buttons-wrapper">
+              <button
+                (click)="editForm(formation)"
+                class="btn-edit"
+                title="Modifier"
+                *ngIf="departement.formations.length > 0"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button
+                (click)="deleteFormation(formation, departement._id)"
+                class="btn-delete"
+                title="Supprimer"
+                *ngIf="departement.formations.length > 0"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+            }
+          </td> -->
         </tr>
       </tbody>
     </table>

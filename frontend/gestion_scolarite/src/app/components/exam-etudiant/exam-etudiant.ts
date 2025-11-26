@@ -4,6 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppNotification, NotificationService } from '../../services/notification-service';
 import { Subscription } from 'rxjs'; // ✅ <-- Importer Subscription
+import { DepartementAvecFormations } from '../../interfaces/DepartementAvecFormations';
+import { Formation } from '../../interfaces/formationInterface';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormationEtudiantService } from '../../services/formation-etudiant-service';
 
 export interface ExamSlot {
   _id?: string;
@@ -18,7 +22,11 @@ export interface ExamSlot {
   end: Date;
   notified: boolean;
 }
-
+interface FiliereOption {
+  _id: string;
+  nom: string;
+  niveaux: string[];
+}
 @Component({
   selector: 'app-exam-etudiant',
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
@@ -28,74 +36,63 @@ export interface ExamSlot {
 export class ExamEtudiant {
   exams: ExamSlot[] = [];
   filteredExams: ExamSlot[] = [];
+  errorMessage: string = '';
+  successMessage: string = '';
 
-  private notifSub!: Subscription;
-  // ✅ Ajouter ces propriétés
-  notifications: AppNotification[] = [];
+  selectedExam: ExamSlot | null = null;
+  showForm = false;
 
-  showNotifications = false;
+  departements: DepartementAvecFormations[] = [];
+  formations: Formation[] = [];
 
+  // 🔹 Filtres
   departementFilter = '';
   filiereFilter = '';
   niveauFilter = '';
 
-  departements = [
-    {
-      nom: 'économie',
-      filieres: [
-        { nom: 'science-économie', niveaux: ['licence1', 'licence2', 'licence3'] },
-        { nom: 'économie-moniteur', niveaux: ['licence1', 'licence2', 'licence3'] },
-      ],
-    },
-    {
-      nom: 'droit',
-      filieres: [{ nom: 'droit', niveaux: ['licence1', 'licence2', 'licence3'] }],
-    },
-    {
-      nom: 'gestion',
-      filieres: [
-        { nom: 'gestion', niveaux: ['licence1', 'licence2', 'licence3'] },
-        { nom: 'finance', niveaux: ['licence1', 'licence2', 'licence3'] },
-        { nom: 'marketing', niveaux: ['licence1', 'licence2', 'licence3'] },
-      ],
-    },
+  salles: string[] = [
+    'salle1',
+    'salle2',
+    'salle3',
+    'salle4',
+    'salle5',
+    'salle6',
+    'salle7',
+    'salle8',
+    'salle9',
+    'salle10',
+    'salle11',
+    'salle12',
   ];
 
-  filteredFilieres: { nom: string; niveaux: string[] }[] = [];
+  // 🔹 Types corrigés pour inclure _id
+  filteredFilieres: FiliereOption[] = [];
   filteredNiveaux: string[] = [];
+
+  formFilieres: FiliereOption[] = [];
+  formNiveaux: string[] = [];
 
   days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
   timeSlots: string[] = [];
 
   constructor(
-    private examEtudiantService: ExamEtudiantService,
+    private examService: ExamEtudiantService,
+    private snackBar: MatSnackBar,
     private notificationService: NotificationService,
+    private formationEtudiantService: FormationEtudiantService
   ) {}
 
   ngOnInit() {
-    // Charger les examens
     this.loadExams();
 
-    // 🔹 S'abonner aux notifications en temps réel
-    this.notifSub = this.notificationService.notifications$.subscribe((list) => {
-      console.log('Notifications reçues :', list);
-      this.notifications = [...list]; // 🔹 Important : copie du tableau
+    this.formationEtudiantService.getDepartementsAvecFormations().subscribe({
+      next: (departements) => (this.departements = departements),
+      error: () => console.error('Erreur lors du chargement des départements'),
     });
-
-    // Test de notification 
-
-    setTimeout(() => {
-      this.notificationService.add({ type: 'success', text: '✅ Notification test' });
-      this.showNotifications = true;
-    }, 1000);
-  }
-
-  ngOnDestroy() {
-    this.notifSub?.unsubscribe();
   }
 
   loadExams() {
-    this.examEtudiantService.getExams().subscribe((data) => {
+    this.examService.getExams().subscribe((data) => {
       this.exams = data.map((e) => ({
         ...e,
         start: new Date(e.start),
@@ -116,33 +113,181 @@ export class ExamEtudiant {
     this.timeSlots = Array.from(horaires).sort();
   }
 
+  // 🔹 Filtrage département
   onDepartementChange() {
-    const dep = this.departements.find((d) => d.nom === this.departementFilter);
-    this.filteredFilieres = dep ? dep.filieres : [];
+    const dep = this.departements.find((d) => d._id === this.departementFilter);
+    if (dep) this.formations = dep.formations;
+
+    // 🔹 Correction : ajouter _id pour les options
+    this.filteredFilieres = dep
+      ? this.formations
+          .filter((f) =>
+            typeof f.departement === 'string'
+              ? f.departement === dep._id
+              : f.departement?._id === dep._id
+          )
+          .map((f) => ({
+            _id: f._id,
+            nom: f.nom,
+            niveaux: f.programmes.flatMap((p) => p.niveaux.map((n) => n.nom)),
+          }))
+      : [];
+
     this.filiereFilter = '';
     this.filteredNiveaux = [];
     this.niveauFilter = '';
     this.filteredExams = [];
   }
+ onFormFiliereChange() {
+  if (!this.selectedExam) return;
+
+  const f = this.filteredFilieres.find((fil) => fil._id === this.selectedExam!.filiere);
+
+  this.filteredNiveaux = f ? f.niveaux : [];
+  this.selectedExam.niveau = '';
+}
 
   onFiliereChange() {
-    const f = this.filteredFilieres.find((f) => f.nom === this.filiereFilter);
+    const f = this.filteredFilieres.find((f) => f._id === this.filiereFilter);
     this.filteredNiveaux = f ? f.niveaux : [];
     this.niveauFilter = '';
     this.filteredExams = [];
   }
 
   filterExams() {
-    if (!this.departementFilter || !this.filiereFilter || !this.niveauFilter) {
-      this.filteredExams = [];
-      return;
+  if (!this.departementFilter || !this.filiereFilter || !this.niveauFilter) {
+    this.filteredExams = [];
+    return;
+  }
+
+  this.filteredExams = this.exams.filter(
+    (e) =>
+      e.departement === this.departementFilter &&
+      e.filiere === this.filiereFilter &&
+      e.niveau === this.niveauFilter
+  );
+}
+
+
+  // newExam() {
+  //   this.selectedExam = {
+  //     title: '',
+  //     description: '',
+  //     date: '',
+  //     type: 'examen',
+  //     departement: '',
+  //     filiere: '',
+  //     niveau: '',
+  //     room: '',
+  //     start: new Date(),
+  //     end: new Date(),
+  //     notified: false,
+  //   };
+  //   this.formFilieres = [];
+  //   this.formNiveaux = [];
+  //   this.showForm = true;
+  // }
+
+  showMessage(msg: string, type: 'success' | 'error', duration = 3000) {
+    if (type === 'success') {
+      this.successMessage = msg;
+      setTimeout(() => (this.successMessage = ''), duration);
+    } else {
+      this.errorMessage = msg;
+      setTimeout(() => (this.errorMessage = ''), duration);
     }
-    this.filteredExams = this.exams.filter(
-      (e) =>
-        e.departement === this.departementFilter &&
-        e.filiere === this.filiereFilter &&
-        e.niveau === this.niveauFilter
-    );
+  }
+
+ addExam() {
+  if (!this.selectedExam) return;
+
+  // ✅ Validation avant envoi
+  if (!this.selectedExam.filiere || !this.selectedExam.niveau || !this.selectedExam.room) {
+    this.showMessage('Veuillez sélectionner une filière, un niveau et une salle', 'error');
+    return;
+  }
+
+  const payload: ExamSlot = {
+    ...this.selectedExam,
+    departement: this.departementFilter,
+    filiere: this.selectedExam.filiere,
+    start: new Date(this.selectedExam.start),
+    end: new Date(this.selectedExam.end),
+  };
+
+  console.log('Payload envoyé au backend:', payload);
+
+  this.examService.addExam(payload).subscribe({
+    next: (res: any) => {
+      const saved: ExamSlot = res.exam || res;
+      this.exams.push(saved);
+      this.filteredExams.push(saved);
+      this.resetForm();
+      this.showMessage(`Examen "${saved.title}" ajouté avec succès !`, 'success');
+    },
+    error: (err) => {
+      const backendMsg = err.error?.message || "Erreur lors de l'ajout de l'examen";
+      this.showMessage(backendMsg, 'error');
+    },
+  });
+}
+
+
+  editExam(exam: ExamSlot) {
+    this.selectedExam = { ...exam };
+    this.showForm = true;
+  }
+
+  updateExam() {
+    if (!this.selectedExam || !this.selectedExam._id) return;
+
+    const payload: ExamSlot = {
+      ...this.selectedExam,
+      departement: this.departementFilter || this.selectedExam.departement,
+      filiere: this.filiereFilter || this.selectedExam.filiere,
+      niveau: this.niveauFilter || this.selectedExam.niveau,
+      start: new Date(this.selectedExam.start),
+      end: new Date(this.selectedExam.end),
+    };
+
+    this.examService.updateExam(payload).subscribe({
+      next: (res: any) => {
+        const updated: ExamSlot = res.exam || res;
+        const index = this.exams.findIndex((e) => e._id === updated._id);
+        if (index !== -1) this.exams[index] = updated;
+
+        const filteredIndex = this.filteredExams.findIndex((e) => e._id === updated._id);
+        if (filteredIndex !== -1) this.filteredExams[filteredIndex] = updated;
+
+        this.resetForm();
+        this.showMessage(`Examen "${updated.title}" mis à jour avec succès !`, 'success');
+      },
+      error: (err) => {
+        const backendMsg = err.error?.message || 'Erreur lors de la mise à jour';
+        this.showMessage(backendMsg, 'error');
+      },
+    });
+  }
+
+  deleteExam(exam: ExamSlot) {
+    if (!confirm('Voulez-vous vraiment supprimer cet examen ?')) return;
+
+    this.examService.deleteExam(exam._id!).subscribe({
+      next: (res: any) => {
+        this.filteredExams = this.filteredExams.filter((e) => e._id !== exam._id);
+        this.exams = this.exams.filter((e) => e._id !== exam._id);
+        this.showMessage(`Examen "${exam.title}" supprimé avec succès !`, 'success');
+      },
+      error: (err) => {
+        const backendMsg = err.error?.message || 'Erreur lors de la suppression';
+        this.showMessage(backendMsg, 'error');
+      },
+    });
+  }
+
+  resetForm() {
+    this.selectedExam = null;
+    this.showForm = false;
   }
 
   getDayName(date: Date): string {
@@ -159,47 +304,11 @@ export class ExamEtudiant {
   showDetails(exam: ExamSlot) {
     alert(
       `Examen: ${exam.title}\nDescription: ${exam.description}\nSalle: ${exam.room}\n` +
-        `Filière: ${exam.departement}/${exam.filiere}/${exam.niveau}\n` +
         `Type: ${exam.type}\nDate: ${exam.start.toLocaleDateString()}\n` +
         `Horaire: ${exam.start.toLocaleTimeString()} - ${exam.end.toLocaleTimeString()}`
     );
   }
-
-  refreshPage() {
-    this.loadExams();
-  }
-
-  toggleNotifications() {
-    this.showNotifications = !this.showNotifications;
-  }
-
-  removeNotification(index: number) {
-  this.notificationService.remove(index);
-}
-
-
-  addExam(exam: ExamSlot) {
-    this.examEtudiantService.addExam(exam).subscribe(() => {
-      this.loadExams();
-      this.notificationService.add({ type: 'success', text: `Examen "${exam.title}" ajouté` });
-      this.showNotifications = true;
-    });
-  }
-
-  updateExam(exam: ExamSlot) {
-    this.examEtudiantService.updateExam(exam).subscribe(() => {
-      this.loadExams();
-      this.notificationService.add({ type: 'info', text: `Examen "${exam.title}" mis à jour` });
-      this.showNotifications = true;
-    });
-  }
-
-  deleteExam(exam: ExamSlot) {
-    if (!confirm('Voulez-vous vraiment supprimer cet examen ?')) return;
-    this.examEtudiantService.deleteExam(exam._id!).subscribe(() => {
-      this.loadExams();
-      this.notificationService.add({ type: 'warning', text: `Examen "${exam.title}" supprimé` });
-      this.showNotifications = true;
-    });
+   refreshPage() {
+    window.location.reload();
   }
 }

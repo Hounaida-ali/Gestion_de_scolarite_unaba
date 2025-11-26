@@ -11,23 +11,23 @@
   <section class="page-header">
     <h1 class="page-title">Départements</h1>
     <p class="page-description">
-    Découvrez l'ensemble des formations offertes par nos départements. Chaque programme est conçu
-    pour offrir une éducation de qualité et préparer les étudiants aux défis du marché du travail.
-  </p>
+      Découvrez l'ensemble des formations offertes par nos départements. Chaque programme est conçu
+      pour offrir une éducation de qualité et préparer les étudiants aux défis du marché du travail.
+    </p>
   </section>
 
-  <!-- Tableau des départements -->
+  <!-- Tableau -->
   <section class="resources-section">
-    <a [routerLink]="['/formationEtudiant']" class="btn-link">
+    <a [routerLink]="['/admindashboard/formationEtudiant']" class="btn-link">
       <i class="fas fa-arrow-left"></i> Retour à la formation
     </a>
+
     <div class="section-header">
       <h2 class="section-title"><i class="fas fa-list"></i> Liste des départements</h2>
-      <div class="filter-group" style="margin-left: auto">
-        <button (click)="newDepartement()" class="add-btn">
-          <i class="fas fa-plus"></i> Ajouter un département
-        </button>
-      </div>
+
+      <button (click)="newDepartement()" class="add-btn" style="margin-left: 45%">
+        <i class="fas fa-plus"></i> Ajouter un département
+      </button>
     </div>
 
     <div class="table-responsive" *ngIf="!showDepartementForm">
@@ -36,15 +36,18 @@
           <tr>
             <th>Nom</th>
             <th>Code / Type</th>
+            <th>Faculté</th>
             <th>Description</th>
             <th>Date de création</th>
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           <tr *ngFor="let dep of departements">
             <td>{{ dep.nom }}</td>
             <td>{{ dep.departement }}</td>
+            <td>{{ dep.faculteNom?.nomFaculte || '-' }}</td>
             <td>{{ dep.description || '-' }}</td>
             <td>{{ dep.createdAt | date : 'dd/MM/yyyy' }}</td>
             <td class="action-buttons">
@@ -56,19 +59,21 @@
               </button>
             </td>
           </tr>
+
           <tr *ngIf="departements.length === 0">
-            <td colspan="5" class="no-resources">Aucun département trouvé.</td>
+            <td colspan="6" class="no-resources">Aucun département trouvé.</td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- Formulaire d’ajout / édition -->
+  <!-- Formulaire -->
   <section *ngIf="showDepartementForm" class="container1">
     <h3>{{ selectedDepartement?._id ? 'Modifier un département' : 'Ajouter un département' }}</h3>
 
     <form (ngSubmit)="saveDepartement()">
+      <!-- Nom -->
       <div class="form-group">
         <label>Nom du département</label>
         <input
@@ -80,6 +85,7 @@
         />
       </div>
 
+      <!-- Code -->
       <div class="form-group">
         <label>Code / Type</label>
         <input
@@ -91,6 +97,18 @@
         />
       </div>
 
+      <!-- Faculté -->
+      <div class="form-group">
+        <label>Faculté</label>
+        <select [(ngModel)]="selectedDepartement.faculteNom" name="faculteNom" required>
+          <option value="" disabled selected>Choisir une faculté</option>
+          <option *ngFor="let fac of facultes" [value]="fac.nomFaculte">
+            {{ fac.nomFaculte }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Description -->
       <div class="form-group">
         <label>Description</label>
         <textarea

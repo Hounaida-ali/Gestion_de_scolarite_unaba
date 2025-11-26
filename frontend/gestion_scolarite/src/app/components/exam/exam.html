@@ -7,7 +7,7 @@
     {{ errorMessage }}
   </div>
 
-  <div class="schedule-container">
+  <div class="schedule-container" *ngIf="!showForm">
     <h2>Calendrier des examens</h2>
     <div class="schedule-header">
       <button (click)="newExam()" class="add-btn">
@@ -21,8 +21,12 @@
       <div class="filter-group">
         <label>Département :</label>
         <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
-          <option value="">Tous</option>
-          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+          <option value="">Sélectionnez un département</option>
+          @for (dep of departements; track $index) {
+          <option [value]="dep._id">
+            {{ dep.nom }}
+          </option>
+          }
         </select>
       </div>
 
@@ -33,16 +37,31 @@
           (change)="onFiliereChange()"
           [disabled]="!departementFilter"
         >
-          <option value="">Toutes</option>
-          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+          <option value="">Sélectionnez une formation</option>
+          @for (formation of formations; track $index) {
+          <option *ngFor="let f of filteredFilieres" [value]="f._id">
+            {{ f.nom }}
+          </option>
+          }
         </select>
       </div>
+
+      <!-- <div class="filter-group">
+        <label>Niveau :</label>
+        <select [(ngModel)]="niveauFilter" (change)="filterExams()" [disabled]="!filiereFilter">
+          <option value="">Tous</option>
+          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+        </select>
+      </div> -->
 
       <div class="filter-group">
         <label>Niveau :</label>
         <select [(ngModel)]="niveauFilter" (change)="filterExams()" [disabled]="!filiereFilter">
           <option value="">Tous</option>
-          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+          @for (n of filteredNiveaux; track $index) {
+          <option [value]="n">{{ n }}</option>
+          }
+          <!-- <option *ngFor="let n of niveaux" [value]="n.value">{{ n.label }}</option> -->
         </select>
       </div>
     </div>
@@ -80,15 +99,19 @@
 
           <!-- Colonne Actions -->
           <!-- Colonne Actions -->
-          <td>
+          <td class="action-buttons">
             <ng-container *ngFor="let exam of filteredExams">
-              <div *ngIf="formatTime(exam.start, exam.end) === time" class="btn">
+              <div *ngIf="formatTime(exam.start, exam.end) === time" class="btn-container">
+                <div class="btn-edit">
                 <button (click)="editExam(exam); $event.stopPropagation()">
                   <i class="fa-solid fa-pen-to-square" style="color: white"></i>
                 </button>
+                </div>
+                <div class="btn-delete">
                 <button (click)="deleteExam(exam); $event.stopPropagation()">
                   <i class="fa-solid fa-trash" style="color: white"></i>
                 </button>
+                </div>
               </div>
             </ng-container>
           </td>
@@ -132,22 +155,23 @@
           <select [(ngModel)]="selectedExam.type" name="type" required>
             <option value="">Type</option>
             <option value="examen">Examen</option>
-            <option value="devoir">Devoir</option>
-            <option value="quiz">Quiz</option>
-            <option value="projet">Projet</option>
           </select>
         </div>
 
         <div class="form-group">
           <label>Département <span class="required"></span></label>
           <select
-            [(ngModel)]="selectedExam.departement"
+            [(ngModel)]="departementFilter"
             name="departement"
             required
-            (change)="onFormDepartementChange()"
+            (change)="onDepartementChange()"
           >
             <option value="">Département</option>
-            <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+            @for (dep of departements; track $index) {
+            <option [value]="dep._id">
+              {{ dep.nom }}
+            </option>
+            }
           </select>
         </div>
 
@@ -161,7 +185,9 @@
               (change)="onFormFiliereChange()"
             >
               <option value="">Filière</option>
-              <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+              <option *ngFor="let f of filteredFilieres" [value]="f._id">
+                {{ f.nom }}
+              </option>
             </select>
           </div>
 
@@ -178,13 +204,10 @@
       <!-- Salle -->
       <div class="form-group">
         <label>Salle <span class="required"></span></label>
-        <input
-          type="text"
-          [(ngModel)]="selectedExam.room"
-          name="room"
-          placeholder="Salle"
-          required
-        />
+        <select [(ngModel)]="selectedExam.room" name="room" required>
+          <option value="">Sélectionnez une salle</option>
+          <option *ngFor="let s of salles" [value]="s">{{ s }}</option>
+        </select>
       </div>
 
       <!-- 🔹 Nouvelle section : Date -->

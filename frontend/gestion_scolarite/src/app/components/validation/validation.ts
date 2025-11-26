@@ -3,6 +3,12 @@ import { Etudiant } from '../../interfaces/EtudiantInterface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EtudiantService } from '../../services/etudiant-service';
 import { CommonModule, DatePipe } from '@angular/common';
+import { DepartementService } from '../../services/departement-service';
+import { FormationEtudiantService } from '../../services/formation-etudiant-service';
+import { DepartementAvecFormations } from '../../interfaces/DepartementAvecFormations';
+import { Formation } from '../../interfaces/formationInterface';
+
+
 
 @Component({
   selector: 'app-validation',
@@ -14,21 +20,40 @@ import { CommonModule, DatePipe } from '@angular/common';
 export class Validation {
   etudiant: Etudiant | null = null;
   etudiantId: string = '';
-  
+  nomDepartement: string = '';
+  nomFormation: string = '';
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, // Garder private mais utiliser dans les méthodes
+    private router: Router,
     private etudiantService: EtudiantService,
-    private datePipe: DatePipe // Injecter DatePipe
+    private formationEtudiantService: FormationEtudiantService,
+    private datePipe: DatePipe
   ) {}
 
-  ngOnInit(): void {
-    this.etudiantId = this.route.snapshot.paramMap.get('id') || '';
-    if (this.etudiantId) {
-      this.chargerEtudiant(this.etudiantId);
-    }
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      this.etudiantService.getEtudiant(id).subscribe((etudiant: Etudiant) => {
+        this.etudiant = etudiant;
+
+        // Charger le département et la formation via FormationEtudiantService
+        this.formationEtudiantService.getDepartementsAvecFormations().subscribe({
+          next: (departements: DepartementAvecFormations[]) => {
+            const dep = departements.find(d => d._id === etudiant.departement);
+            this.nomDepartement = dep?.nom || 'Non trouvé';
+
+            if (dep) {
+              const form = dep.formations.find(f => f._id === etudiant.formation);
+              this.nomFormation = form?.nom || 'Non trouvé';
+            }
+          },
+          error: () => console.error('Erreur chargement départements/formations')
+        });
+      });
+    });
   }
+
 
    chargerEtudiant(id: string) {
     this.etudiantService.getEtudiant(id).subscribe({
@@ -43,19 +68,19 @@ export class Validation {
   }
 
   
-   simulerValidation(): void {
-    if (this.etudiantId) {
-      this.etudiantService.validerInscription(this.etudiantId).subscribe({
-        next: (etudiant) => {
-          this.etudiant = etudiant;
-          this.naviguerVersPaiement();
-        },
-        error: (error) => {
-          console.error('Erreur lors de la validation:', error);
-        }
-      });
-    }
-  }
+  //  simulerValidation(): void {
+  //   if (this.etudiantId) {
+  //     this.etudiantService.validerInscription(this.etudiantId).subscribe({
+  //       next: (etudiant) => {
+  //         this.etudiant = etudiant;
+  //         this.naviguerVersPaiement();
+  //       },
+  //       error: (error) => {
+  //         console.error('Erreur lors de la validation:', error);
+  //       }
+  //     });
+  //   }
+  // }
 
   // Méthode pour naviguer vers le paiement
    naviguerVersPaiement(): void {

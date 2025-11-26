@@ -5,8 +5,8 @@ export interface Evaluation {
   etudiant: { id: string; nom: string };
   enseignant: { id: string; nom: string };
   matiere: string;
-  departement: string;
-  filiere?: string;
+  departement: string | { _id: string; nom?: string };
+  filiere: string | { _id: string; nom?: string };
   niveau?: string;
   typeEvaluation: 'controle' | 'td' | 'tp';
   note: number;

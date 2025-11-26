@@ -7,6 +7,7 @@ export interface Cours {
   cm: number;
   td: number;
   totalHeures: number;
+  niveau: 'L1' | 'L2' | 'L3';
   createdAt?: Date;
   updatedAt?: Date;
 }

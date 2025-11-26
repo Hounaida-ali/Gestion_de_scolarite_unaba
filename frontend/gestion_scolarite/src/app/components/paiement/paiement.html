@@ -25,16 +25,16 @@
 
   <div class="form-container">
     <div class="form-section active">
-      <h2>Paiement des Frais d'Inscription</h2>
+      <h2>Paiement des Frais d'inscription</h2>
 
       <!-- Message de succès -->
       <div class="alert alert-success" *ngIf="etudiant?.statut === 'valide'">
         <p>
-          <strong>Félicitations ! Votre inscription a été validée par l'administration.</strong>
+          <strong>Félicitations ! Votre préinscription a été validée par l'administration.</strong>
         </p>
         <p>
-          Montant des frais d'inscription:
-          <strong>{{ etudiant?.fraisInscription || 50000 }} €</strong>
+          Montant des frais de préinscription:
+          <strong>{{ etudiant?.fraisInscription || 5000 }} FCFA</strong>
         </p>
       </div>
 
@@ -54,21 +54,21 @@
           <div class="detail-value">{{ etudiant.idProvisoire }}</div>
         </div>
 
-        <div class="detail-row">
+      <div class="detail-row">
           <div class="detail-label">Département:</div>
-          <div class="detail-value">{{ etudiant.departement }}</div>
+          <div class="detail-value">{{ nomDepartement }}</div>
         </div>
+
         <div class="detail-row">
           <div class="detail-label">Formation:</div>
           <div class="detail-value">
-            {{ getFormationLabel(etudiant.formation) }} -
-            {{ getModeFormationLabel(etudiant.modeFormation) }}
+                {{ nomFormation }}
           </div>
         </div>
 
         <div class="detail-row">
           <div class="detail-label">Montant à payer:</div>
-          <div class="detail-value amount">{{ etudiant.fraisInscription || 450 }} €</div>
+          <div class="detail-value amount">{{ etudiant.fraisInscription || 450 }} FCFA</div>
         </div>
       </div>
 
@@ -81,7 +81,8 @@
             [class.selected]="methodePaiement === 'card'"
             (click)="selectionnerMethode('card')"
           >
-            <div class="payment-icon">💳</div>
+            <div class="payment-icon"><i class="fa-solid fa-credit-card" style="color:#dbd034; font-size:50px;"></i>
+</div>
             <div class="payment-title">Carte Bancaire</div>
             <div class="payment-description">Paiement sécurisé en ligne</div>
           </div>
@@ -91,7 +92,8 @@
             [class.selected]="methodePaiement === 'transfer'"
             (click)="selectionnerMethode('transfer')"
           >
-            <div class="payment-icon">🏦</div>
+            <div class="payment-icon"><i class="fa-solid fa-university" style="color:#67a9f5; font-size:50px;"></i>
+</div>
             <div class="payment-title">Virement Bancaire</div>
             <div class="payment-description">Transfert bancaire sécurisé</div>
           </div>
@@ -155,7 +157,8 @@
         </div>
 
         <div class="security-notice">
-          <div class="security-icon">🔒</div>
+          <div class="security-icon"><i class="fa-solid fa-lock" style="color:#e2e046; font-size:20px;"></i>
+</div>
           <div class="security-text">
             <strong>Paiement sécurisé</strong><br />
             Vos informations bancaires sont cryptées et protégées
@@ -208,7 +211,8 @@
         </div>
 
         <div class="transfer-notice">
-          <div class="notice-icon">⏱️</div>
+          <div class="notice-icon"><i class="fa-solid fa-stopwatch" style="color:#bdcfdf; font-size:20px;"></i>
+</div>
           <div class="notice-text">
             <strong>Délai de traitement:</strong><br />
             Votre inscription sera confirmée sous 24-48h après réception du virement
@@ -234,8 +238,8 @@
           (click)="traiterPaiement()"
           [disabled]="!methodePaiement || !formulaireValide()"
         >
-          <span class="btn-icon">💳</span>
-          Payer {{ etudiant?.fraisInscription || 450 }} €
+          <span class="btn-icon"><i class="fa-solid fa-credit-card" style="color:#dbd034; font-size:20px;"></i></span>
+          Payer {{ etudiant?.fraisInscription || 450 }} FCFA
         </button>
       </div>
     </div>

@@ -1,0 +1,74 @@
+.graphiques-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.graphique-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e5e9;
+  transition: all 0.3s ease;
+}
+
+.graphique-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.graphique-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.graphique-header h3 {
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.graphique-header p {
+  color: #7f8c8d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .graphiques-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .graphique-card {
+    padding: 20px;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .graphiques-container {
+    gap: 15px;
+  }
+  
+  .graphique-card {
+    padding: 15px;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+}

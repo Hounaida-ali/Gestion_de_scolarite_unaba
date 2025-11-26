@@ -1,97 +1,171 @@
 <div class="container">
+  <!-- Notifications -->
   <div *ngIf="successMessage" class="notification-float notification-success">
     {{ successMessage }}
   </div>
-
   <div *ngIf="errorMessage" class="notification-float notification-error">
     {{ errorMessage }}
   </div>
 
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Inscription en cours...</p>
+  </div>
+
   <!-- Barre de progression -->
-  <div class="progress-bar">
-    <div class="step" [class.completed]="etapeActuelle > 1" [class.active]="etapeActuelle === 1">
-      <div class="step-number">1</div>
-      <div class="step-label">Informations Personnelles</div>
-    </div>
-    <div class="step" [class.active]="etapeActuelle === 2">
-      <div class="step-number">2</div>
-      <div class="step-label">Choix de Formation</div>
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="step" [class.completed]="etapeActuelle > 1" [class.active]="etapeActuelle === 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Informations Personnelles</div>
+      </div>
+      <div class="step-connector" [class.completed]="etapeActuelle > 1"></div>
+      <div class="step" [class.completed]="etapeActuelle > 2" [class.active]="etapeActuelle === 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Choix de Formation</div>
+      </div>
+      <div class="step-connector" [class.completed]="etapeActuelle > 2"></div>
+      <div class="step" [class.completed]="etapeActuelle > 3" [class.active]="etapeActuelle === 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Validation Administrative</div>
+      </div>
+      <div class="step-connector" [class.completed]="etapeActuelle > 3"></div>
+      <div class="step" [class.completed]="etapeActuelle > 4" [class.active]="etapeActuelle === 4">
+        <div class="step-number">4</div>
+        <div class="step-label">Paiement</div>
+      </div>
+      <div class="step-connector" [class.completed]="etapeActuelle > 4"></div>
+      <div class="step" [class.active]="etapeActuelle === 5">
+        <div class="step-number">5</div>
+        <div class="step-label">Confirmation</div>
+      </div>
     </div>
   </div>
 
   <div class="form-container">
-    <!-- Section 1: Informations personnelles -->
+    <!-- ÉTAPE 1: Informations personnelles -->
     <div *ngIf="etapeActuelle === 1" class="form-section active">
       <h2>Informations Personnelles</h2>
 
       <form [formGroup]="etudiantForm">
-        <div class="form-group">
-          <label for="nom">Nom *</label>
-          <input type="text" id="nom" formControlName="nom" class="form-control" />
-          <div
-            *ngIf="etudiantForm.get('nom')?.invalid && etudiantForm.get('nom')?.touched"
-            class="error-message"
-          >
-            Le nom est obligatoire
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nom">Nom <span class="required">*</span></label>
+            <input
+              type="text"
+              id="nom"
+              formControlName="nom"
+              class="form-control"
+              placeholder="Votre nom"
+            />
+            <div
+              *ngIf="etudiantForm.get('nom')?.invalid && etudiantForm.get('nom')?.touched"
+              class="error-message"
+            >
+              Le nom est obligatoire
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prenom">Prénom <span class="required">*</span></label>
+            <input
+              type="text"
+              id="prenom"
+              formControlName="prenom"
+              class="form-control"
+              placeholder="Votre prénom"
+            />
+            <div
+              *ngIf="etudiantForm.get('prenom')?.invalid && etudiantForm.get('prenom')?.touched"
+              class="error-message"
+            >
+              Le prénom est obligatoire
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Adresse Email <span class="required">*</span></label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              placeholder="exemple@email.com"
+            />
+            <div
+              *ngIf="etudiantForm.get('email')?.invalid && etudiantForm.get('email')?.touched"
+              class="error-message"
+            >
+              Veuillez saisir une adresse email valide
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="telephone">Numéro de Téléphone <span class="required">*</span></label>
+            <input
+              type="tel"
+              id="telephone"
+              formControlName="telephone"
+              class="form-control"
+              placeholder="+235 XX XX XX XX"
+            />
+            <div
+              *ngIf="
+                etudiantForm.get('telephone')?.invalid && etudiantForm.get('telephone')?.touched
+              "
+              class="error-message"
+            >
+              Le numéro de téléphone est obligatoire
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dateNaissance">Date de Naissance <span class="required">*</span></label>
+            <input
+              type="date"
+              id="dateNaissance"
+              formControlName="dateNaissance"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ville">Ville <span class="required">*</span></label>
+            <input
+              type="text"
+              id="ville"
+              formControlName="ville"
+              class="form-control"
+              placeholder="Votre ville"
+            />
           </div>
         </div>
 
         <div class="form-group">
-          <label for="prenom">Prénom *</label>
-          <input type="text" id="prenom" formControlName="prenom" class="form-control" />
-          <div
-            *ngIf="etudiantForm.get('prenom')?.invalid && etudiantForm.get('prenom')?.touched"
-            class="error-message"
-          >
-            Le prénom est obligatoire
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Adresse Email *</label>
-          <input type="email" id="email" formControlName="email" class="form-control" />
-          <div
-            *ngIf="etudiantForm.get('email')?.invalid && etudiantForm.get('email')?.touched"
-            class="error-message"
-          >
-            Veuillez saisir une adresse email valide
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="telephone">Numéro de Téléphone *</label>
-          <input type="tel" id="telephone" formControlName="telephone" class="form-control" />
-          <div
-            *ngIf="etudiantForm.get('telephone')?.invalid && etudiantForm.get('telephone')?.touched"
-            class="error-message"
-          >
-            Le numéro de téléphone est obligatoire
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="dateNaissance">Date de Naissance *</label>
-          <input
-            type="date"
-            id="dateNaissance"
-            formControlName="dateNaissance"
+          <label for="adresse">Adresse <span class="required">*</span></label>
+          <textarea
+            id="adresse"
+            formControlName="adresse"
+            rows="2"
             class="form-control"
+            placeholder="Votre adresse complète"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="codePostal">Code Postal <span class="required">*</span></label>
+          <input
+            type="text"
+            id="codePostal"
+            formControlName="codePostal"
+            class="form-control"
+            placeholder="Code postal"
           />
-        </div>
-
-        <div class="form-group">
-          <label for="adresse">Adresse *</label>
-          <textarea id="adresse" formControlName="adresse" rows="3" class="form-control"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="ville">Ville *</label>
-          <input type="text" id="ville" formControlName="ville" class="form-control" />
-        </div>
-
-        <div class="form-group">
-          <label for="codePostal">Code Postal *</label>
-          <input type="text" id="codePostal" formControlName="codePostal" class="form-control" />
         </div>
 
         <div class="form-actions">
@@ -102,113 +176,198 @@
             (click)="suivant()"
             [disabled]="!etudiantForm.valid"
           >
-            Suivant
+            Suivant →
           </button>
         </div>
       </form>
     </div>
 
-    <!-- Section 2: Choix de formation -->
+    <!-- ÉTAPE 2: Choix de formation avec FILTRAGE -->
     <div *ngIf="etapeActuelle === 2" class="form-section active">
       <h2>Choix de Formation</h2>
 
-      <form [formGroup]="formationForm">
+      <!-- Info filtrage -->
+      <div class="filter-info">
+        <span class="info-icon"><i class="fa-solid fa-circle-info"></i> </span>
+        <span>Sélectionnez d'abord le département, puis la filière, et enfin le niveau.</span>
+      </div>
+
+      <form>
+        <!-- 1. DÉPARTEMENT -->
         <div class="form-group">
-          <label for="niveauEtudes">Niveau d'études *</label>
-          <select id="niveauEtudes" formControlName="niveauEtudes" class="form-control">
-            <option value="">Sélectionnez votre niveau</option>
-            <option *ngFor="let niveau of niveauxEtudes" [value]="niveau.value">
-              {{ niveau.label }}
+          <label>
+            <span class="step-badge">1</span> Département <span class="required">*</span>
+          </label>
+          <select
+            [(ngModel)]="selectedCourse.departement"
+            name="departement"
+            class="form-control"
+            (change)="onFormDepartementChange()"
+          >
+            <option value="">-- Sélectionnez un département --</option>
+            <option *ngFor="let dep of departements" [value]="dep._id">{{ dep.nom }}</option>
+          </select>
+        </div>
+
+        <!-- 2. FILIÈRE (filtrée par département) -->
+        <div class="form-group">
+          <label> <span class="step-badge">2</span> Filière <span class="required">*</span> </label>
+          <select
+            [(ngModel)]="selectedCourse.filiere"
+            name="filiere"
+            class="form-control"
+            (change)="onFormFiliereChange()"
+            [disabled]="!selectedCourse.departement"
+            [class.disabled]="!selectedCourse.departement"
+          >
+            <option value="">
+              {{
+                selectedCourse.departement
+                  ? '-- Sélectionnez une filière --'
+                  : " Choisissez d'abord un département"
+              }}
             </option>
+            <option *ngFor="let f of formFilieres" [value]="f._id">{{ f.nom }}</option>
           </select>
+          <div *ngIf="formFilieres.length === 0 && selectedCourse.departement" class="info-message">
+            Aucune filière disponible pour ce département
+          </div>
         </div>
 
-        <!-- Nouveau champ Departement -->
+        <!-- 3. NIVEAU (filtré par filière) -->
         <div class="form-group">
-          <label for="departement">Département *</label>
-          <select id="departement" formControlName="departement" class="form-control">
-            <option value="">Sélectionnez un département</option>
-            <option value="économie">Économie</option>
-            <option value="droit">Droit</option>
-            <option value="gestion">Gestion</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="formation">Formation souhaitée *</label>
-          <select id="formation" formControlName="formation" class="form-control">
-            <option value="">Sélectionnez une formation</option>
-            <option *ngFor="let formation of formations" [value]="formation.value">
-              {{ formation.label }}
+          <label> <span class="step-badge">3</span> Niveau <span class="required">*</span> </label>
+          <select
+            [(ngModel)]="selectedCourse.niveau"
+            name="niveau"
+            class="form-control"
+            [disabled]="!selectedCourse.filiere"
+            [class.disabled]="!selectedCourse.filiere"
+          >
+            <option value="">
+              {{
+                selectedCourse.filiere
+                  ? '-- Sélectionnez un niveau --'
+                  : " Choisissez d'abord une filière"
+              }}
             </option>
+            <option *ngFor="let n of formNiveaux" [value]="n">{{ n }}</option>
           </select>
+          <div *ngIf="formNiveaux.length === 0 && selectedCourse.filiere" class="info-message">
+            Aucun niveau disponible pour cette filière
+          </div>
         </div>
 
+        <!-- Résumé de la sélection -->
+        <div class="selection-summary" *ngIf="selectedCourse.niveau">
+          <h4><i class="fas fa-file-invoice" style="color: #579bcf"></i>Votre sélection</h4>
+          <div class="summary-item">
+            <span class="summary-label">Département:</span>
+            <span class="summary-value">{{ getDepartementNom() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Filière:</span>
+            <span class="summary-value">{{ getFiliereNom() }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Niveau:</span>
+            <span class="summary-value">{{ selectedCourse.niveau }}</span>
+          </div>
+        </div>
+
+        <!-- Mode de formation -->
         <div class="form-group">
-          <label>Mode de formation *</label>
+          <label>Mode de formation <span class="required">*</span></label>
           <div class="radio-group">
-            <div class="radio-option">
+            <label
+              class="radio-option"
+              [class.selected]="selectedCourse.modeFormation === 'presentiel'"
+            >
               <input
                 type="radio"
-                id="presentiel"
-                formControlName="modeFormation"
+                [(ngModel)]="selectedCourse.modeFormation"
+                name="modeFormation"
                 value="presentiel"
               />
-              <label for="presentiel">Présentiel</label>
-            </div>
-            <div class="radio-option">
-              <input type="radio" id="en-ligne" formControlName="modeFormation" value="en-ligne" />
-              <label for="en-ligne">En ligne</label>
-            </div>
+              <span><i class="fas fa-school" style="color: #252520;"></i> Présentiel</span>
+            </label>
+            <label
+              class="radio-option"
+              [class.selected]="selectedCourse.modeFormation === 'en-ligne'"
+            >
+              <input
+                type="radio"
+                [(ngModel)]="selectedCourse.modeFormation"
+                name="modeFormation"
+                value="en-ligne"
+              />
+              <span><i class="fa-solid fa-laptop"></i>
+ En ligne</span>
+            </label>
           </div>
         </div>
 
+        <!-- Photo -->
         <div class="form-group">
-          <label>Documents à fournir</label>
-          <!-- Upload de photo -->
-          <div class="form-group">
-            <label for="photoEtudiant" class="photo-label">
-              <div class="photo-upload-area" [class.has-photo]="photoPreview">
-                <div class="upload-icon" *ngIf="!photoPreview">📷</div>
-                <img
-                  *ngIf="photoPreview"
-                  [src]="photoPreview"
-                  class="photo-preview"
-                  alt="Aperçu photo"
-                />
-                <div class="upload-text">
-                  {{ photoPreview ? 'Photo sélectionnée' : "Ajouter une photo d'identité" }}
-                </div>
-                <div class="upload-hint">Format JPG/PNG - Max 2MB</div>
+          <label>Photo d'identité (optionnel)</label>
+          <label for="photoEtudiant" class="photo-label">
+            <div class="photo-upload-area" [class.has-photo]="photoPreview">
+              <div class="upload-icon" *ngIf="!photoPreview"><i class="fa-solid fa-camera" style="color:#464646"></i>
+</div>
+              <img
+                *ngIf="photoPreview"
+                [src]="photoPreview"
+                class="photo-preview"
+                alt="Aperçu photo"
+              />
+              <div class="upload-text">
+                {{ photoPreview ? '✓ Photo sélectionnée' : 'Cliquez pour ajouter' }}
               </div>
-            </label>
-            <input
-              type="file"
-              id="photoEtudiant"
-              (change)="onPhotoSelected($event)"
-              accept=".jpg,.jpeg,.png"
-              class="photo-input"
-            />
-          </div>
-          <div *ngFor="let doc of documents" class="checkbox-group">
-            <input
-              type="checkbox"
-              [id]="doc.value"
-              (change)="onDocumentChange(doc.value, $event)"
-            />
-            <label [for]="doc.value">{{ doc.label }}</label>
+              <div class="upload-hint">Format JPG/PNG - Max 2MB</div>
+            </div>
+          </label>
+          <input
+            type="file"
+            id="photoEtudiant"
+            (change)="onPhotoSelected($event)"
+            accept=".jpg,.jpeg,.png"
+            class="photo-input"
+          />
+        </div>
+        
+        <!-- Documents -->
+        <div class="form-group">
+          <label>Documents à fournir (optionnel)</label>
+          <div class="documents-list">
+            <div *ngFor="let doc of documents; let i = index" class="file-upload-group">
+              <label [for]="'doc-' + i" class="file-label">
+                <span class="doc-name">{{ doc.label }}</span>
+                <span *ngIf="selectedDocs[doc.value]" class="doc-selected"
+                  ><i class="fa-solid fa-check" style="color:#27ae60; font-size:20px;"></i>
+ {{ selectedDocs[doc.value].name }}</span
+                >
+                <span *ngIf="!selectedDocs[doc.value]" class="doc-upload"><i class="fa-solid fa-file-lines" style="color: #74C0FC;"></i>Ajouter</span>
+              </label>
+              <input
+                type="file"
+                [id]="'doc-' + i"
+                (change)="onDocumentSelected(doc.value, $event)"
+                accept=".pdf,.jpg,.jpeg,.png"
+                class="file-input"
+              />
+            </div>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" (click)="precedent()">Précédent</button>
+          <button type="button" class="btn btn-secondary" (click)="precedent()">← Précédent</button>
           <button
             type="button"
             class="btn btn-primary"
             (click)="suivant()"
-            [disabled]="!formationForm.valid"
+            [disabled]="!isFormationFormValid() || isLoading"
           >
-            Soumettre pour validation
+            {{ isLoading ? '⏳ Envoi...' : "✓ Soumettre l'inscription" }}
           </button>
         </div>
       </form>

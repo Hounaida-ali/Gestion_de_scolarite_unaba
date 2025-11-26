@@ -1,27 +1,26 @@
 import { Component } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { ScheduleService } from '../../services/schedule-service';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ScheduleService } from '../../services/schedule-service';
 import { NotificationService } from '../../services/notification-service';
+import { FormationEtudiantService } from '../../services/formation-etudiant-service';
+import { DepartementAvecFormations } from '../../interfaces/DepartementAvecFormations';
+import { Formation } from '../../interfaces/formationInterface';
 
-// =============================================
-// 🔹 Interface des cours
-// =============================================
+export interface Teacher {
+  nom: string;
+  prenom: string;
+}
+
 export interface CourseSlot {
   _id?: string;
   title: string;
-  teacher: string;
+  teacher: Teacher;
   departement: string;
   filiere: string;
   niveau: string;
-  group: 'TD' | 'TP' | 'CM';
+  group: 'TD' | 'TP' | 'CM' | 'Contrôle';
   room: string;
   start: Date;
   end: Date;
@@ -29,9 +28,12 @@ export interface CourseSlot {
   canceled: boolean;
 }
 
-// =============================================
-// 🔹 Composant principal
-// =============================================
+interface FiliereOption {
+  _id: string;
+  nom: string;
+  niveaux: string[];
+}
+
 @Component({
   selector: 'app-schedule',
   standalone: true,
@@ -40,182 +42,75 @@ export interface CourseSlot {
   styleUrls: ['./schedule.css'],
 })
 export class Schedule {
-  // ------------------------------
-  // 🔸 Messages & états
-  // ------------------------------
-  errorMessage = '';
-  successMessage = '';
-  loading = true;
-
-  formFilieres: { nom: string; niveaux: string[] }[] = [];
-  formNiveaux: string[] = [];
-
-  // ------------------------------
-  // 🔸 Données principales
-  // ------------------------------
   slots: CourseSlot[] = [];
   filteredSlots: CourseSlot[] = [];
 
-  // ------------------------------
-  // 🔸 Données pour affichage du tableau
-  // ------------------------------
-  days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-  timeSlots: string[] = [];
+  selectedCourse: CourseSlot | null = null;
+  showForm = false;
 
-  // ------------------------------
-  // 🔸 États d’interface
-  // ------------------------------
-  showModal = false;
-  showForm = false; // ✅ ajouté
-  selectedCourse: CourseSlot | null = null; // ✅ ajouté
+  errorMessage = '';
+  successMessage = '';
 
-  // ------------------------------
-  // 🔸 Formulaire
-  // ------------------------------
-  courseForm: FormGroup;
+  departements: DepartementAvecFormations[] = [];
+  formations: Formation[] = [];
 
-  // ------------------------------
-  // 🔸 Filtres
-  // ------------------------------
+  // Pour les FILTRES de recherche
+  filteredFilieres: FiliereOption[] = [];
+  filteredNiveaux: string[] = [];
+
+  // Pour le FORMULAIRE d'ajout/modification
+  formFilieres: FiliereOption[] = [];
+  formNiveaux: string[] = [];
+
   departementFilter = '';
   filiereFilter = '';
   niveauFilter = '';
-  teacherFilter = '';
 
-  // ------------------------------
-  // 🔸 Hiérarchie des départements
-  // ------------------------------
-  departements = [
-    {
-      nom: 'économie',
-      filieres: [
-        { nom: 'science-économie', niveaux: ['licence1', 'licence2', 'licence3'] },
-        { nom: 'économie-monaiteur', niveaux: ['licence1', 'licence2', 'licence3'] },
-      ],
-    },
-    {
-      nom: 'droit',
-      filieres: [{ nom: 'droit', niveaux: ['licence1', 'licence2', 'licence3'] }],
-    },
-    {
-      nom: 'gestion',
-      filieres: [{ nom: 'gestion', niveaux: ['licence1', 'licence2', 'licence3'] }],
-    },
+  days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  timeSlots: string[] = [];
+
+  salles: string[] = [
+    'salle1',
+    'salle2',
+    'salle3',
+    'salle4',
+    'salle5',
+    'salle6',
+    'salle7',
+    'salle8',
+    'salle9',
+    'salle10',
+    'salle11',
+    'salle12',
   ];
 
-  filteredFilieres: { nom: string; niveaux: string[] }[] = [];
-  filteredNiveaux: string[] = [];
-
-  // =============================================
-  // 🔹 Constructeur
-  // =============================================
   constructor(
     private slotService: ScheduleService,
-    private fb: FormBuilder,
     private snackBar: MatSnackBar,
-    private notificationService: NotificationService
-  ) {
-    this.courseForm = this.fb.group({
-      title: ['', Validators.required],
-      teacher: ['', Validators.required],
-      departement: ['', Validators.required],
-      filiere: ['', Validators.required],
-      niveau: ['', Validators.required],
-      group: ['CM', Validators.required],
-      room: ['', Validators.required],
-      start: ['', Validators.required],
-      end: ['', Validators.required],
+    private notificationService: NotificationService,
+    private formationEtudiantService: FormationEtudiantService
+  ) {}
+
+  ngOnInit() {
+    this.loadSlots();
+    this.formationEtudiantService.getDepartementsAvecFormations().subscribe({
+      next: (deps) => (this.departements = deps),
+      error: () => console.error('Erreur de chargement des départements'),
     });
   }
 
-  ngOnInit(): void {
-    this.loadSlots();
-  }
-
-  // ======================================================
-  // 🔹 GESTION DES FILTRES ET FORMULAIRES
-  // ======================================================
-
-  // 🔹 Quand on change le département dans la zone de filtrage principale
-  onDepartementChange() {
-    const dep = this.departements.find((d) => d.nom === this.departementFilter);
-    this.filteredFilieres = dep ? dep.filieres : [];
-    this.filiereFilter = '';
-    this.filteredNiveaux = [];
-    this.niveauFilter = '';
-    this.filteredSlots = [];
-  }
-
-  // 🔹 Quand on change la filière dans la zone de filtrage principale
-  onFiliereChange() {
-    const f = this.filteredFilieres.find((f) => f.nom === this.filiereFilter);
-    this.filteredNiveaux = f ? f.niveaux : [];
-    this.niveauFilter = '';
-    this.filteredSlots = [];
-  }
-
-  // 🔹 Appliquer les filtres au tableau
-  filterSlots() {
-    if (!this.departementFilter || !this.filiereFilter || !this.niveauFilter) {
-      this.filteredSlots = [];
-      return;
-    }
-
-    this.filteredSlots = this.slots.filter(
-      (s) =>
-        s.departement === this.departementFilter &&
-        s.filiere === this.filiereFilter &&
-        s.niveau === this.niveauFilter
-    );
-  }
-
-  // 🔹 Quand on change le département dans le formulaire d’ajout / modification
-  // 🔹 Quand on change le département dans le formulaire
-  onFormDepartementChange() {
-    if (!this.selectedCourse) return;
-
-    const dep = this.departements.find((d) => d.nom === this.selectedCourse!.departement);
-    this.filteredFilieres = dep ? dep.filieres : [];
-    this.filteredNiveaux = [];
-
-    // Reset filiere et niveau
-    this.selectedCourse.filiere = '';
-    this.selectedCourse.niveau = '';
-  }
-
-  // 🔹 Quand on change la filière dans le formulaire
-  onFormFiliereChange() {
-    if (!this.selectedCourse) return;
-
-    const f = this.filteredFilieres.find((f) => f.nom === this.selectedCourse!.filiere);
-    this.filteredNiveaux = f ? f.niveaux : [];
-
-    // Reset niveau
-    this.selectedCourse.niveau = '';
-  }
-
-  // =============================================
-  // 🔹 Chargement des données
-  // =============================================
   loadSlots() {
-    this.loading = true;
     this.slotService.getSlots().subscribe({
-      next: (data) => {
+      next: (data: any[]) => {
         this.slots = data.map((slot) => ({
           ...slot,
           start: new Date(slot.start),
           end: new Date(slot.end),
         }));
         this.filteredSlots = [...this.slots];
-        // Génération automatique des créneaux horaires via la méthode dédiée
         this.generateTimeSlots();
-
-        this.loading = false;
       },
-      error: () => {
-        this.errorMessage = 'Erreur de chargement des cours';
-        this.loading = false;
-      },
+      error: () => (this.errorMessage = 'Erreur lors du chargement des cours'),
     });
   }
 
@@ -229,38 +124,50 @@ export class Schedule {
     this.timeSlots = Array.from(horaires).sort();
   }
 
-  // =============================================
-  // 🔹 Gestion du formulaire
-  // =============================================
-  updateFilieres() {
-    const dep = this.departements.find((d) => d.nom === this.courseForm.get('departement')?.value);
-    this.filteredFilieres = dep ? dep.filieres : [];
+  /* ---------------- FILTRES DE RECHERCHE ---------------- */
+  onDepartementChange() {
+    const dep = this.departements.find((d) => d._id === this.departementFilter);
+    this.formations = dep ? dep.formations : [];
+
+    this.filteredFilieres = dep
+      ? dep.formations.map((f) => ({
+          _id: f._id,
+          nom: f.nom,
+          niveaux: f.programmes.flatMap((p) => p.niveaux.map((n) => n.nom)),
+        }))
+      : [];
+
+    this.filiereFilter = '';
+    this.niveauFilter = '';
     this.filteredNiveaux = [];
-    this.courseForm.patchValue({ filiere: '', niveau: '' });
+    this.filteredSlots = [];
   }
 
-  updateNiveaux() {
-    const f = this.filteredFilieres.find((f) => f.nom === this.courseForm.get('filiere')?.value);
+  onFiliereChange() {
+    const f = this.filteredFilieres.find((fl) => fl._id === this.filiereFilter);
     this.filteredNiveaux = f ? f.niveaux : [];
-    this.courseForm.patchValue({ niveau: '' });
+    this.niveauFilter = '';
+    this.filteredSlots = [];
   }
 
-  openModal() {
-    this.showModal = true;
+  filterSlots() {
+    if (!this.departementFilter || !this.filiereFilter || !this.niveauFilter) {
+      this.filteredSlots = [];
+      return;
+    }
+    this.filteredSlots = this.slots.filter(
+      (s) =>
+        s.departement === this.departementFilter &&
+        s.filiere === this.filiereFilter &&
+        s.niveau === this.niveauFilter
+    );
   }
 
-  closeModal() {
-    this.showModal = false;
-    this.courseForm.reset({ group: 'CM' });
-  }
-
-  // =============================================
-  // 🔹 Ajout / Modification
-  // =============================================
+  /* ---------------- FORMULAIRE ---------------- */
   newCourse() {
     this.selectedCourse = {
       title: '',
-      teacher: '',
+      teacher: { nom: '', prenom: '' },
       departement: '',
       filiere: '',
       niveau: '',
@@ -276,236 +183,159 @@ export class Schedule {
     this.showForm = true;
   }
 
-  loadCourses() {
-    this.slotService.getSlots().subscribe((data) => {
-      this.slots = data.map((s: any) => ({
-        ...s,
-        start: new Date(s.start),
-        end: new Date(s.end),
-      }));
-
-      // On met aussi à jour la liste filtrée
-      this.filteredSlots = this.slots.filter(
-        (s) =>
-          (!this.departementFilter || s.departement === this.departementFilter) &&
-          (!this.filiereFilter || s.filiere === this.filiereFilter) &&
-          (!this.niveauFilter || s.niveau === this.niveauFilter)
-      );
-
-      // Si tu as une méthode pour générer les horaires (comme pour exam)
-      if (this.generateTimeSlots) {
-        this.generateTimeSlots();
-      }
-    });
-  }
-
-  /// 🔹 Ajout d’un cours
-  // 🔹 Ajout d’un cours
-  // Méthode utilitaire pour afficher des messages temporaires
-showMessage(msg: string, type: 'success' | 'error', duration = 3000) {
-  if (type === 'success') {
-    this.successMessage = msg;
-    setTimeout(() => (this.successMessage = ''), duration);
-  } else {
-    this.errorMessage = msg;
-    setTimeout(() => (this.errorMessage = ''), duration);
-  }
-}
-
-
-// Ajouter un cours
-addCourse() {
-  if (!this.selectedCourse) return;
-
-  const payload: CourseSlot = {
-    ...this.selectedCourse,
-    start: new Date(this.selectedCourse.start),
-    end: new Date(this.selectedCourse.end),
-  };
-
-  this.slotService.addSlot(payload).subscribe({
-    next: (res: any) => {
-      const saved: CourseSlot = res.course || res;
-      const message = res.message || `Cours "${saved.title}" ajouté avec succès !`;
-
-      // ❌ Ne pas ajouter localement (évite "Invalid Date - Invalid Date")
-      // this.slots.push(saved);
-      // this.filteredSlots.push(saved);
-
-      // ✅ Réinitialiser le formulaire
-      this.resetForm();
-
-      // ✅ Notification interne
-      this.notificationService.add({
-        type: 'success',
-        text: message,
-      });
-
-      // ✅ Message du backend (succès)
-      this.showMessage(message, 'success', 3000);
-    },
-    error: (err) => {
-      const backendMsg = err.error?.message || "Erreur lors de l'ajout du cours";
-      // ✅ Message d’erreur du backend
-      this.showMessage(backendMsg, 'error', 5000);
-    },
-  });
-}
-
-
-
-
   editCourse(course: CourseSlot) {
-    this.selectedCourse = {
-      ...course,
-    };
+    this.selectedCourse = { ...course };
+    
+    // ✅ Pré-charger les filières et niveaux si un département est déjà sélectionné
+    if (this.selectedCourse.departement) {
+      this.onFormDepartementChange();
+      
+      // Si une filière est déjà sélectionnée, charger les niveaux
+      if (this.selectedCourse.filiere) {
+        setTimeout(() => this.onFormFiliereChange(), 100);
+      }
+    }
+    
     this.showForm = true;
   }
 
-  // Mettre à jour un cours
-updateCourse() {
-  if (!this.selectedCourse || !this.selectedCourse._id) return;
+  // ✅ CORRECTION : Mise à jour du département dans le FORMULAIRE
+  onFormDepartementChange() {
+    if (!this.selectedCourse) return;
+    
+    const dep = this.departements.find((d) => d._id === this.selectedCourse!.departement);
+    
+    // ✅ Utiliser formFilieres au lieu de filteredFilieres
+    this.formFilieres = dep
+      ? dep.formations.map((f) => ({
+          _id: f._id,
+          nom: f.nom,
+          niveaux: f.programmes.flatMap((p) => p.niveaux.map((n) => n.nom)),
+        }))
+      : [];
+    
+    // Réinitialiser filière et niveau
+    this.formNiveaux = [];
+    this.selectedCourse.filiere = '';
+    this.selectedCourse.niveau = '';
+  }
 
-  const payload: CourseSlot = {
-    ...this.selectedCourse,
-    start: new Date(this.selectedCourse.start),
-    end: new Date(this.selectedCourse.end),
-  };
-
-  this.slotService.updateSlot(payload).subscribe({
-    next: (res: any) => {
-      const updated: CourseSlot = res.course || res;
-      const message = res.message || `Cours "${updated.title}" mis à jour avec succès !`;
-
-      // Mise à jour locale
-      const index = this.slots.findIndex((s) => s._id === updated._id);
-      if (index !== -1)
-        this.slots[index] = { ...updated, start: new Date(updated.start), end: new Date(updated.end) };
-
-      const filteredIndex = this.filteredSlots.findIndex((s) => s._id === updated._id);
-      if (filteredIndex !== -1)
-        this.filteredSlots[filteredIndex] = { ...updated, start: new Date(updated.start), end: new Date(updated.end) };
-
-      this.generateTimeSlots();
-      this.resetForm();
-
-      this.notificationService.add({
-        type: 'info',
-        text: message,
-      });
-
-      // ✅ Message du backend
-      this.showMessage(message, 'success', 3000);
-    },
-    error: (err) => {
-      const backendMsg = err.error?.message || "Erreur lors de la mise à jour du cours";
-      this.showMessage(backendMsg, 'error', 5000);
-    },
-  });
-}
-
-  // 🔹 Gestion du formulaire
-  submitCourse() {
+  // ✅ CORRECTION : Mise à jour de la filière dans le FORMULAIRE
+  onFormFiliereChange() {
     if (!this.selectedCourse) return;
 
-    if (this.selectedCourse._id) {
-      this.updateCourse();
-    } else {
-      this.addCourse(); // Ajout immédiat avec mise à jour de filteredSlots
+    // ✅ Utiliser formFilieres au lieu de filteredFilieres
+    const f = this.formFilieres.find((fil) => fil._id === this.selectedCourse!.filiere);
+
+    // ✅ Utiliser formNiveaux au lieu de filteredNiveaux
+    this.formNiveaux = f ? f.niveaux : [];
+    this.selectedCourse.niveau = '';
+  }
+
+  /* ---------------- CRUD ---------------- */
+  addCourse() {
+    if (!this.selectedCourse) return;
+
+    // ✅ Validation avant envoi
+    if (
+      !this.selectedCourse.departement ||
+      !this.selectedCourse.filiere ||
+      !this.selectedCourse.niveau ||
+      !this.selectedCourse.room ||
+      !this.selectedCourse.teacher
+    ) {
+      this.showMessage(
+        'Veuillez remplir tous les champs obligatoires (département, filière, niveau, enseignant, salle)',
+        'error'
+      );
+      return;
     }
+
+    // Préparer le payload avec conversion de dates
+    const payload: CourseSlot = {
+      ...this.selectedCourse,
+      start: new Date(this.selectedCourse.start),
+      end: new Date(this.selectedCourse.end),
+      departement: this.selectedCourse.departement,
+      filiere: this.selectedCourse.filiere,
+      teacher: this.selectedCourse.teacher,
+    };
+
+    console.log('Payload envoyé au backend:', payload);
+
+    // Appel du service
+    this.slotService.addSlot(payload).subscribe({
+      next: (res: any) => {
+        const saved: CourseSlot = res.course || res;
+        this.slots.push(saved);
+        this.filteredSlots.push(saved);
+        this.resetForm();
+        this.showMessage(`Cours "${saved.title}" ajouté avec succès !`, 'success');
+      },
+      error: (err) => {
+        const backendMsg = err.error?.message || "Erreur lors de l'ajout du cours";
+        this.showMessage(backendMsg, 'error');
+      },
+    });
+  }
+
+  updateCourse() {
+    if (!this.selectedCourse || !this.selectedCourse._id) return;
+    const payload: CourseSlot = {
+      ...this.selectedCourse,
+      start: new Date(this.selectedCourse.start),
+      end: new Date(this.selectedCourse.end),
+    };
+    this.slotService.updateSlot(payload).subscribe({
+      next: (res: any) => {
+        const updated: CourseSlot = res.course || res;
+        const index = this.slots.findIndex((s) => s._id === updated._id);
+        if (index !== -1) this.slots[index] = updated;
+
+        const filteredIndex = this.filteredSlots.findIndex((s) => s._id === updated._id);
+        if (filteredIndex !== -1) this.filteredSlots[filteredIndex] = updated;
+
+        this.resetForm();
+        this.showMessage(`Cours "${updated.title}" mis à jour avec succès !`, 'success');
+      },
+      error: (err) => this.showMessage(err.error?.message || 'Erreur update', 'error'),
+    });
+  }
+
+  submitCourse() {
+    if (!this.selectedCourse) return;
+    if (this.selectedCourse._id) this.updateCourse();
+    else this.addCourse();
+  }
+
+  deleteCourse(course: CourseSlot) {
+    if (!confirm('Voulez-vous supprimer ce cours ?')) return;
+    this.slotService.deleteSlot(course._id!).subscribe({
+      next: () => {
+        this.slots = this.slots.filter((s) => s._id !== course._id);
+        this.filteredSlots = this.filteredSlots.filter((s) => s._id !== course._id);
+        this.showMessage(`Cours "${course.title}" supprimé avec succès !`, 'success');
+      },
+      error: (err) => this.showMessage(err.error?.message || 'Erreur suppression', 'error'),
+    });
   }
 
   resetForm() {
     this.selectedCourse = null;
     this.showForm = false;
+    this.formFilieres = [];
+    this.formNiveaux = [];
   }
 
-  // submitCourse() {
-  //   if (!this.selectedCourse) return;
-
-  //   if (this.selectedCourse._id) {
-  //     this.updateCourse();
-  //   } else {
-  //     this.addCourse(); // ici, addCourse() doit récupérer les valeurs du formulaire
-  //   }
-  // }
-
-  // 🔹 Suppression d’un cours
-  deleteCourse(course: CourseSlot) {
-  if (!confirm('Voulez-vous vraiment supprimer ce cours ?')) return;
-
-  this.errorMessage = '';
-  this.successMessage = '';
-
-  this.slotService.deleteSlot(course._id!).subscribe({
-    next: (res: any) => {
-      const message = res.message || `Cours "${course.title}" supprimé avec succès !`;
-
-      // ✅ Supprimer localement sans recharger
-      this.slots = this.slots.filter((s) => s._id !== course._id);
-      this.filteredSlots = this.filteredSlots.filter((s) => s._id !== course._id);
-
-      // ✅ Afficher le message de succès
-      this.showMessage(message, 'success');
-
-      // ✅ Notification interne
-      this.notificationService.add({
-        type: 'warning',
-        text: message,
-      });
-
-      // (Optionnel) Recalcul des créneaux si ton composant les affiche
-      if (this.generateTimeSlots) this.generateTimeSlots();
-    },
-    error: (err) => {
-      const backendMsg = err.error?.message || 'Erreur lors de la suppression';
-      this.showMessage(backendMsg, 'error');
-    },
-  });
-}
-
-  // =============================================
-  // 🔹 Suppression / Statut
-  // =============================================
-  toggleStatus(slot: CourseSlot) {
-    slot.canceled = !slot.canceled;
-    this.slotService.updateSlot(slot).subscribe(() => {
-      const msg = `Cours ${slot.canceled ? 'annulé' : 'réactivé'} : ${slot.title}`;
-      this.notificationService.add({ type: 'warning', text: msg });
-      this.snackBar.open(msg, 'Fermer', { duration: 2500 });
-    });
-  }
-
-  // deleteCourse(slot: CourseSlot) {
-  //   if (!confirm('Voulez-vous vraiment supprimer ce cours ?')) return;
-
-  //   this.slotService.deleteSlot(slot._id!).subscribe({
-  //     next: () => {
-  //       this.slots = this.slots.filter((s) => s._id !== slot._id);
-  //       this.filterSlots();
-  //       const msg = `Cours "${slot.title}" supprimé`;
-  //       this.notificationService.add({ type: 'error', text: msg });
-  //       this.snackBar.open(msg, 'Fermer', { duration: 2500 });
-  //     },
-  //     error: () => {
-  //       this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 2500 });
-  //     },
-  //   });
-  // }
-
-  // =============================================
-  // 🔹 Utilitaires
-  // =============================================
-  showDetails(slot: CourseSlot) {
-    const status = slot.canceled ? '❌ Annulé' : '✅ Actif';
-    alert(
-      `Cours: ${slot.title}\nEnseignant: ${slot.teacher}\nSalle: ${slot.room}\n` +
-        `Département: ${slot.departement}/${slot.filiere}/${slot.niveau}\n` +
-        `Groupe: ${slot.group}\n` +
-        `Date: ${slot.start.toLocaleDateString()}\n` +
-        `Horaire: ${slot.start.toLocaleTimeString()} - ${slot.end.toLocaleTimeString()}\n` +
-        `Statut: ${status}`
-    );
+  /* ---------------- UTILITAIRES ---------------- */
+  showMessage(msg: string, type: 'success' | 'error', duration = 3000) {
+    if (type === 'success') {
+      this.successMessage = msg;
+      setTimeout(() => (this.successMessage = ''), duration);
+    } else {
+      this.errorMessage = msg;
+      setTimeout(() => (this.errorMessage = ''), duration);
+    }
   }
 
   getDayName(date: Date): string {
@@ -519,6 +349,20 @@ updateCourse() {
     return `${s}-${e}`;
   }
 
+  showDetails(slot: CourseSlot) {
+    const status = slot.canceled ? '❌ Annulé' : '✅ Actif';
+    const teacherName =
+      slot.teacher && typeof slot.teacher === 'object'
+        ? `${slot.teacher.nom || 'Inconnu'} ${slot.teacher.prenom || ''}`
+        : 'Inconnu';
+    alert(
+      `Cours: ${slot.title}\nEnseignant: ${teacherName}\nSalle: ${slot.room}\n` +
+        `Groupe: ${slot.group}\n` +
+        `Date: ${slot.start.toLocaleDateString()}\n` +
+        `Horaire: ${slot.start.toLocaleTimeString()} - ${slot.end.toLocaleTimeString()}\n` +
+        `Statut: ${status}`
+    );
+  }
   refreshPage() {
     window.location.reload();
   }

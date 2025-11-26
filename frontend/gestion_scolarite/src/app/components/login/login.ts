@@ -47,25 +47,42 @@ export class Login {
   }
 
   onSubmit(): void {
-    if (!this.loginForm.valid) return;
-    
-    const email = this.f['email'].value;
-    const password = this.f['password'].value;
+  if (!this.loginForm.valid) return;
 
-    this.userService.login(email, password).subscribe({
-      next: res => {
-        this.errorMessage = '';
-        this.successMessage = res.message || 'Connexion réussie';
-        console.log('Connexion réussie', res);
-        
-        // Optionally close modal on successful login
-        // setTimeout(() => this.closeModal(), 2000);
-      },
-      error: (err: any) => {
-        this.errorMessage = err.error.error || err.error.message || 'Erreur de connexion';
-        this.successMessage = '';
-        console.error('Erreur de connexion', err);
+  const email = this.f['email'].value;
+  const password = this.f['password'].value;
+  const role = this.f['role'].value; // récupérer le rôle sélectionné
+
+  this.userService.login(email, password).subscribe({
+    next: res => {
+      this.errorMessage = '';
+      this.successMessage = res.message || 'Connexion réussie';
+      console.log('Connexion réussie', res);
+
+      // 🔹 Redirection selon le rôle
+      switch (role) {
+        case 'admin':
+          this.router.navigate(['admindashboard']);
+          break;
+        case 'teacher':
+          this.router.navigate(['enseignantdashboard']);
+          break;
+        case 'student':
+          this.router.navigate(['etudiantdashboard']);
+          break;
+        default:
+          this.router.navigate(['']); // redirection par défaut
       }
-    });
-  }
+
+      // Optionnel : fermer la modal après redirection
+      this.closeModal();
+    },
+    error: (err: any) => {
+      this.errorMessage = err.error.error || err.error.message || 'Erreur de connexion';
+      this.successMessage = '';
+      console.error('Erreur de connexion', err);
+    }
+  });
+}
+
 }

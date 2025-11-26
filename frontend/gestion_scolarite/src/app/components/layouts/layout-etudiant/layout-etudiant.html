@@ -4,6 +4,8 @@
     <h2>Université Adam Barka</h2>
     <p>Tableau de Bord Étudiant</p>
   </div>
+
+  @if (isRegistered) {
   <div class="sidebar-menu">
     <ul>
       <li class="active">
@@ -13,13 +15,19 @@
         <a routerLink="#"><i class="fas fa-user"></i> <span>Mon Profil</span></a>
       </li>
       <li>
-        <a routerLink="scheduleEtudiant"><i class="fas fa-calendar-alt"></i> <span>Emploi du Temps</span></a>
+        <a routerLink="scheduleEtudiant"
+          ><i class="fas fa-calendar-alt"></i> <span>Emploi du Temps</span></a
+        >
       </li>
       <li>
-        <a routerLink="calendarEtudiant"><i class="fas fa-calendar"></i> <span>Calendrier accademique</span></a>
+        <a routerLink="calendarEtudiant"
+          ><i class="fas fa-calendar"></i> <span>Calendrier accademique</span></a
+        >
       </li>
       <li>
-        <a routerLink="noteEtudiant"><i class="fas fa-file-alt"></i> <span>Notes & Résultats</span></a>
+        <a routerLink="noteEtudiant"
+          ><i class="fas fa-file-alt"></i> <span>Notes & Résultats</span></a
+        >
       </li>
       <li>
         <a routerLink="examEtudiant"><i class="fas fa-clipboard-list"></i> <span>Examens</span></a>
@@ -35,6 +43,11 @@
       </li>
     </ul>
   </div>
+  } @else () {
+    <div>
+      Inscrivez-vous pour accéder à votre dashboard.
+    </div>
+  }
 </div>
 
 <!-- Main Content -->
@@ -51,5 +64,4 @@
   </div>
 
   <router-outlet></router-outlet>
-    
 </div>

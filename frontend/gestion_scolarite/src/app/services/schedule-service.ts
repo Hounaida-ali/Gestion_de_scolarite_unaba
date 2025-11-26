@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CourseSlot } from '../components/schedule/schedule';
+import { map, Observable } from 'rxjs';
+import { CourseSlot, Teacher } from '../components/schedule/schedule';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ export class ScheduleService {
 
   constructor(private http: HttpClient) {}
 
-  // 🔹 Récupérer tous les créneaux, avec filtres optionnels
+ // 🔹 Récupérer tous les créneaux avec filtres optionnels
   getSlots(
     departement?: string,
     filiere?: string,
@@ -24,18 +24,51 @@ export class ScheduleService {
     if (niveau) params = params.set('niveau', niveau);
     if (teacher) params = params.set('teacher', teacher);
 
-    return this.http.get<CourseSlot[]>(this.apiUrl, { params });
+    return this.http.get<CourseSlot[]>(this.apiUrl, { params }).pipe(
+      map((slots) =>
+        slots.map((slot) => ({
+          ...slot,
+          // 🔸 Convertir teacher string → objet { nom, prenom }
+          teacher:
+            typeof slot.teacher === 'string'
+              ? this.parseTeacher(slot.teacher)
+              : (slot.teacher as Teacher),
+          start: new Date(slot.start),
+          end: new Date(slot.end),
+        }))
+      )
+    );
   }
 
   // 🔹 Ajouter un créneau
   addSlot(slot: CourseSlot): Observable<CourseSlot> {
-    return this.http.post<CourseSlot>(this.apiUrl, slot);
+    return this.http.post<CourseSlot>(this.apiUrl, slot).pipe(
+      map((saved) => ({
+        ...saved,
+        teacher:
+          typeof saved.teacher === 'string'
+            ? this.parseTeacher(saved.teacher)
+            : (saved.teacher as Teacher),
+        start: new Date(saved.start),
+        end: new Date(saved.end),
+      }))
+    );
   }
 
   // 🔹 Mettre à jour un créneau
   updateSlot(slot: CourseSlot): Observable<CourseSlot> {
     if (!slot._id) throw new Error('ID du créneau manquant pour la mise à jour');
-    return this.http.put<CourseSlot>(`${this.apiUrl}/${slot._id}`, slot);
+    return this.http.put<CourseSlot>(`${this.apiUrl}/${slot._id}`, slot).pipe(
+      map((updated) => ({
+        ...updated,
+        teacher:
+          typeof updated.teacher === 'string'
+            ? this.parseTeacher(updated.teacher)
+            : (updated.teacher as Teacher),
+        start: new Date(updated.start),
+        end: new Date(updated.end),
+      }))
+    );
   }
 
   // 🔹 Supprimer un créneau
@@ -48,8 +81,16 @@ export class ScheduleService {
     return this.http.get<CourseSlot>(`${this.apiUrl}/${id}`);
   }
 
-  // 🔹 Notification (peut être remplacé par un service Angular Material Snackbar)
+  // 🔹 Parser un teacher string en objet Teacher
+  private parseTeacher(value: string): Teacher {
+    if (!value) return { nom: 'Inconnu', prenom: '' };
+    const parts = value.split(' ');
+    return { nom: parts[0] || 'Inconnu', prenom: parts[1] || '' };
+  }
+
+  // 🔹 Notification simple
   addNotification(message: string) {
     alert(message);
   }
 }
+

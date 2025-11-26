@@ -100,7 +100,9 @@
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
   text-align: justify;
-  overflow: visible;  /* ✅ affiche tout le texte */
+  overflow: visible;  
+  text-align: left;          
+  flex-grow: 1;  
 }
 
 /* Lire la suite */

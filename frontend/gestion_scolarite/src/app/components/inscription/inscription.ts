@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,8 +8,9 @@ import {
 } from '@angular/forms';
 import { EtudiantService } from '../../services/etudiant-service';
 import { Router } from '@angular/router';
-import { CreationEtudiantResponse, Etudiant } from '../../interfaces/EtudiantInterface';
 import { CommonModule } from '@angular/common';
+import { DepartementAvecFormations } from '../../interfaces/DepartementAvecFormations';
+import { Formation } from '../../interfaces/formationInterface';
 
 @Component({
   selector: 'app-inscription',
@@ -17,44 +18,33 @@ import { CommonModule } from '@angular/common';
   templateUrl: './inscription.html',
   styleUrl: './inscription.css',
 })
-export class Inscription {
+export class Inscription implements OnInit {
   etapeActuelle = 1;
   etudiantForm: FormGroup;
-  formationForm: FormGroup;
-  etudiantId: string | null = null;
   photoFile: File | null = null;
   photoPreview: string | null = null;
+  selectedDocs: { [key: string]: File } = {};
+  successMessage = '';
+  errorMessage = '';
+  isLoading = false;
 
-  successMessage: string = '';
-  errorMessage: string = '';
+  // Données brutes
+  departements: DepartementAvecFormations[] = [];
+  formations: Formation[] = [];
+  // Données filtrées
+  formFilieres: any[] = []; // Filières filtrées par département
+  formNiveaux: string[] = []; // Niveaux filtrés par filière
 
-  niveauxEtudes = [
-    { value: 'bac', label: 'Baccalauréat' },
-    { value: 'bac1', label: 'Bac+1' },
-    { value: 'bac2', label: 'Bac+2' },
-    { value: 'bac3', label: 'Bac+3' },
-    { value: 'bac4', label: 'Bac+4' },
-    { value: 'bac5', label: 'Bac+5' },
-  ];
-
-  departements = [
-    { value: 'économie', label: 'Économie' },
-    { value: 'droit', label: 'Droit' },
-    { value: 'gestion', label: 'Gestion' },
-  ];
-
-  formations = [
-    { value: 'informatique', label: 'Licence Informatique' },
-    { value: 'gestion', label: 'Licence Gestion' },
-    { value: 'droit', label: 'Licence Droit' },
-    { value: 'psychologie', label: 'Licence Psychologie' },
-    { value: 'master-info', label: 'Master Informatique' },
-    { value: 'master-gestion', label: 'Master Management' },
-  ];
+  // Sélection du formulaire étape 2
+  selectedCourse = {
+    departement: '',
+    filiere: '',
+    niveau: '',
+    modeFormation: 'presentiel',
+  };
 
   documents = [
-    { value: 'cv', label: 'Curriculum Vitae' },
-    { value: 'lettre-motivation', label: 'Lettre de motivation' },
+    { value: 'demande-manuscrite', label: 'Demande manuscrite' },
     { value: 'releves-notes', label: 'Relevés de notes' },
     { value: 'diplome', label: 'Copie du diplôme' },
   ];
@@ -74,187 +64,298 @@ export class Inscription {
       ville: ['', Validators.required],
       codePostal: ['', Validators.required],
     });
+  }
 
-    this.formationForm = this.fb.group({
-      niveauEtudes: ['', Validators.required],
-      departement: ['', Validators.required],
-      formation: ['', Validators.required],
-      modeFormation: ['presentiel', Validators.required],
-      documents: [[]],
+  ngOnInit(): void {
+    this.chargerDonnees();
+  }
+
+  chargerDonnees(): void {
+    // Charger les départements
+    this.etudiantService.getDepartements().subscribe({
+      next: (data) => {
+        this.departements = data;
+        console.log('Départements chargés:', data);
+      },
+      error: (err) => console.error('Erreur départements:', err),
+    });
+
+    // Charger les formations/filières
+    this.etudiantService.getFormations().subscribe({
+      next: (data) => {
+        this.formations = data;
+        console.log('Formations chargées:', data);
+      },
+      error: (err) => console.error('Erreur formations:', err),
     });
   }
 
-  ngOnInit(): void {}
+  // Quand le DÉPARTEMENT change
+  // 🔹 Quand le DÉPARTEMENT change
+  onFormDepartementChange(): void {
+    console.log('Département sélectionné:', this.selectedCourse.departement);
+
+    // Reset filière et niveau
+    this.selectedCourse.filiere = '';
+    this.selectedCourse.niveau = '';
+    this.formFilieres = [];
+    this.formNiveaux = [];
+
+    if (!this.selectedCourse.departement) return;
+
+    // Filtrer les filières par département
+    this.formFilieres = this.formations.filter((f) => {
+      // Si departement est un objet avec _id, sinon juste l'ID
+      const depId = typeof f.departement === 'string' ? f.departement : f.departement?._id;
+      return depId === this.selectedCourse.departement;
+    });
+
+    console.log('Filières filtrées:', this.formFilieres);
+
+    // Si aucune filière trouvée, fallback optionnel
+    if (this.formFilieres.length === 0) {
+      console.warn('Aucune filière trouvée pour ce département');
+    }
+  }
+
+  // 🔹 Quand la FILIÈRE change
+  onFormFiliereChange(): void {
+    console.log('Filière sélectionnée:', this.selectedCourse.filiere);
+
+    // Reset niveau
+    this.selectedCourse.niveau = '';
+    this.formNiveaux = [];
+
+    if (!this.selectedCourse.filiere) return;
+
+    // Trouver la filière sélectionnée
+    const filiereSelectionnee = this.formFilieres.find(
+      (f) => f._id === this.selectedCourse.filiere
+    );
+
+    if (!filiereSelectionnee) return;
+
+    const niveauxSet = new Set<string>();
+
+    // Si la filière a des niveaux directs
+    if (filiereSelectionnee.niveaux && Array.isArray(filiereSelectionnee.niveaux)) {
+      filiereSelectionnee.niveaux.forEach((n: any) => {
+        if (typeof n === 'string') niveauxSet.add(n);
+        else if (n.nom) niveauxSet.add(n.nom);
+      });
+    }
+    // Sinon, vérifier les programmes avec niveaux
+    else if (filiereSelectionnee.programmes && Array.isArray(filiereSelectionnee.programmes)) {
+      filiereSelectionnee.programmes.forEach((p: any) => {
+        if (Array.isArray(p.niveaux)) {
+          p.niveaux.forEach((n: any) => {
+            if (n.nom) niveauxSet.add(n.nom);
+          });
+        } else if (p.niveau) {
+          niveauxSet.add(p.niveau);
+        }
+      });
+    }
+
+    // Fallback si aucun niveau trouvé
+    this.formNiveaux =
+      niveauxSet.size > 0 ? Array.from(niveauxSet) : ['L1', 'L2', 'L3', 'M1', 'M2'];
+
+    console.log('Niveaux disponibles:', this.formNiveaux);
+  }
+
+  // Vérifier si le formulaire étape 2 est valide
+  isFormationFormValid(): boolean {
+    return !!(
+      this.selectedCourse.departement &&
+      this.selectedCourse.filiere &&
+      this.selectedCourse.niveau &&
+      this.selectedCourse.modeFormation
+    );
+  }
+
+  // Obtenir le nom du département
+  getDepartementNom(): string {
+    const dep = this.departements.find((d) => d._id === this.selectedCourse.departement);
+    return dep?.nom || '';
+  }
+
+  // Obtenir le nom de la filière
+  getFiliereNom(): string {
+    const filiere = this.formations.find((f) => f._id === this.selectedCourse.filiere);
+    return filiere?.nom || '';
+  }
+
+  allerAEtape(etape: number): void {
+    if (etape >= 1 && etape <= 5) {
+      this.etapeActuelle = etape;
+    }
+  }
 
   suivant(): void {
-    if (this.etapeActuelle === 1 && this.etudiantForm.valid) {
-      this.etapeActuelle = 2;
-    } else if (this.etapeActuelle === 2 && this.formationForm.valid) {
-      this.soumettreInscription();
+    if (this.etapeActuelle === 1) {
+      if (this.etudiantForm.valid) {
+        this.etapeActuelle = 2;
+      } else {
+        this.markFormGroupTouched(this.etudiantForm);
+        this.showMessage('Veuillez remplir tous les champs obligatoires.', 'error');
+      }
+    } else if (this.etapeActuelle === 2) {
+      if (this.isFormationFormValid()) {
+        this.soumettreInscription();
+      } else {
+        this.showMessage('Veuillez sélectionner département, filière et niveau.', 'error');
+      }
     }
   }
 
   precedent(): void {
-    if (this.etapeActuelle === 2) {
-      this.etapeActuelle = 1;
+    if (this.etapeActuelle > 1) {
+      this.etapeActuelle--;
     }
   }
 
   onPhotoSelected(event: any): void {
     const file = event.target.files[0];
-    if (file) {
-      // Vérification de la taille (2MB max)
-      if (file.size > 2 * 1024 * 1024) {
-        alert('La photo ne doit pas dépasser 2MB');
-        return;
-      }
+    if (!file) return;
 
-      // Vérification du type
-      if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-        alert('Seuls les formats JPG et PNG sont acceptés');
-        return;
-      }
-
-      this.photoFile = file;
-
-      // Prévisualisation
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.photoPreview = e.target.result;
-      };
-      reader.readAsDataURL(file);
+    if (file.size > 2 * 1024 * 1024) {
+      this.showMessage('La photo ne doit pas dépasser 2MB', 'error');
+      return;
     }
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      this.showMessage('Format accepté: JPG ou PNG', 'error');
+      return;
+    }
+
+    this.photoFile = file;
+    const reader = new FileReader();
+    reader.onload = (e: any) => (this.photoPreview = e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  onDocumentSelected(docKey: string, event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.showMessage('Le fichier ne doit pas dépasser 5MB', 'error');
+      return;
+    }
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!allowed.includes(file.type)) {
+      this.showMessage('Format accepté: PDF, JPG ou PNG', 'error');
+      return;
+    }
+
+    this.selectedDocs[docKey] = file;
   }
 
   soumettreInscription(): void {
-    if (this.etudiantForm.valid && this.formationForm.valid) {
-      // Préparer les données de l'étudiant
-      const etudiantData: any = {
-        ...this.etudiantForm.value,
-        ...this.formationForm.value,
-        statut: 'en-attente',
-        fraisInscription: 50000,
-        documents: this.formationForm.value.documents || [],
-      };
+  this.isLoading = true;
 
-      console.log('Données envoyées:', etudiantData);
+  // Construire les données de l'étudiant
+  const data: any = {
+    ...this.etudiantForm.value,
+    departement: this.selectedCourse.departement,
+    formation: this.selectedCourse.filiere,
+    niveau: this.selectedCourse.niveau,
+    modeFormation: this.selectedCourse.modeFormation,
+  };
 
-      // --- Étape 1 : Vérifier si une photo a été sélectionnée ---
-      if (this.photoFile) {
-        const formData = new FormData();
-        formData.append('file', this.photoFile!);
+  console.log('Données à envoyer:', data);
 
-        // --- Étape 2 : Upload de la photo ---
-        this.etudiantService.uploadPhoto(formData).subscribe({
-          next: (response: any) => {
-            console.log('Photo uploadée avec succès:', response);
-
-            // Corriger le chemin pour qu'il soit accessible depuis le navigateur
-            const relativeUrl = response.file.url.replace('public/', '');
-            etudiantData.photoEtudiant = `http://localhost:5000/${relativeUrl}`;
-
-            // --- Étape 3 : Créer l'étudiant avec la photo ---
-            this.etudiantService.creerEtudiant(etudiantData).subscribe({
-              next: (response: any) => {
-                console.log('Réponse complète du serveur:', response);
-
-                const etudiantId = response.etudiant?._id;
-                if (etudiantId) {
-                  this.showMessage(response.message || 'Inscription réussie !', 'success', 5000);
-                  console.log('Navigation vers validation avec ID:', etudiantId);
-                  this.router.navigate(['/validation', etudiantId]);
-                } else {
-                  console.error('ID étudiant manquant dans la réponse:', response);
-                  this.showMessage(
-                    "Erreur : Impossible de récupérer l'ID de l'étudiant",
-                    'error',
-                    5000
-                  );
-                }
-              },
-              error: (error) => {
-                console.error("Erreur lors de l'inscription:", error);
-                const msg = error.error?.message || 'Veuillez vérifier vos informations';
-                this.showMessage(msg, 'error', 5000);
-              },
-            });
-          },
-          error: (error) => {
-            console.error('Erreur upload photo:', error);
-            this.showMessage("Erreur lors de l'upload de la photo", 'error', 5000);
-          },
-        });
-      } else {
-        // --- Si aucune photo n'est sélectionnée ---
-        this.etudiantService.creerEtudiant(etudiantData).subscribe({
-          next: (response: any) => {
-            console.log('Réponse complète du serveur:', response);
-
-            const etudiantId = response.etudiant?._id;
-            if (etudiantId) {
-              this.showMessage(response.message || 'Inscription réussie !', 'success', 5000);
-              console.log('Navigation vers validation avec ID:', etudiantId);
-              this.router.navigate(['/validation', etudiantId]);
-            } else {
-              console.error('ID étudiant manquant dans la réponse:', response);
-              this.showMessage(
-                "Erreur : Impossible de récupérer l'ID de l'étudiant",
-                'error',
-                5000
-              );
-            }
-          },
-          error: (error) => {
-            console.error("Erreur lors de l'inscription:", error);
-            const msg = error.error?.message || 'Veuillez vérifier vos informations';
-            this.showMessage(msg, 'error', 5000);
-          },
-        });
-      }
-    } else {
-      // --- Si le formulaire n'est pas valide ---
-      console.log('Formulaire invalide');
-      this.markFormGroupTouched(this.etudiantForm);
-      this.markFormGroupTouched(this.formationForm);
-      this.showMessage(
-        'Veuillez remplir correctement tous les champs du formulaire.',
-        'error',
-        5000
-      );
-    }
+  // Si aucune photo ni document sélectionné, on crée directement l'étudiant
+  if (!this.photoFile && Object.keys(this.selectedDocs).length === 0) {
+    this.creerEtudiant(data);
+    return;
   }
 
-  private markFormGroupTouched(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach((key) => {
-      const control = formGroup.get(key);
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      } else {
-        control?.markAsTouched();
+  const formData = new FormData();
+
+  // Ajouter la photo
+  if (this.photoFile) {
+    formData.append('photoEtudiant', this.photoFile);
+  }
+
+  // Ajouter les documents
+  Object.keys(this.selectedDocs).forEach((key) => {
+    formData.append('documents', this.selectedDocs[key]);
+  });
+
+  // ⚡ Utilisation de uploadFiles et typage explicite
+  this.etudiantService.uploadFiles(formData).subscribe({
+    next: (res: { photo?: any; documents?: any[] }) => {
+      console.log('Fichiers uploadés:', res);
+
+      // Ajouter la photo
+      if (res.photo?.url) {
+        data.photoEtudiant = `http://localhost:5000${res.photo.url}`;
       }
+
+      // Ajouter les documents
+      if (res.documents?.length) {
+        data.documents = res.documents.map((d: any) => ({          
+          filename: d.url.split("uploads/")[1],
+          originalName: d.nom,
+          path: d.path,
+          url: `http://localhost:5000${d.url}`,
+          taille: d.taille,
+          type: d.type,
+        }));
+      }
+      console.log("Inscrirption - data :", data);
+      
+
+      this.creerEtudiant(data);
+    },
+    error: (err: any) => {
+      console.error('Erreur upload:', err);
+      this.creerEtudiant(data);
+    },
+  });
+}
+
+
+  private creerEtudiant(data: any): void {
+    this.etudiantService.creerEtudiant(data).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        console.log('Inscription réussie:', res);
+        this.showMessage(res.message || 'Inscription réussie!', 'success');
+
+        const id = res.etudiant?._id;
+        if (id) {
+          setTimeout(() => this.router.navigate(['/validation', id]), 2000);
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Erreur inscription:', err);
+        this.showMessage(err.error?.message || "Erreur lors de l'inscription", 'error');
+      },
     });
   }
 
-  showMessage(msg: string, type: 'success' | 'error', duration = 3000) {
-    if (type === 'success') {
-      this.successMessage = msg;
-      setTimeout(() => (this.successMessage = ''), duration);
-    } else {
-      this.errorMessage = msg;
-      setTimeout(() => (this.errorMessage = ''), duration);
-    }
+  private markFormGroupTouched(fg: FormGroup): void {
+    Object.keys(fg.controls).forEach((key) => {
+      const ctrl = fg.get(key);
+      ctrl?.markAsTouched();
+      if (ctrl instanceof FormGroup) this.markFormGroupTouched(ctrl);
+    });
   }
 
-  onDocumentChange(document: string, event: any): void {
-    const documents = this.formationForm.get('documents')?.value || [];
-    if (event.target.checked) {
-      documents.push(document);
+  showMessage(msg: string, type: 'success' | 'error', duration = 5000): void {
+    if (type === 'success') {
+      this.successMessage = msg;
+      this.errorMessage = '';
     } else {
-      const index = documents.indexOf(document);
-      if (index > -1) {
-        documents.splice(index, 1);
-      }
+      this.errorMessage = msg;
+      this.successMessage = '';
     }
-    this.formationForm.patchValue({ documents });
+    setTimeout(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }, duration);
   }
 }

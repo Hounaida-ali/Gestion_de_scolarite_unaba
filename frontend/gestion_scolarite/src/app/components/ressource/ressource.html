@@ -47,14 +47,14 @@
         </select>
       </div>
 
-      <div class="filter-group">
+      <!-- <div class="filter-group">
         <label for="matiereFilter">Matière</label>
         <select id="matiereFilter" [(ngModel)]="matiereFilter" (change)="onFilterChange()">
           <option *ngFor="let matiere of matieres" [value]="matiere.value">
             {{ matiere.label }}
           </option>
         </select>
-      </div>
+      </div> -->
 
       <div class="filter-group" style="margin-left: auto">
         <button (click)="newRessource()" class="add-btn">
@@ -73,7 +73,7 @@
             <th>Description</th>
             <th>Niveau</th>
             <th>Matière</th>
-            <th>Auteur</th>
+            <!-- <th>Auteur</th> -->
             <th>Date publication</th>
             <th>Taille</th>
             <th>Télécharger</th>
@@ -87,7 +87,7 @@
             <td>{{ ressource.description }}</td>
             <td>{{ getNiveauLabel(ressource.niveau) }}</td>
             <td>{{ getMatiereLabel(ressource.matiere) }}</td>
-            <td>{{ressource.auteur.prenom}} {{ressource.auteur.nom}}</td>
+            <!-- <td>{{ressource.auteur.prenom}} {{ressource.auteur.nom}}</td> -->
             <td>{{ ressource.datePublication | date : 'dd/MM/yyyy' }}</td>
             <td>{{ formatFileSize(ressource.fichier.taille) }}</td>
             <td class="telechargerRessource">
@@ -172,8 +172,6 @@
           <option value="licence1">Licence 1</option>
           <option value="licence2">Licence 2</option>
           <option value="licence3">Licence 3</option>
-          <option value="master1">Master 1</option>
-          <option value="master2">Master 2</option>
         </select>
       </div>
 

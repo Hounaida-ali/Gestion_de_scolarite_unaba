@@ -29,20 +29,20 @@
 
       <!-- Message d'information -->
       <div class="alert alert-info" *ngIf="etudiant?.statut === 'en-attente'">
-        <p><strong>Votre demande d'inscription a été soumise avec succès.</strong></p>
+        <p><strong>Votre demande de préinscription a été soumise avec succès.</strong></p>
         <p>Elle est en cours de validation par l'administration universitaire.</p>
-        <p>Vous recevrez un email de confirmation une fois votre inscription validée.</p>
+        <p>Vous recevrez un email de confirmation une fois votre préinscription validée.</p>
       </div>
 
       <!-- Message de validation réussie -->
       <div class="alert alert-success" *ngIf="etudiant?.statut === 'valide'">
-        <p><strong>Félicitations ! Votre inscription a été validée.</strong></p>
+        <p><strong>Félicitations ! Votre préinscription a été validée.</strong></p>
         <p>Vous pouvez maintenant procéder au paiement des frais d'inscription.</p>
       </div>
 
       <!-- Récapitulatif de l'inscription -->
       <div class="confirmation-details" *ngIf="etudiant">
-        <h3>Récapitulatif de votre inscription</h3>
+        <h3>Récapitulatif de votre préinscription </h3>
 
         <div class="detail-row">
           <div class="detail-label">ID Provisoire:</div>
@@ -68,20 +68,19 @@
 
         <div class="detail-row">
           <div class="detail-label">Département:</div>
-          <div class="detail-value">{{ getDepartementLabel(etudiant.departement) }}</div>
+          <div class="detail-value">{{ nomDepartement }}</div>
         </div>
 
         <div class="detail-row">
           <div class="detail-label">Formation:</div>
           <div class="detail-value">
-            {{ getFormationLabel(etudiant.formation) }} -
-            {{ getModeFormationLabel(etudiant.modeFormation) }}
+                {{ nomFormation }} - {{ getModeFormationLabel(etudiant.modeFormation) }}
           </div>
         </div>
 
         <div class="detail-row">
           <div class="detail-label">Niveau d'études:</div>
-          <div class="detail-value">{{ getNiveauEtudesLabel(etudiant.niveauEtudes) }}</div>
+          <div class="detail-value">{{etudiant.niveau}}</div>
         </div>
 
         <div class="detail-row">
@@ -91,7 +90,7 @@
               >Aucun document sélectionné</span
             >
             <ul *ngIf="etudiant.documents && etudiant.documents.length > 0" class="documents-list">
-              <li *ngFor="let doc of etudiant.documents">{{ getDocumentLabel(doc) }}</li>
+              <li *ngFor="let doc of etudiant.documents">{{ getDocumentLabel(doc.originalName) }}</li>
             </ul>
           </div>
         </div>
@@ -112,10 +111,10 @@
           </div>
         </div>
 
-        <div class="detail-row" *ngIf="etudiant.statut === 'valide'">
+        <!-- <div class="detail-row" *ngIf="etudiant.statut === 'valide'">
           <div class="detail-label">Frais d'inscription:</div>
-          <div class="detail-value">{{ etudiant.fraisInscription || 450 }} €</div>
-        </div>
+          <div class="detail-value">{{ etudiant.fraisInscription || 450 }} FCFA</div>
+        </div> -->
       </div>
 
       <!-- Chargement -->
@@ -129,24 +128,24 @@
         <button type="button" class="btn btn-secondary" routerLink="/">← Retour à l'accueil</button>
 
         <!-- Bouton pour l'administration (simulation) -->
-        <button
+        <!-- <button
           *ngIf="etudiant?.statut === 'en-attente'"
           type="button"
           class="btn btn-primary"
           (click)="simulerValidation()"
         >
           Simuler la validation administrative
-        </button>
+        </button> -->
 
         <!-- Bouton pour passer au paiement -->
-        <button
-          *ngIf="etudiant?.statut === 'valide'"
+        <!-- <button
+          *ngIf="etudiant?.statut === 'en-attente'"
           type="button"
           class="btn btn-success"
           (click)="naviguerVersPaiement()"
         >
           Procéder au paiement →
-        </button>
+        </button> -->
       </div>
     </div>
   </div>

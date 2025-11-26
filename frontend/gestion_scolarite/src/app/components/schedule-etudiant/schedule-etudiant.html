@@ -6,12 +6,15 @@
         <i class="fa-solid fa-rotate-right"></i> Actualiser
       </button>
     </div>
+    <!-- 🔹 Filtres de recherche -->
     <div class="filters">
       <div class="filter-group">
         <label>Département :</label>
         <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
-          <option value="">Tout les departement</option>
-          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+          <option value="">Sélectionnez un département</option>
+          <option *ngFor="let dep of departements" [value]="dep._id">
+            {{ dep.nom }}
+          </option>
         </select>
       </div>
 
@@ -22,20 +25,20 @@
           (change)="onFiliereChange()"
           [disabled]="!departementFilter"
         >
-          <option value="">Toutes les filières</option>
-          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+          <option value="">Sélectionnez une formation</option>
+          <option *ngFor="let f of filteredFilieres" [value]="f._id">
+            {{ f.nom }}
+          </option>
         </select>
       </div>
 
       <div class="filter-group">
         <label>Niveau :</label>
         <select [(ngModel)]="niveauFilter" (change)="filterSlots()" [disabled]="!filiereFilter">
-          <option value="">Tout les niveaux</option>
+          <option value="">Tous</option>
           <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
         </select>
       </div>
-
-      <!-- <button class="add-btn" (click)="openModal()">Ajouter un cours</button> -->
     </div>
 
     <table class="timetable">
@@ -66,7 +69,7 @@
               >
                 <strong>{{ slot.title }}</strong
                 ><br />
-                {{ slot.teacher }} - {{ slot.room }}
+                {{ slot.teacher.nom }} {{ slot.teacher.prenom }}
               </div>
             </ng-container>
           </td>

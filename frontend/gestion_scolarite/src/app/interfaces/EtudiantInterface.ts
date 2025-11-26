@@ -1,3 +1,13 @@
+export interface UploadedFile {
+  filename: string;
+  originalName: string;
+  path: string;
+  url: string;
+  uploadDate?: string;
+  taille?: number;
+  type?: string;
+}
+
 export interface Etudiant {
   _id?: string;
   idProvisoire?: string;
@@ -9,24 +19,22 @@ export interface Etudiant {
   adresse: string;
   ville: string;
   codePostal: string;
-  niveauEtudes: string;
-  departement:'économie'| 'droit'| 'gestion';
+  departement: string;
   formation: string;
+  niveau?: string;
   modeFormation: 'presentiel' | 'en-ligne';
-  documents?: string[];
-  photoEtudiant?: string; // Nouveau champ pour la photo
-  statut?: 'en-attente' | 'valide' | 'rejete' | 'paye' | 'confirme';
+  
+  // Documents multiples
+  documents?: UploadedFile[];
+  
+  // Photo étudiant
+  photoEtudiant?: string; // URL directe de la photo
+  photo?: UploadedFile;   // Détails complets du fichier
+  
+  statut?: 'en-attente' | 'valide' | 'rejete' | 'paye' | 'confirme' | 'PXE';
   fraisInscription?: number;
   dateInscription?: string;
   numeroEtudiant?: string;
-
-   photo?: {
-    filename: string;
-    originalName: string;
-    path: string;
-    url: string;
-    uploadDate: string;
-  };
 }
 
 // Interface pour la réponse de création

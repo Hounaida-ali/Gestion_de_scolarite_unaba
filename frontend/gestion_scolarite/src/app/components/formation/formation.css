@@ -5,7 +5,10 @@
   gap: 2rem;
   margin-bottom: 3rem;
 }
-
+.page-description {
+  font-size: 1.2rem;
+  color: #666;
+}
 .department-card {
   background: white;
   border-radius: 10px;

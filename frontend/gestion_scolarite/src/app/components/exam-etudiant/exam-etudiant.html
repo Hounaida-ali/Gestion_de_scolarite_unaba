@@ -5,12 +5,12 @@
       <button (click)="refreshPage()" class="refresh-btn">
         <i class="fa-solid fa-rotate-right"></i> Actualiser
       </button>
-      <div class="notification-icon" (click)="toggleNotifications()">
+      <!-- <div class="notification-icon" (click)="toggleNotifications()">
         <i class="fa-solid fa-bell"></i>
         <span *ngIf="notifications.length > 0" class="badge">{{ notifications.length }}</span>
-      </div>
+      </div> -->
 
-      <div class="notification-list">
+      <!-- <div class="notification-list">
         <div
           *ngFor="let n of notifications; let i = index"
           [ngClass]="n.type"
@@ -19,14 +19,18 @@
           {{ n.text }}
           <button (click)="removeNotification(i)">×</button>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="filters">
       <div class="filter-group">
         <label>Département :</label>
         <select [(ngModel)]="departementFilter" (change)="onDepartementChange()">
-          <option value="">Tous les départements</option>
-          <option *ngFor="let d of departements" [value]="d.nom">{{ d.nom }}</option>
+          <option value="">Sélectionnez un département</option>
+          @for (dep of departements; track $index) {
+          <option [value]="dep._id">
+            {{ dep.nom }}
+          </option>
+          }
         </select>
       </div>
 
@@ -37,19 +41,25 @@
           (change)="onFiliereChange()"
           [disabled]="!departementFilter"
         >
-          <option value="">Toutes les filières</option>
-          <option *ngFor="let f of filteredFilieres" [value]="f.nom">{{ f.nom }}</option>
+          <option value="">Sélectionnez une formation</option>
+          @for (formation of formations; track $index) {
+          <option *ngFor="let f of filteredFilieres" [value]="f._id">
+            {{ f.nom }}
+          </option>
+          }
         </select>
       </div>
-
       <div class="filter-group">
         <label>Niveau :</label>
         <select [(ngModel)]="niveauFilter" (change)="filterExams()" [disabled]="!filiereFilter">
-          <option value="">Tous les niveaux</option>
-          <option *ngFor="let n of filteredNiveaux" [value]="n">{{ n }}</option>
+          <option value="">Tous</option>
+          @for (n of filteredNiveaux; track $index) {
+          <option [value]="n">{{ n }}</option>
+          }
+          <!-- <option *ngFor="let n of niveaux" [value]="n.value">{{ n.label }}</option> -->
         </select>
       </div>
-    </div>
+      </div>
 
     <table class="timetable">
       <thead>

@@ -1,21 +1,21 @@
 /* Centrer le formulaire sur la page */
-:host {
+/* :host {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: rgba(0, 0, 0, 0.4); /* overlay semi-transparent */
-}
+ */
 
 /* Boîte principale (modal-content) */
-.modal-content {
-  border-radius: 12px;           /* arrondi comme sur ton image */
+/* .modal-content {
+  border-radius: 12px;          
   border: none;
-  max-width: 400px;              /* largeur max */
+  max-width: 400px;              
   width: 100%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* ombre douce */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); 
   background: #fff;
-}
+} */
 
 /* Header */
 .modal-header {

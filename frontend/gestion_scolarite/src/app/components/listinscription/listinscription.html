@@ -1,0 +1,170 @@
+<div class="container">
+  <div class="header">
+    <h1>Liste des Inscriptions</h1>
+    <p>Gestion des inscriptions des étudiants</p>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filtres-section">
+    <div class="filtres-row">
+      <div class="filtre-group">
+        <label for="recherche">Recherche:</label>
+        <input
+          type="text"
+          id="recherche"
+          [(ngModel)]="filtreRecherche"
+          (input)="onFiltreChange()"
+          placeholder="Nom, prénom, email..."
+          class="form-control"
+        />
+      </div>
+
+      <div class="filtre-group">
+        <label for="statut">Statut:</label>
+        <select
+          id="statut"
+          [(ngModel)]="filtreStatut"
+          (change)="onFiltreChange()"
+          class="form-control"
+        >
+          <option value="tous">Tous les statuts</option>
+          <option value="en-attente">En attente</option>
+          <option value="valide">Validé</option>
+          <option value="paye">Payé</option>
+          <option value="confirme">Confirmé</option>
+          <option value="rejete">Rejeté</option>
+        </select>
+      </div>
+
+      <div class="filtre-group">
+        <label for="departement">Département:</label>
+        <select
+          id="departement"
+          [(ngModel)]="filtreDepartement"
+          (change)="onFiltreChange()"
+          class="form-control"
+        >
+          <option value="">Sélectionnez un département</option>
+          <option *ngFor="let dep of departements" [value]="dep._id">
+            {{ dep.nom }}
+        </select>
+      </div>
+
+      <!-- <div class="filtre-group">
+        <button class="btn btn-export" (click)="exporterCSV()">Exporter CSV</button>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="table-container">
+    <div *ngIf="chargement" class="chargement">
+      <p>Chargement des inscriptions...</p>
+    </div>
+
+    <div *ngIf="erreur" class="erreur">
+      {{ erreur }}
+    </div>
+
+    <div *ngIf="!chargement && !erreur">
+      <div class="table-info">
+        <p>{{ etudiantsFiltres.length }} inscription(s) trouvée(s)</p>
+      </div>
+      <div class="scroll-wrapper">
+        <table class="table-inscriptions">
+          <thead>
+            <tr>
+              <th>ID Provisoire</th>
+              <th>Nom complet</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Département</th>
+              <th>Formation</th>
+              <th>Niveau</th>
+              <th>Documents</th>
+              <th>Statut</th>
+              <th>Date inscription</th>
+              <th>Actions</th>
+              <th>Valider</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let etudiant of etudiantsFiltres" class="ligne-etudiant">
+              <td class="id-provisoire">{{ etudiant.idProvisoire }}</td>
+              <td class="nom-complet">
+                <strong>{{ etudiant.nom | uppercase }} {{ etudiant.prenom | uppercase }}</strong>
+              </td>
+              <td class="email">{{ etudiant.email }}</td>
+              <td class="telephone">{{ etudiant.telephone }}</td>
+              <td class="departement">{{ getNomDepartement(etudiant.departement) }}</td>
+              <td class="formation">
+               {{ getNomFormation(etudiant.departement, etudiant.formation) }} - {{ getModeFormationLabel(etudiant.modeFormation) }}
+              </td>
+              <td class="niveau">{{ getNiveauEtudesLabel(etudiant.niveau) }}</td>
+              <td class="documents">
+                <ng-container
+                  *ngIf="etudiant.documents && etudiant.documents.length > 0; else aucunDocument"
+                >
+                  <div *ngFor="let doc of etudiant.documents">
+                    <a [href]="doc.url" target="_blank">{{ doc.originalName }}</a>
+                    <span class="file-info"
+                      >({{ doc.type || 'inconnu' }},
+                      {{
+                        doc.taille
+                          ? (doc.taille / 1024 | number : '1.0-2') + ' KB'
+                          : 'taille inconnue'
+                      }})</span
+                    >
+                  </div>
+                </ng-container>
+                <ng-template #aucunDocument>-</ng-template>
+              </td>
+              <td class="statut">
+                <span [class]="'badge ' + getStatutClass(etudiant.statut)">
+                  {{ getStatutLabel(etudiant.statut) }}
+                </span>
+              </td>
+              <td class="date">{{ formaterDate(etudiant.dateInscription) }}</td>
+              <td class="actions">
+                <button
+                  class="btn btn-details"
+                  [routerLink]="['/validation', etudiant._id]"
+                  *ngIf="etudiant._id"
+                >
+                  <i class="fa-solid fa-eye" style="color: #5a5f66"></i>
+                  Détails
+                </button>
+                <!-- Bouton de confirmation pour les étudiants payés -->
+                <button
+                  class="btn btn-confirmation"
+                  (click)="confirmerInscription(etudiant)"
+                  *ngIf="peutEtreConfirme(etudiant)"
+                  [disabled]="!etudiant._id"
+                >
+                  <i class="fa-solid fa-check" style="color: #ffffff"></i>
+                  Confirmer
+                </button>
+                <span *ngIf="!etudiant._id">-</span>
+              </td>
+              <td class="valider">
+                <button
+                  class="btn btn-success"
+                  *ngIf="etudiant.statut === 'en-attente'"
+                  (click)="validerEtudiant(etudiant)"
+                >
+                  Valider
+                </button>
+
+                <span *ngIf="etudiant.statut !== 'en-attente'"> - </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="etudiantsFiltres.length === 0" class="aucune-donnee">
+          <p>Aucune inscription trouvée avec les critères sélectionnés.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

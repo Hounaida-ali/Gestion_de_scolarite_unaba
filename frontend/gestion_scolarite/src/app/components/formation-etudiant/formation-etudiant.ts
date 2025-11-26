@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { Program } from '../program/program';
 import { RouterLink, RouterModule } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Departement } from '../../interfaces/departementInterface';
+import { Formation } from '../../interfaces/formationInterface';
 
 @Component({
   selector: 'app-formation-etudiant',
@@ -18,6 +20,7 @@ export class FormationEtudiant {
   departements: DepartementAvecFormations[] = [];
   selectedDepartement?: DepartementAvecFormations;
   selectedProgramme: any = null;
+  selectedFormation: Formation | null = null;
   modalOpen = false;
   isLoading = false;
   error: string | null = null;
@@ -30,6 +33,7 @@ export class FormationEtudiant {
 
   constructor(private fb: FormBuilder, private formationEtudiantService: FormationEtudiantService) {
     this.formationForm = this.fb.group({
+      _id: [''],
       nom: ['', Validators.required],
       departementId: ['', Validators.required],
       programmes: this.fb.array([]),
@@ -38,12 +42,6 @@ export class FormationEtudiant {
 
   ngOnInit(): void {
     this.loadData();
-
-    // Test simple pour vérifier que la route fonctionne
-    this.formationEtudiantService.getFormationsByDepartement('68e0f02daf2f0da2695fdf1d').subscribe({
-      next: (formations) => console.log('Formations reçues :', formations),
-      error: (err) => console.error('Erreur API formations :', err),
-    });
   }
 
   loadData(): void {
@@ -67,6 +65,9 @@ export class FormationEtudiant {
   }
 
   newFormation(): void {
+    this.selectedFormation = null;
+    this.formationForm.reset();
+    this.programmes.clear();
     this.showFormationForm = true;
     if (this.programmes.length === 0) {
       this.addProgramme();
@@ -207,6 +208,7 @@ export class FormationEtudiant {
         cm: [0],
         td: [0],
         totalHeures: [0, Validators.required],
+        niveau: ['', Validators.required],
       })
     );
   }
@@ -224,26 +226,230 @@ export class FormationEtudiant {
     );
   }
 
-  // ENVOI AU BACKEND
+  // ✅ MÉTHODE : Modifier une formation
+  editFormation(formation: Formation): void {
+    this.selectedFormation = formation;
+    
+    // Extraire le departementId selon le type (string ou objet Departement)
+    let departementId = '';
+    if (typeof formation.departement === 'string') {
+      departementId = formation.departement;
+    } else if (formation.departement && typeof formation.departement === 'object') {
+      departementId = formation.departement._id || '';
+    }
+    
+    // Pré-remplir le formulaire avec les données de la formation
+    this.formationForm.patchValue({
+      _id: formation._id,
+      nom: formation.nom,
+      departementId: departementId,
+    });
+
+    // Pré-remplir les programmes avec toute leur structure
+    if (formation.programmes && formation.programmes.length > 0) {
+      this.populateProgrammes(formation.programmes);
+    } else {
+      this.programmes.clear();
+      this.addProgramme();
+    }
+
+    this.showFormationForm = true;
+  }
+
+  // ✅ HELPER : Pré-remplir les programmes avec toute leur structure
+  private populateProgrammes(programmes: any[]): void {
+    this.programmes.clear();
+    
+    programmes.forEach((prog: any) => {
+      const programmeGroup = this.fb.group({
+        departement: [prog.departement || '', Validators.required],
+        code: [prog.code || '', Validators.required],
+        nom: [prog.nom || '', Validators.required],
+        description: [prog.description || ''],
+        duree: [prog.duree || ''],
+        credits: [prog.credits || ''],
+        diplome: [prog.diplome || ''],
+        acces: [prog.acces || ''],
+        niveaux: this.fb.array([]),
+      });
+
+      // Ajouter les niveaux
+      if (prog.niveaux && prog.niveaux.length > 0) {
+        const niveauxArray = programmeGroup.get('niveaux') as FormArray;
+        prog.niveaux.forEach((niveau: any) => {
+          const niveauGroup = this.fb.group({
+            code: [niveau.code || '', Validators.required],
+            nom: [niveau.nom || '', Validators.required],
+            description: [niveau.description || ''],
+            semestres: this.fb.array([]),
+          });
+
+          // Ajouter les semestres
+          if (niveau.semestres && niveau.semestres.length > 0) {
+            const semestresArray = niveauGroup.get('semestres') as FormArray;
+            niveau.semestres.forEach((semestre: any) => {
+              const semestreGroup = this.fb.group({
+                numero: [semestre.numero || '', Validators.required],
+                nom: [semestre.nom || '', Validators.required],
+                ues: this.fb.array([]),
+              });
+
+              // Ajouter les UEs
+              if (semestre.ues && semestre.ues.length > 0) {
+                const uesArray = semestreGroup.get('ues') as FormArray;
+                semestre.ues.forEach((ue: any) => {
+                  const ueGroup = this.fb.group({
+                    nom: [ue.nom || '', Validators.required],
+                    totalCredits: [ue.totalCredits || '', Validators.required],
+                    modules: this.fb.array([]),
+                  });
+
+                  // Ajouter les modules
+                  if (ue.modules && ue.modules.length > 0) {
+                    const modulesArray = ueGroup.get('modules') as FormArray;
+                    ue.modules.forEach((module: any) => {
+                      const moduleGroup = this.fb.group({
+                        nom: [module.nom || '', Validators.required],
+                        cours: this.fb.array([]),
+                      });
+
+                      // Ajouter les cours
+                      if (module.cours && module.cours.length > 0) {
+                        const coursArray = moduleGroup.get('cours') as FormArray;
+                        module.cours.forEach((cours: any) => {
+                          const coursGroup = this.fb.group({
+                            nom: [cours.nom || '', Validators.required],
+                            code: [cours.code || '', Validators.required],
+                            coefficient: [cours.coefficient || 0, Validators.required],
+                            credits: [cours.credits || 0, Validators.required],
+                            cm: [cours.cm || 0],
+                            td: [cours.td || 0],
+                            totalHeures: [cours.totalHeures || 0, Validators.required],
+                            niveau: [cours.niveau || '', Validators.required],
+                          });
+                          coursArray.push(coursGroup);
+                        });
+                      }
+
+                      modulesArray.push(moduleGroup);
+                    });
+                  }
+
+                  uesArray.push(ueGroup);
+                });
+              }
+
+              semestresArray.push(semestreGroup);
+            });
+          }
+
+          niveauxArray.push(niveauGroup);
+        });
+      }
+
+      this.programmes.push(programmeGroup);
+    });
+  }
+
+  // ✅ MÉTHODE : Enregistrer (création ou mise à jour)
   saveFormation() {
     if (this.formationForm.invalid) {
-      this.errorMessage = 'Veuillez remplir tous les champs requis.';
+      this.showMessage('Veuillez remplir tous les champs requis.', 'error');
       return;
     }
 
-    this.formationEtudiantService.createFormation(this.formationForm.value).subscribe({
-      next: (res) => {
-        this.successMessage = 'Formation enregistrée avec succès !';
-        this.showFormationForm = false;
-        this.formationForm.reset();
-        this.programmes.clear();
-        this.loadData();
+    const formData = this.formationForm.value;
+    const isUpdate = !!formData._id;
+
+    if (isUpdate) {
+      // MISE À JOUR
+      this.formationEtudiantService.updateFormation(formData._id, formData).subscribe({
+        next: (res: any) => {
+          const message = res?.message ?? 'Formation mise à jour avec succès !';
+          
+          this.showFormationForm = false;
+          this.formationForm.reset();
+          this.programmes.clear();
+          this.selectedFormation = null;
+          
+          this.showMessage(message, 'success');
+          this.loadData();
+        },
+        error: (err: any) => {
+          const message = err?.error?.message ?? 'Erreur lors de la mise à jour';
+          this.showMessage(message, 'error');
+          console.error('Erreur Backend :', err);
+        }
+      });
+    } else {
+      // CRÉATION
+      this.formationEtudiantService.createFormation(formData).subscribe({
+        next: (res: any) => {
+          const message = res?.message ?? 'Formation enregistrée avec succès !';
+          
+          this.showFormationForm = false;
+          this.formationForm.reset();
+          this.programmes.clear();
+          
+          this.showMessage(message, 'success');
+          this.loadData();
+        },
+        error: (err: any) => {
+          const message = err?.error?.message ?? "Erreur lors de l'enregistrement";
+          this.showMessage(message, 'error');
+          console.error('Erreur Backend :', err);
+        }
+      });
+    }
+  }
+
+  // ✅ MÉTHODE : Supprimer une formation
+  deleteFormation(formation: Formation, departementId: string): void {
+    if (!formation._id) return;
+    
+    if (!confirm(`Voulez-vous vraiment supprimer la formation "${formation.nom}" ?`)) return;
+
+    this.formationEtudiantService.deleteFormation(formation._id).subscribe({
+      next: (res: any) => {
+        const success = res.success !== false;
+        const message = res?.message ?? 'Formation supprimée avec succès';
+        
+        this.showMessage(message, success ? 'success' : 'error');
+        
+        if (success) {
+          const dept = this.departements.find(d => d._id === departementId);
+          if (dept) {
+            dept.formations = dept.formations.filter(f => f._id !== formation._id);
+          }
+        }
       },
-      error: (err) => {
-        this.errorMessage = "Erreur lors de l'enregistrement de la formation.";
-        console.error(err);
+      error: (err: any) => {
+        const message = err?.error?.message ?? 'Erreur lors de la suppression';
+        this.showMessage(message, 'error');
+        console.error('Erreur suppression :', err);
       },
     });
+  }
+
+  // ✅ MÉTHODE : Annuler le formulaire
+  cancelForm(): void {
+    this.showFormationForm = false;
+    this.formationForm.reset();
+    this.programmes.clear();
+    this.selectedFormation = null;
+  }
+
+  // ✅ MÉTHODE : Afficher les messages
+  showMessage(message: string, type: 'success' | 'error'): void {
+    if (type === 'success') {
+      this.successMessage = message;
+      this.errorMessage = null;
+      setTimeout(() => (this.successMessage = null), 3000);
+    } else {
+      this.errorMessage = message;
+      this.successMessage = null;
+      setTimeout(() => (this.errorMessage = null), 3000);
+    }
   }
 
   getDepartmentClass(code: string): string {
@@ -255,38 +461,27 @@ export class FormationEtudiant {
     return classes[code] || 'eco-header';
   }
 
-  openProgrammeModal(departement: string, code: string): void {
-    this.formationEtudiantService.getProgramme(departement, code).subscribe({
+  openProgrammeModal(departementId: string, code: string): void {
+    if (!departementId) return;
+
+    this.formationEtudiantService.getProgramme(departementId, code).subscribe({
       next: (programme) => {
         this.selectedProgramme = programme;
         this.modalOpen = true;
       },
-      error: () => {
+      error: (error) => {
         this.error = 'Erreur lors du chargement du programme';
       },
     });
   }
 
+  getDepartementId(departement: string | Departement): string {
+    if (typeof departement === 'string') return departement;
+    return departement._id ?? '';
+  }
+
   closeModal(): void {
     this.modalOpen = false;
     this.selectedProgramme = null;
-  }
-
-  editFormation(departement: DepartementAvecFormations) {
-    console.log('Modifier', departement);
-    this.selectedDepartement = departement; // Formulaire pré-rempli si nécessaire
-    this.showFormationForm = true;
-  }
-
-  // Méthode pour supprimer un département
-  deleteFormation(id: string) {
-    if (confirm('Voulez-vous vraiment supprimer ce département ?')) {
-      this.formationEtudiantService.deleteFormation(id).subscribe({
-        next: () => {
-          this.loadData(); // Recharge la liste après suppression
-        },
-        error: (err: any) => console.error(err),
-      });
-    }
   }
 }

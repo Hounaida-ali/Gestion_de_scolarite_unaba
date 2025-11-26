@@ -1,105 +1,134 @@
 <section id="contact" class="page-section">
-    <div class="container">
-        <h2 class="section-title">Contactez-Nous</h2>
-        <p class="section-subtitle">Nous sommes à votre disposition pour toute question ou information</p>
-        <div class="contact-container">
-            <div class="contact-info">
-                <h5>Informations de Contact</h5>
-                <ul class="contact-details">
-                    <li>
-                        <i>📍</i>
-                        <div>
-                            <strong>Adresse</strong><br>
-                            Université Adam Barka d'Abéché<br>
-                            Département de Science Économique<br>
-                            BP: 1234 Abéché, Tchad
-                        </div>
-                    </li>
-                    <li>
-                        <i>📞</i>
-                        <div>
-                            <strong>Téléphone</strong><br>
-                            +235 XX XX XX XX<br>
-                            +235 XX XX XX XX
-                        </div>
-                    </li>
-                    <li>
-                        <i>✉️</i>
-                        <div>
-                            <strong>Email</strong><br>
-                            eco@univ-adam-barka.td<br>
-                            info.eco@univ-adam-barka.td
-                        </div>
-                    </li>
-                    <li>
-                        <i>🕒</i>
-                        <div>
-                            <strong>Heures d'ouverture</strong><br>
-                            Lundi - Vendredi: 8h - 17h<br>
-                            Samedi: 9h - 13h
-                        </div>
-                    </li>
-                </ul>
+  <div class="container">
+    <h2 class="section-title">Contactez-Nous</h2>
+    <p class="section-subtitle">
+      Nous sommes à votre disposition pour toute question ou information
+    </p>
+    <div class="contact-container">
+      <div class="contact-info">
+        <h5>Informations de Contact</h5>
+        <ul class="contact-details">
+          <li>
+            <i><i class="fa-solid fa-location-dot" style="color: #ff4d4d"></i> </i>
+            <div>
+              <strong>Adresse</strong><br />
+              Université Adam Barka d'Abéché<br />
+              Département de Science Économique<br />
+              BP: 1173  Abéché, Tchad
+            </div>
+          </li>
+          <li>
+            <i><i class="fa-solid fa-phone" style="color: black"></i></i>
+            <div>
+              <strong>Téléphone</strong><br />
+              +235 62 46 83 44<br />
+            </div>
+          </li>
+          <li>
+            <i><i class="fa-solid fa-envelope" style="color: #79b8f7"></i> </i>
+            <div>
+              <strong>Email</strong><br />
+              hounaidaalibilal057@gmail.com <br />
+            </div>
+          </li>
+          <li>
+            <i><i class="fa-regular fa-clock" style="color: #4bc0c4"></i> </i>
+            <div>
+              <strong>Heures d'ouverture</strong><br />
+              Lundi - Vendredi: 8h - 17h<br />
+              Samedi: 9h - 13h
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="contact-form">
+        <h5>Envoyez-nous un message</h5>
+        <div class="modal-body">
+          <!-- Messages globaux -->
+          <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success mt-3" role="alert">
+            {{ successMessage }}
+          </div>
+          <!-- Formulaire -->
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" id="contactForm">
+            <!-- Nom -->
+            <div class="mb-3">
+              <label class="form-label">Nom complet</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="lastName"
+                placeholder="Votre nom"
+              />
+              <div
+                *ngIf="
+                  contactForm.controls['lastName'].touched &&
+                  contactForm.controls['lastName'].invalid
+                "
+                class="text-danger mt-1"
+              >
+                Nom invalide
+              </div>
             </div>
 
-            <div class="contact-form">
-                <h5>Envoyez-nous un message</h5>
-                <div class="modal-body">    
-                    <!-- Messages globaux -->
-                    <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
-                        {{ errorMessage }}
-                    </div>
-                    <div *ngIf="successMessage" class="alert alert-success mt-3" role="alert">
-                        {{ successMessage }}
-                    </div>
-                    <!-- Formulaire -->
-                    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" id="contactForm">
-
-                        <!-- Nom -->
-                        <div class="mb-3">
-                            <label class="form-label">Nom complet</label>
-                            <input type="text" class="form-control" formControlName="lastName"
-                                placeholder="Votre nom" />
-                            <div *ngIf="contactForm.controls['lastName'].touched && contactForm.controls['lastName'].invalid"
-                                class="text-danger mt-1">
-                                Nom invalide
-                            </div>
-                        </div>
-
-                        <!-- Email -->
-                        <div class="mb-3">
-                            <label class="form-label">Adresse email</label>
-                            <input type="email" class="form-control" formControlName="email"
-                                placeholder="Votre email" />
-                            <div *ngIf="contactForm.controls['email'].touched && contactForm.controls['email'].hasError('required')"
-                                class="text-danger mt-1">
-                                L'email est obligatoire
-                            </div>
-                            <div *ngIf="contactForm.controls['email'].touched && contactForm.controls['email'].hasError('email')"
-                                class="text-danger mt-1">
-                                Email invalide
-                            </div>
-                        </div>
-
-                        <!-- Message -->
-                        <div class="mb-3">
-                            <label class="form-label">Message</label>
-                            <textarea class="form-control" formControlName="message"
-                                placeholder="Votre message"></textarea>
-                            <div *ngIf="contactForm.controls['message'].touched && contactForm.controls['message'].invalid"
-                                class="text-danger mt-1">
-                                Message invalide (minimum 10 caractères)
-                            </div>
-                        </div>
-                        <!-- Bouton -->
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary" [disabled]="contactForm.invalid">
-                                Envoyer le message
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label">Adresse email</label>
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+                placeholder="Votre email"
+              />
+              <div
+                *ngIf="
+                  contactForm.controls['email'].touched &&
+                  contactForm.controls['email'].hasError('required')
+                "
+                class="text-danger mt-1"
+              >
+                L'email est obligatoire
+              </div>
+              <div
+                *ngIf="
+                  contactForm.controls['email'].touched &&
+                  contactForm.controls['email'].hasError('email')
+                "
+                class="text-danger mt-1"
+              >
+                Email invalide
+              </div>
             </div>
+
+            <!-- Message -->
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea
+                class="form-control"
+                formControlName="message"
+                placeholder="Votre message"
+              ></textarea>
+              <div
+                *ngIf="
+                  contactForm.controls['message'].touched && contactForm.controls['message'].invalid
+                "
+                class="text-danger mt-1"
+              >
+                Message invalide (minimum 10 caractères)
+              </div>
+            </div>
+            <!-- Bouton -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary" [disabled]="contactForm.invalid">
+                Envoyer le message
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </section>

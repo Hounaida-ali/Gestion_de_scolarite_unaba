@@ -35,12 +35,12 @@
         </select>
       </div>
       
-      <div class="filter-group">
+      <!-- <div class="filter-group">
         <label for="matiereFilter">Matière</label>
         <select id="matiereFilter" [(ngModel)]="matiereFilter" (change)="onFilterChange()">
           <option *ngFor="let matiere of matieres" [value]="matiere.value">{{matiere.label}}</option>
         </select>
-      </div>
+      </div> -->
     </div>
     
     <!-- Grille des ressources -->
@@ -58,7 +58,7 @@
             <span><i class="fas fa-book"></i> {{getMatiereLabel(ressource.matiere)}}</span>
           </div>
           <div class="resource-meta">
-            <span><i class="fas fa-user"></i> {{ressource.auteur.prenom}} {{ressource.auteur.nom}}</span>
+            <!-- <span><i class="fas fa-user"></i> {{ressource.auteur.prenom}} {{ressource.auteur.nom}}</span> -->
             <span><i class="fas fa-calendar"></i> {{ressource.datePublication | date:'dd/MM/yyyy'}}</span>
           </div>
         </div>

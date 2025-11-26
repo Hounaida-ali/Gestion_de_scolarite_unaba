@@ -68,6 +68,8 @@
   color: #444;
   font-size: 0.95rem;
   flex-grow: 1;
+   text-align: left;         
+  flex-grow: 1;   
 }
 
 /* FOOTER : label + action côte à côte */

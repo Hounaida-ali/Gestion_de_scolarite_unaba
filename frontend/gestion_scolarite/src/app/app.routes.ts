@@ -3,7 +3,6 @@ import { LayoutPublic } from './components/layouts/layout-public/layout-public';
 import { LayoutAdmin } from './components/layouts/layout-admin/layout-admin';
 import { LayoutEtudiant } from './components/layouts/layout-etudiant/layout-etudiant';
 import { LayoutEnseignant } from './components/layouts/layout-enseignant/layout-enseignant';
-
 import { Acceuil } from './components/acceuil/acceuil';
 import { Registre } from './components/registre/registre';
 import { Login } from './components/login/login';
@@ -22,7 +21,6 @@ import { Schedule } from './components/schedule/schedule';
 import { Exam } from './components/exam/exam';
 import { Note } from './components/note/note';
 import { ExamEtudiant } from './components/exam-etudiant/exam-etudiant';
-import { ScheduleEtudiant } from './components/schedule-etudiant/schedule-etudiant';
 import { NoteEtudiant } from './components/note-etudiant/note-etudiant';
 import { DashboardAdmin } from './components/dashboard-admin/dashboard-admin';
 import { CalendarEtudiant } from './components/calendar-etudiant/calendar-etudiant';
@@ -41,6 +39,15 @@ import { Inscription } from './components/inscription/inscription';
 import { Validation } from './components/validation/validation';
 import { Paiement } from './components/paiement/paiement';
 import { Confirmation } from './components/confirmation/confirmation';
+import { Listinscription } from './components/listinscription/listinscription';
+import { Listeinscription } from './components/listeinscription/listeinscription';
+import { enseignant } from './components/enseignant/enseignant';
+import { ProfilEnseignent } from './components/profil-enseignent/profil-enseignent';
+import { ScheduleEtudiantService } from './services/schedule-etudiant-service';
+import { Faculte, FaculteComponent } from './components/faculte/faculte';
+import { Utilisateur } from './components/utilisateur/utilisateur';
+import { ScheduleEtudiant } from './components/schedule-etudiant/schedule-etudiant';
+import { Cours } from './components/cours/cours';
 
 export const routes: Routes = [
   {
@@ -64,12 +71,15 @@ export const routes: Routes = [
       { path: 'validation/:id', component: Validation },
       { path: 'paiement/:id', component: Paiement },
       { path: 'confirmation/:id', component: Confirmation },
+      { path: 'profilenseignant', component: ProfilEnseignent },
+      { path: 'faculte', component: FaculteComponent },
     ],
   },
   {
     path: 'admindashboard',
     component: LayoutAdmin,
     children: [
+      { path: '', component: Listeinscription }, // ← Route par défaut
       { path: 'admin', component: DashboardAdmin },
       { path: 'schedule', component: Schedule },
       { path: 'exam', component: Exam },
@@ -82,16 +92,21 @@ export const routes: Routes = [
       { path: 'actualiteadmin', component: ActualiteAdmin },
       { path: 'calendar', component: Calendar },
       { path: 'ressource', component: RessourceComponent },
+      { path: 'listinscription', component: Listinscription },
+      { path: 'listeinscription', component: Listeinscription },
+      { path: 'utilisateur', component: Utilisateur },
+      { path: 'enseignant', component: enseignant },
     ],
   },
   {
     path: 'etudiantdashboard',
     component: LayoutEtudiant,
     children: [
-      { path: 'etudiant', component: DashboardEtudiant },
-      { path: 'scheduleEtudiant', component: ScheduleEtudiant },
-      { path: 'examEtudiant', component: ExamEtudiant },
+      { path: '', component: DashboardEtudiant },
       { path: 'noteEtudiant', component: NoteEtudiant },
+      { path: 'examEtudiant', component: ExamEtudiant },
+      // { path: 'scheduleEtudiant', component: ScheduleEtudiantService },
+      { path: 'scheduleEtudiant', component: ScheduleEtudiant },
       { path: 'ressourceEtudiant', component: RessourceEtudiant },
       { path: 'calendarEtudiant', component: CalendarEtudiant },
     ],
@@ -102,9 +117,12 @@ export const routes: Routes = [
     children: [
       { path: 'enseignant', component: DashboardEnseignant },
       { path: 'scheduleEtudiant', component: ScheduleEtudiant },
+      // { path: 'scheduleEtudiant', component: ScheduleEtudiantService },
       { path: 'examEtudiant', component: ExamEtudiant },
       { path: 'note', component: Note },
       { path: 'ressourceEtudiant', component: RessourceEtudiant },
+      { path: 'enseignant', component: enseignant },
+      { path: 'cours', component: Cours },
       { path: 'calendarEtudiant', component: CalendarEtudiant },
     ],
   },

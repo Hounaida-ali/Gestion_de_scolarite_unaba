@@ -1,0 +1,124 @@
+<!-- src/app/components/dashboard-enseignant/dashboard-enseignant.component.html -->
+<div class="dashboard-container" *ngIf="enseignant">
+  <!-- Sidebar -->
+    <div class="user-profile">
+      <div class="avatar">
+      </div>
+      <h2 class="user-name">{{ enseignant.prenom }} {{ enseignant.nom }}</h2>
+      <p class="user-role">{{ enseignant.grade }} - {{ enseignant.specialite }}</p>
+      <p class="user-departement">{{ enseignant.departement }}</p>
+    </div>
+    
+    
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="header">
+      <h1 class="page-title">Tableau de bord</h1>
+      <div class="date-display">
+        <i class="far fa-calendar"></i> Aujourd'hui, {{ today | date:'fullDate':'':'fr' }}
+      </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-title">Cours aujourd'hui</h3>
+          <div class="stat-number">{{ getCoursAujourdhui() }}</div>
+          <p class="stat-description">Sur {{ getSallesDifferentes() }} salle(s) différente(s)</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-title">Cours assignés</h3>
+          <div class="stat-number">{{ coursAssignes.length }}</div>
+          <p class="stat-description">Matières enseignées</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-title">Heures cette semaine</h3>
+          <div class="stat-number">{{ getHeuresSemaine() | number:'1.0-0' }}h</div>
+          <p class="stat-description">Volume horaire hebdomadaire</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Content Sections -->
+    <div class="content-sections">
+      <!-- Today's Schedule -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Emploi du temps d'aujourd'hui</h2>
+          <a href="#" class="view-all">Voir la semaine</a>
+        </div>
+        
+        <div *ngIf="emploiDuTemps.length === 0" class="empty-state">
+          <p>Aucun cours programmé pour aujourd'hui</p>
+        </div>
+        
+        <ul class="schedule-list" *ngIf="emploiDuTemps.length > 0">
+          <li class="schedule-item" *ngFor="let cours of emploiDuTemps">
+            <div class="time-badge">
+              {{ formatDate(cours.start) }} - {{ formatDate(cours.end) }}
+            </div>
+            <div class="course-info">
+              <h4>{{ cours.title }}</h4>
+              <div class="course-meta">
+                <i class="fas fa-users"></i> {{ cours.filiere }} - {{ cours.niveau }} |
+                <i class="fas fa-map-marker-alt"></i> {{ cours.room }}
+              </div>
+              <span [class]="'badge badge-' + getBadgeType(cours.group)">
+                {{ cours.group }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </section>
+      
+      <!-- Assigned Courses -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Mes cours assignés</h2>
+          <a href="#" class="view-all">Voir tous</a>
+        </div>
+        
+        <div *ngIf="coursAssignes.length === 0" class="empty-state">
+          <p>Aucun cours assigné</p>
+        </div>
+        
+        <div class="courses-grid" *ngIf="coursAssignes.length > 0">
+          <div class="course-card" *ngFor="let cours of coursAssignes">
+            <h4>{{ cours.title }}</h4>
+            <div class="course-details">
+              <span><i class="fas fa-users"></i> {{ cours.filiere }} - {{ cours.niveau }}</span>
+              <span><i class="fas fa-clock"></i> {{ getDureeCours(cours) }}h</span>
+            </div>
+            <div class="course-type">
+              <span [class]="'badge badge-' + getBadgeType(cours.group)">
+                {{ cours.group }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div *ngIf="!enseignant" class="loading-container">
+  <div class="spinner"></div>
+  <p>Chargement de vos données...</p>
+</div>

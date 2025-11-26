@@ -63,10 +63,12 @@ getDepartements(): Observable<any[]> {
 
   // Récupérer un programme spécifique
   getProgramme(departement: string, code: string): Observable<Programme> {
-    return this.http
-      .get<ApiResponse<Programme>>(`${this.apiUrl}/programmes/${departement}/${code}`)
-      .pipe(map((response) => response.data!));
-  }
+  console.log("Appel getProgramme avec :", departement, code);
+  return this.http
+    .get<ApiResponse<Programme>>(`${this.apiUrl}/programmes/${departement}/${code}`)
+    .pipe(map((response) => response.data!));
+}
+
 
   // Récupérer tous les programmes
   getAllProgrammes(): Observable<Programme[]> {

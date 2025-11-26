@@ -1,0 +1,138 @@
+<div class="container">
+  <!-- Notifications -->
+  <div *ngIf="successMessage" class="notification-float notification-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="notification-float notification-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- En-tête -->
+  <section class="page-header">
+    <h1 class="page-title">Utilisateurs</h1>
+    <p class="page-description">
+      Gestion des utilisateurs de la plateforme. Ajoutez, modifiez ou supprimez des utilisateurs et
+      gérez leurs rôles.
+    </p>
+  </section>
+
+  <!-- Tableau -->
+  <section class="resources-section">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-list"></i> Liste des utilisateurs</h2>
+      <button (click)="newUser()" class="add-btn" style="margin-left: 45%">
+        <i class="fas fa-plus"></i> Ajouter un utilisateur
+      </button>
+    </div>
+
+    <div class="table-responsive" *ngIf="!showUserForm">
+      <table class="resources-table">
+        <thead>
+          <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Email Vérifié</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.isEmailVerified ? 'Oui' : 'Non' }}</td>
+            <td class="action-buttons">
+              <button (click)="editUser(user)" class="btn-edit" title="Modifier">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button (click)="deleteUser(user)" class="btn-delete" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="users.length === 0">
+            <td colspan="7" class="no-resources">Aucun utilisateur trouvé.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Formulaire -->
+  <section *ngIf="showUserForm" class="container1">
+    <h3>{{ selectedUser._id ? 'Modifier un utilisateur' : 'Ajouter un utilisateur' }}</h3>
+
+    <form (ngSubmit)="saveUser()">
+      <!-- Prénom -->
+      <div class="form-group">
+        <label>Prénom</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedUser.firstName"
+          name="firstName"
+          required
+          placeholder="Ex: John"
+        />
+      </div>
+
+      <!-- Nom -->
+      <div class="form-group">
+        <label>Nom</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedUser.lastName"
+          name="lastName"
+          required
+          placeholder="Ex: Doe"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          [(ngModel)]="selectedUser.email"
+          name="email"
+          required
+          placeholder="Ex: john.doe@example.com"
+        />
+      </div>
+
+      <!-- Mot de passe (si ajout) -->
+      <div class="form-group" *ngIf="!selectedUser?._id">
+        <label>Mot de passe</label>
+        <input
+          type="password"
+          [(ngModel)]="selectedUser.password"
+          name="password"
+          required
+          placeholder="Mot de passe"
+        />
+      </div>
+
+      <!-- Rôle -->
+      <div class="form-group">
+        <label>Rôle</label>
+        <select [(ngModel)]="selectedUser.role" name="role" required>
+          <option value="" disabled selected>Choisir un rôle</option>
+          <option value="student">Étudiant</option>
+          <option value="teacher">Enseignant</option>
+          <option value="admin">Administrateur</option>
+        </select>
+      </div>
+
+      <div class="buttons">
+        <button type="submit" class="btn-save">
+          {{ selectedUser._id ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" (click)="resetForm()" class="btn-cancel">Annuler</button>
+      </div>
+    </form>
+  </section>
+</div>

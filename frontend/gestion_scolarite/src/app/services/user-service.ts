@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { User } from '../interfaces/userInterface';
+import { ApiResponse } from './event-service';
 
 export interface AuthResponse {
   message: string;
@@ -15,7 +16,7 @@ export interface AuthResponse {
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = 'http://localhost:5000/api/auth'
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -105,4 +106,25 @@ export class UserService {
   getEnseignants(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/users?role=enseignant`);
   }
+   getAll(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/getAll`);
+  }
+
+  getById(id: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
+  }
+
+  // 🔹 Création utilisateur avec message backend
+update(id: string, user: Partial<User>): Observable<ApiResponse<User>> {
+  return this.http.put<ApiResponse<User>>(`${this.apiUrl}/${id}`, user);
+}
+
+create(user: User): Observable<ApiResponse<User>> {
+  return this.http.post<ApiResponse<User>>(`${this.apiUrl}/register`, user);
+}
+
+delete(id: string): Observable<ApiResponse<null>> {
+  return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${id}`);
+}
+
 }

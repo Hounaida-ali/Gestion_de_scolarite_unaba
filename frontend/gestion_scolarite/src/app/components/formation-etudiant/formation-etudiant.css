@@ -18,7 +18,10 @@
   gap: 12px;
   font-weight: 600;
 }
-
+.container p {
+font-size: 1.1rem;
+  color: #666;
+}
 .section-title i {
   color: var(--accent-color);
   font-size: 1.8rem;
@@ -39,8 +42,6 @@
   background-color: #27ae60;
 }
 
-
-
 /* --- TABLEAU --- */
 .departments-table {
   width: 100%;
@@ -48,7 +49,7 @@
   background-color: #fff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   table-layout: fixed; /* ✅ rend les colonnes uniformes */
 }
 
@@ -112,7 +113,119 @@
 .btn-delete:hover {
   background: #c9302c;
 }
+/* Styles pour les boutons d'actions dans le tableau */
+.action-buttons {
+  text-align: center;
+  vertical-align: middle;
+  padding: 12px;
+}
 
+.action-buttons-wrapper {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit {
+  background: #f0ad4e; /* couleur orange */
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #ec971f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-delete {
+  background: #d9534f; /* couleur rouge */
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c9302c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Styles pour les actions dans chaque formation */
+.formation-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.btn-edit-formation,
+.btn-delete-formation {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-edit-formation {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-edit-formation:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+.btn-delete-formation {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-delete-formation:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .action-buttons-wrapper {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    width: 100%;
+    padding: 6px 10px;
+  }
+
+  .formation-actions {
+    flex-direction: column;
+  }
+
+  .btn-edit-formation,
+  .btn-delete-formation {
+    width: 100%;
+  }
+}
 /* Lignes de tableau adaptatives */
 .departments-table tr {
   height: auto; /* la hauteur s’adapte automatiquement au contenu */
@@ -325,8 +438,12 @@
 /* ========================== */
 /* Blocs dynamiques            */
 /* ========================== */
-.programme-block, .niveau-block, .semestre-block, 
-.ue-block, .module-block, .cours-block {
+.programme-block,
+.niveau-block,
+.semestre-block,
+.ue-block,
+.module-block,
+.cours-block {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
@@ -357,7 +474,6 @@
   gap: 10px;
   border: 4px solid #ffffff;
   margin-top: -10px;
-
 }
 
 /* Icône */
@@ -380,7 +496,6 @@
   background-color: #f8d7da;
   color: #721c24;
 }
-
 
 /* Indentation progressive pour lisibilité */
 .niveau-block {
@@ -408,11 +523,11 @@
   border-color: #1976d2;
 }
 
-//* ✅ Boutons Ajouter (Vert) */
+/* ✅ Boutons Ajouter (Vert) */
 /* ============================ */
 button.add-btn,
-button[type="button"].add,
-button[type="button"][ng-reflect-ng-click*="add"] {
+button[type='button'].add,
+button[type='button'][ng-reflect-ng-click*='add'] {
   background-color: #4caf50; /* Vert principal */
   color: #fff;
   border: none;
@@ -425,8 +540,8 @@ button[type="button"][ng-reflect-ng-click*="add"] {
 }
 
 button.add-btn:hover,
-button[type="button"].add:hover,
-button[type="button"][ng-reflect-ng-click*="add"]:hover {
+button[type='button'].add:hover,
+button[type='button'][ng-reflect-ng-click*='add']:hover {
   background-color: #43a047; /* Vert plus foncé */
   transform: scale(1.03);
 }
@@ -435,9 +550,9 @@ button[type="button"][ng-reflect-ng-click*="add"]:hover {
 /* ❌ Boutons Supprimer (Rouge) */
 /* ============================ */
 button.delete-btn,
-button[type="button"].delete,
-button[type="button"][ng-reflect-ng-click*="remove"],
-button[type="button"][ng-reflect-ng-click*="Supprimer"] {
+button[type='button'].delete,
+button[type='button'][ng-reflect-ng-click*='remove'],
+button[type='button'][ng-reflect-ng-click*='Supprimer'] {
   background-color: #e53935; /* Rouge principal */
   color: #fff;
   border: none;
@@ -450,15 +565,14 @@ button[type="button"][ng-reflect-ng-click*="Supprimer"] {
 }
 
 button.delete-btn:hover,
-button[type="button"].delete:hover,
-button[type="button"][ng-reflect-ng-click*="remove"]:hover,
-button[type="button"][ng-reflect-ng-click*="Supprimer"]:hover {
+button[type='button'].delete:hover,
+button[type='button'][ng-reflect-ng-click*='remove']:hover,
+button[type='button'][ng-reflect-ng-click*='Supprimer']:hover {
   background-color: #c62828; /* Rouge plus foncé */
   transform: scale(1.03);
 }
 
-
-button[type="submit"] {
+button[type='submit'] {
   background-color: #1976d2;
   color: #fff;
   border: none;
@@ -469,7 +583,7 @@ button[type="submit"] {
   margin-top: 10px;
 }
 
-button[type="submit"]:hover {
+button[type='submit']:hover {
   background-color: #1565c0;
 }
 
@@ -481,8 +595,12 @@ input::placeholder {
 }
 
 @media (max-width: 768px) {
-  .programme-block, .niveau-block, .semestre-block, 
-  .ue-block, .module-block, .cours-block {
+  .programme-block,
+  .niveau-block,
+  .semestre-block,
+  .ue-block,
+  .module-block,
+  .cours-block {
     margin-left: 10px !important;
     padding: 8px;
   }
